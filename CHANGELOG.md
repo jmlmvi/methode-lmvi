@@ -3,6 +3,15 @@
 > Semver (convention LMVI). Chaque instance note la `KIT-VERSION` copiée et resynce via ce fichier
 > (procédure : README racine, « Resync d'une instance »).
 
+## 1.4.1 — 2026-07-06
+
+**Restructuration (⚠️ cassante pour les chemins)** : le dossier `methode/` est **fusionné à plat
+dans `conception/`** (décision commanditaire — la chaîne M0→M7 EST la conception). `conception/`
+devient LE kit de conception : METHODE + templates M0→M7/US/EPIC + générateur + YAML exemple +
+prompt + TEMPLATE-RG/HABILITATIONS/TESTS. Ce CHANGELOG remonte à la **racine** du repo (il couvre
+tous les piliers). Vendoring d'instance : copier `conception/` en `_kit/` (USAGE §1 mis à jour).
+Aucun contenu supprimé ; liens internes corrigés.
+
 ## 1.4.0 — 2026-07-06
 
 Pilier **conception/** + seconde passe d'analyse. Structuration actée : 3 piliers à la racine

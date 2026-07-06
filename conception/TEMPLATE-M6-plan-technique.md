@@ -14,10 +14,9 @@ Traduire chaque phase en briques techniques + prouver la couverture.
 ## 3. Livrable (par phase)
 1. **Réutilisation plateforme** (ce qu'on NE code pas) · 2. **Briques nouvelles**
 (worker/service/stage/package) · 3. **Modèle de données** · 4. **Matrice de couverture** ·
-5. **Plan de test** (pilier conception : `conception/TEMPLATE-TESTS.md` — tagging `@US-x`/`@RG-x`,
-gate scriptée, non-régression des gates précédentes) · 6. **Mapping habilitations → IAM**
-(rôles métier → rôles/scopes `manifest.json` + mode SSO par route, §3 de
-`conception/TEMPLATE-HABILITATIONS.md`).
+5. **Plan de test** (`TEMPLATE-TESTS.md` — tagging `@US-x`/`@RG-x`, gate scriptée, non-régression
+des gates précédentes) · 6. **Mapping habilitations → IAM** (rôles métier → rôles/scopes
+`manifest.json` + mode SSO par route, §3 de `TEMPLATE-HABILITATIONS.md`).
 
 ## 4. Relations (mermaid)
 ```mermaid

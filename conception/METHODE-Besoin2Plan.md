@@ -30,12 +30,13 @@ Un épic **traverse** plusieurs briques ; une brique (ex. un moteur de pipeline)
 métier ; le rattachement US → phase → brique vit **uniquement** dans la **matrice de couverture (M6)**,
 seule source de vérité du mapping entre les 3 axes.
 
-**Les 3 piliers** : la chaîne M0→M7 est la colonne vertébrale ; trois kits de domaine s'y branchent,
-**activables selon le contexte** (déclaré dans le casting M0) — [`conception/`](../conception/)
-(RG · habilitations · tests — ce que le client signe côté produit, et sa preuve),
-[`conformite/`](../conformite/) (recette formelle, RGPD, risques, budget — le contractuel & légal),
-[`run/`](../run/) (environnements, exploitation, CI, doc — la vie après la livraison). En solo :
-`conception/` au minimum ; chez un client : les trois.
+**Les 3 piliers** : la chaîne M0→M7 vit dans le pilier **`conception/`** (ce dossier), avec les
+artefacts signables (fiches RG · matrice d'habilitations · plan de test — `TEMPLATE-RG`,
+`TEMPLATE-HABILITATIONS`, `TEMPLATE-TESTS`). Les deux autres piliers s'y branchent, **activables
+selon le contexte** (déclaré dans le casting M0) — [`conformite/`](../conformite/) (recette
+formelle, RGPD, risques, budget — le contractuel & légal) et [`run/`](../run/) (environnements,
+exploitation, CI, doc — la vie après la livraison). En solo : `conception/` au minimum ; chez un
+client : les trois.
 
 ---
 

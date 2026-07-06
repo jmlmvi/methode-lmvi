@@ -1,47 +1,57 @@
-<!-- KIT-VERSION: 1.4.0 -->
-# Pilier CONCEPTION — RG · Habilitations · Tests
+<!-- KIT-VERSION: 1.4.1 -->
+# Pilier CONCEPTION — la méthode M0→M7 · RG · Habilitations · Tests
 
-> Le premier des 3 piliers du kit (conception / [conformité](../conformite/) / [run](../run/)) :
-> **ce que le client signe côté produit, et la preuve associée**. Les piliers se branchent sur la
-> colonne vertébrale M0→M7 ([`methode/`](../methode/)) — ils ne la remplacent pas. Activation
-> déclarée dans le **casting M0** (en solo : `conception/` au minimum ; chez un client : les trois).
+> **LE kit de conception** : la chaîne complète Besoin→Plan (M0→M7) + les artefacts que le client
+> signe (RG, habilitations) + la preuve (tests). Premier des 3 piliers du kit
+> (conception / [conformité](../conformite/) v1.5 / [run](../run/) v1.6), activés via le casting M0.
+> Copier **ce dossier** comme `_kit/` d'un nouveau chantier (cf. [`../USAGE.md`](../USAGE.md)).
 
-## Les 3 artefacts et où ils se branchent
+- 📘 **[`METHODE-Besoin2Plan.md`](METHODE-Besoin2Plan.md)** — la méthodologie de référence (M0→M7,
+  3 axes, piliers, boucles de retour, matrice de couverture). **À lire en premier.**
+- 🛠️ **[`gen-fiches-us.py`](gen-fiches-us.py)** — générateur **générique** : fiches US/Épic/RG,
+  matrice d'habilitations, squelettes de tests Gherkin. Données dans un **YAML externe** :
+  `python3 gen-fiches-us.py <us-data.yml>` — modèle : [`us-data.example.yml`](us-data.example.yml).
+- 💬 **[`PROMPT-generer-fiches-US.md`](PROMPT-generer-fiches-US.md)** — (re)générer les fiches
+  (script **ou** prompt agent IA).
 
-| Artefact | Template | S'écrit en | Se mappe en | Se prouve en |
-|---|---|---|---|---|
-| **Fiches RG** (règles de gestion) | [`TEMPLATE-RG.md`](TEMPLATE-RG.md) | **M1** (avec la spec ; les décisions M4 les créent/modifient) | matrice de conformité RG→US | tests `@RG-x` (exemples/contre-exemples) |
-| **Matrice d'habilitations** (rôle × US) | [`TEMPLATE-HABILITATIONS.md`](TEMPLATE-HABILITATIONS.md) | **M1** (le métier la signe) | **M6** : rôles → IAM/scopes `manifest.json` + mode SSO par route | tests négatifs (chaque ⛔ = 403 attendu) + étanchéité cross-tenant |
-| **Plan de test** (par phase) | [`TEMPLATE-TESTS.md`](TEMPLATE-TESTS.md) | **M6.5** | colonne **Tests** de la matrice de couverture | gate de chaque P-x (run scripté + démo) |
+## Les templates
 
-## Le modèle de test aligné sur les 3 axes (rappel doctrinal)
+| Template | Pour |
+|---|---|
+| [`TEMPLATE-M0-vision.md`](TEMPLATE-M0-vision.md) | M0 · Vision + **casting** + piliers activés |
+| [`TEMPLATE-M1-spec-besoins.md`](TEMPLATE-M1-spec-besoins.md) | M1 · Spec de besoins (+ NFR, révisions) |
+| [`TEMPLATE-M2-user-stories.md`](TEMPLATE-M2-user-stories.md) · [`TEMPLATE-US.md`](TEMPLATE-US.md) | M2 · index + **fiche US** (axe métier seul) |
+| [`TEMPLATE-M3-epics.md`](TEMPLATE-M3-epics.md) · [`TEMPLATE-EPIC.md`](TEMPLATE-EPIC.md) | M3 · index + **fiche épic** |
+| [`TEMPLATE-M4-arbitrages.md`](TEMPLATE-M4-arbitrages.md) | M4 · Arbitrages |
+| [`TEMPLATE-M5-phasage.md`](TEMPLATE-M5-phasage.md) | M5 · Phasage gaté (+ convention de préfixe) |
+| [`TEMPLATE-M6-plan-technique.md`](TEMPLATE-M6-plan-technique.md) | M6 · Plan + matrice (colonne Tests) + mapping IAM |
+| [`TEMPLATE-M7-execution.md`](TEMPLATE-M7-execution.md) | M7 · Exécution & câblage (+ suivi par phase) |
+| [`TEMPLATE-RG.md`](TEMPLATE-RG.md) | **fiche règle de gestion** (M1 — typée, tracée, testable) |
+| [`TEMPLATE-HABILITATIONS.md`](TEMPLATE-HABILITATIONS.md) | **matrice rôle × US** (M1, signée métier) + mapping IAM (M6) |
+| [`TEMPLATE-TESTS.md`](TEMPLATE-TESTS.md) | **plan de test par phase** (M6.5, gate scriptée) |
+
+**Règle** : chaque instance remplace les `{{placeholders}}`, garde la section **Relations (mermaid)**,
+et vérifie sa **DoD** avant le maillon suivant. Relecture **requise** M1/M4/M6. Versions :
+`KIT-VERSION` en tête de chaque fichier + [`../CHANGELOG.md`](../CHANGELOG.md).
+
+## Le modèle de test aligné sur les 3 axes (doctrine)
 
 Pas de mapping naïf « US→unitaires, épic→intégration » (même piège que « 1 épic = 1 worker ») :
-
-- **US → ≥ 1 test d'acceptation** (ses CA), automatisé, taggé `@US-<code>` ;
-- **RG → ≥ 2 tests** (cas conforme + cas de rejet), taggés `@RG-<code>` ;
-- **épic → rollup** par tag (pas un niveau de test) + scénarios inter-US éventuels ;
-- **brique → tests unitaires / intégration technique** (vivent avec le code) ;
-- **phase P-x → gate scriptée** : acceptation de la phase + **toute** la non-régression des phases
-  précédentes + démo humaine du non-automatisable ;
-- **app → E2E / smoke post-déploiement**.
-
-Calibrage recommandé : acceptation automatisée **au niveau API par défaut**, UI/E2E réservé aux US
-pivots ; unitaires seulement où il y a de la vraie logique ; pas de dogme de % de couverture.
+**US → ≥ 1 test d'acceptation** (ses CA, `@US-<code>`) · **RG → ≥ 2 tests** (conforme + rejet,
+`@RG-<code>`) · **épic → rollup** par tag · **brique → unitaires/intégration technique** ·
+**phase P-x → gate scriptée** (acceptation + non-régression des phases précédentes + démo du
+non-automatisable) · **app → E2E/smoke**. Calibrage : acceptation **API par défaut**, UI/E2E réservé
+aux `@pivot` ; unitaires où il y a de la vraie logique ; pas de dogme de % de couverture.
 
 ## Doctrine habilitations (frontière RBAC / RG)
 
-Le **RBAC gros grain** vit dans l'IAM Hub (rôles/scopes du `manifest.json`, vérifiés au proxy et à
-l'entrée de l'app — contrat d'architecture §5). Les **conditions fines** (ownership « ses propres
-recettes », états, montants…) sont des **RG de type `droit_acces`**, appliquées dans le code. On ne
-fabrique pas de moteur ABAC maison (anti-extrapolation).
+Le **RBAC gros grain** vit dans l'IAM Hub (rôles/scopes du `manifest.json`, vérifiés au proxy —
+contrat d'architecture §5). Les **conditions fines** (ownership, états…) sont des **RG de type
+`droit_acces`**, appliquées dans le code. Pas de moteur ABAC maison (anti-extrapolation).
 
 ## Génération automatique
 
-Le générateur [`../methode/gen-fiches-us.py`](../methode/gen-fiches-us.py) consomme les sections
-optionnelles `rg:` et `roles:` du YAML (cf. `us-data.example.yml`) et produit :
-- `M1-spec-besoins/RG/` — 1 fiche par RG + index, liens croisés US↔RG automatiques ;
-- `M1-spec-besoins/matrice-habilitations.generated.md` — brouillon rôle × US (✅ dérivés des acteurs,
-  `?` à qualifier en ⛔/⚠️ à la main) ;
-- `tests-squelettes/` — squelettes Gherkin `@US-x` (1 scénario par CA) et `@RG-x` (1 scénario par
-  exemple + contre-exemple), **à déplacer dans le repo de code** et à implémenter.
+Le générateur consomme les sections optionnelles `rg:` et `roles:` du YAML et produit :
+`M1-spec-besoins/RG/` (1 fiche/RG + index + RG orphelines signalées) ·
+`M1-spec-besoins/matrice-habilitations.generated.md` (✅ dérivés des acteurs, `?` à qualifier) ·
+`tests-squelettes/` (Gherkin `@US-x` / `@RG-x`, **à déplacer dans le repo de code**).

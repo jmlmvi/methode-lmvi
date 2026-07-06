@@ -2,7 +2,7 @@
 # USAGE — démarrer un nouveau chantier avec le kit Besoin2Plan
 
 > Le mode d'emploi opérationnel : **quoi faire, dans quel ordre, et quel prompt lancer** à chaque
-> maillon. La théorie est dans [`methode/METHODE-Besoin2Plan.md`](methode/METHODE-Besoin2Plan.md) —
+> maillon. La théorie est dans [`conception/METHODE-Besoin2Plan.md`](conception/METHODE-Besoin2Plan.md) —
 > ici, on exécute. Les prompts sont écrits pour un agent type Claude Code ayant accès au repo.
 
 ---
@@ -60,7 +60,7 @@ APP=/opt/.../APP-XX-MONAPP ; CHANTIER=$APP/docs/mon-chantier
 mkdir -p $CHANTIER/{M0-vision,M1-spec-besoins,M4-arbitrages,M5-phasage,M6-plan-technique,M7-execution,inputs,tracking}
 
 # 3. Vendorer le kit (copie de travail) + noter la version copiée
-cp -r /tmp/methode-lmvi/methode $CHANTIER/_kit
+cp -r /tmp/methode-lmvi/conception $CHANTIER/_kit
 grep -m1 KIT-VERSION $CHANTIER/_kit/METHODE-Besoin2Plan.md   # → noter dans le README du chantier
 ```
 
@@ -230,7 +230,7 @@ DECISIONS.md, tasks/. Puis on code la P-0 par incréments atomiques — zéro mo
 
 ## 4. Resync du kit (quand le canonique évolue)
 
-1. Comparer la `KIT-VERSION` de `_kit/` avec [`methode/CHANGELOG.md`](methode/CHANGELOG.md) du repo
+1. Comparer la `KIT-VERSION` de `_kit/` avec [`CHANGELOG.md`](CHANGELOG.md) (racine) du repo
    canonique (`github.com/jmlmvi/methode-lmvi`, prendre les tags).
 2. Reporter les changements pertinents dans `_kit/` (le CHANGELOG les décrit par change-set) ;
    toute divergence volontaire = décision M4 de l'instance.

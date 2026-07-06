@@ -12,8 +12,7 @@
 | **[`USAGE.md`](USAGE.md)** | **Commencer ici pour un nouveau chantier** : pas-à-pas M0→M7 + les **prompts prêts à coller** par maillon (dont relectures adversariales M1/M4/M6). |
 | **[`CONTRAT-ARCHITECTURE.md`](CONTRAT-ARCHITECTURE.md)** | Les règles plateforme que toute app hérite (S3, APIs via Hub, APIM/LLM, minihub, Vault, IAM/SSO, PG THESOCLE, no-mock). **Input #8.** |
 | **[`inputs-corpus/`](inputs-corpus/)** | Définition des **9 slots d'inputs (0→8)** techniques (framework, Hub, front, packs, minihub, PG, contrat d'archi) — un sous-dossier par slot. |
-| **[`methode/`](methode/)** | **La colonne vertébrale** : la méthode **M0→M7** générique (`METHODE-Besoin2Plan.md` + 10 templates + générateur + prompt). |
-| **[`conception/`](conception/)** | Pilier 1 (v1.4) : **RG en fiches · matrice d'habilitations · plan de test** — ce que le client signe côté produit, et sa preuve. Se branche sur M1/M4/M6/P-x. |
+| **[`conception/`](conception/)** | Pilier 1 (v1.4) — **LE kit de conception** : la méthode **M0→M7** (METHODE + templates + générateur + prompt) **et** les artefacts signables (**fiches RG · matrice d'habilitations · plan de test**). |
 | **[`conformite/`](conformite/)** | Pilier 2 (v1.5, périmètre acté) : PV de recette, RGPD, risques, budget/avenants, audit trail — le contractuel & légal. |
 | **[`run/`](run/)** | Pilier 3 (v1.6, périmètre acté) : environnements, exploitation, CI/revue, doc/formation — la vie après la livraison. |
 
@@ -71,9 +70,8 @@ par une recette (la gate) et une livraison réelle. Détails opérationnels : [`
   appliquée, `inputs/` rempli, `tracking/PA-0`).
 
 ## Statut de mise en place
-- ✅ Méthode générique M0→M7 (templates + générateur + prompt) dans [`methode/`](methode/) —
-  **kit v1.1.0** (revue Fable appliquée, cf. [`methode/CHANGELOG.md`](methode/CHANGELOG.md) et
-  [`AnalyseFable/`](AnalyseFable/)).
+- ✅ Méthode générique M0→M7 + artefacts signables dans [`conception/`](conception/) — revues Fable
+  appliquées, cf. [`CHANGELOG.md`](CHANGELOG.md) et [`AnalyseFable/`](AnalyseFable/).
 - ✅ Corpus d'inputs (9 slots, 0→8) dans [`inputs-corpus/`](inputs-corpus/).
 - ✅ Contrat d'architecture.
 - ⏳ **Aligner la version** framework **5.8.0 (ligne 5.8)** (input slot #1).
@@ -86,7 +84,7 @@ Chaque fichier du kit porte un marqueur `<!-- KIT-VERSION: x.y.z -->` ; une inst
 une version donnée. Pour resynchroniser :
 
 1. **Comparer** : lire la `KIT-VERSION` des fichiers de l'instance et le
-   [`methode/CHANGELOG.md`](methode/CHANGELOG.md) canonique → lister les versions manquantes.
+   [`CHANGELOG.md`](CHANGELOG.md) canonique (racine) → lister les versions manquantes.
 2. **Reporter** : appliquer à l'instance les changements pertinents de chaque version (le CHANGELOG
    les décrit par change-set) ; toute divergence volontaire est une décision M4 de l'instance.
 3. **Marquer** : mettre à jour la `KIT-VERSION` des fichiers resyncés dans l'instance.
