@@ -705,3 +705,19 @@ us:
     - L'atelier n'échoue pas ; aucun code provider dans l'app.
     phase: PA-1
     brique: API APIM (fallback)
+
+# ---- Sections OPTIONNELLES (pilier conception, kit >= 1.4.0) — schéma d'exemple ----
+# (commentées ici : les énoncés réels des RG Régie vivent dans sa SPEC ; zéro invention.)
+# roles:
+#   metteur_en_scene: {label: "metteur en scène", description: "pilote la décomposition"}
+#   producteur:       {label: "producteur", description: "administre projets et bibliothèque"}
+# rg:
+#   RG-A2:
+#     titre: Citation source
+#     enonce: "Chaque entité produite cite son passage source (span Tier 0)."
+#     type: invariant            # invariant | calcul | contrainte | droit_acces | workflow
+#     source: "M0 vision"        # ou "M4 Q-n" / "exigence client du JJ-MM"
+#     exceptions: ["entité marquée « sans ancrage » et signalée"]
+#     exemples: ["une entité candidate référence un span valide"]
+#     contre_exemples: ["une entité sans span est committée sans signalement"]
+#     statut: active

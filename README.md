@@ -12,7 +12,10 @@
 | **[`USAGE.md`](USAGE.md)** | **Commencer ici pour un nouveau chantier** : pas-à-pas M0→M7 + les **prompts prêts à coller** par maillon (dont relectures adversariales M1/M4/M6). |
 | **[`CONTRAT-ARCHITECTURE.md`](CONTRAT-ARCHITECTURE.md)** | Les règles plateforme que toute app hérite (S3, APIs via Hub, APIM/LLM, minihub, Vault, IAM/SSO, PG THESOCLE, no-mock). **Input #8.** |
 | **[`inputs-corpus/`](inputs-corpus/)** | Définition des **9 slots d'inputs (0→8)** techniques (framework, Hub, front, packs, minihub, PG, contrat d'archi) — un sous-dossier par slot. |
-| **[`methode/`](methode/)** | La méthode **M0→M7** générique : `METHODE-Besoin2Plan.md` + **10 templates** (M0→M7 + fiche US + fiche épic) + **générateur** + **prompt**. |
+| **[`methode/`](methode/)** | **La colonne vertébrale** : la méthode **M0→M7** générique (`METHODE-Besoin2Plan.md` + 10 templates + générateur + prompt). |
+| **[`conception/`](conception/)** | Pilier 1 (v1.4) : **RG en fiches · matrice d'habilitations · plan de test** — ce que le client signe côté produit, et sa preuve. Se branche sur M1/M4/M6/P-x. |
+| **[`conformite/`](conformite/)** | Pilier 2 (v1.5, périmètre acté) : PV de recette, RGPD, risques, budget/avenants, audit trail — le contractuel & légal. |
+| **[`run/`](run/)** | Pilier 3 (v1.6, périmètre acté) : environnements, exploitation, CI/revue, doc/formation — la vie après la livraison. |
 
 ## Le principe
 
@@ -57,6 +60,9 @@ en V classique est **replié dans chaque P-x**. Chaque phase est un mini-cycle c
 par une recette (la gate) et une livraison réelle. Détails opérationnels : [`USAGE.md`](USAGE.md).
 
 - La **méthode** (M0→M7) et le **corpus d'inputs** sont **génériques** et vivent **ici**.
+- Les **3 piliers** (`conception/` · `conformite/` · `run/`) se **branchent** sur la chaîne M0→M7,
+  **activables selon le contexte** (déclaré dans le casting M0 : solo = conception au minimum ;
+  client = les trois).
 - Chaque **app** crée son dossier d'instance (méthode appliquée + `inputs/` rempli + `tracking/`).
 - Le **contrat d'architecture** est la source de vérité transversale : aucune app ne le redécide.
 

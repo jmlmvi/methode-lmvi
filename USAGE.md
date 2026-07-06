@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.3.0 -->
+<!-- KIT-VERSION: 1.4.0 -->
 # USAGE — démarrer un nouveau chantier avec le kit Besoin2Plan
 
 > Le mode d'emploi opérationnel : **quoi faire, dans quel ordre, et quel prompt lancer** à chaque
@@ -23,12 +23,17 @@ Le déroulé complet, en phases projet classiques. Repère-toi ici à tout momen
 ```
 
 **Les tests entrent en scène trois fois** : leur *matière* s'écrit en conception (les critères
-d'acceptation de chaque US, M2) ; leur *stratégie* se décide au plan (M6.5 : automatisé vs démo,
-non-régression) ; leur *code* s'écrit pendant le développement, en même temps que les briques
-(CA → tests). La **recette** n'est pas une phase finale : c'est la **gate** de chaque P-x (démo
-réelle validée par le commanditaire + re-vérification des gates précédentes). La **livraison** est
-incrémentale : chaque gate passée se déploie. Le cycle en V est **replié dans chaque P-x** — jamais
-de tunnel de dev suivi d'une grande recette finale.
+d'acceptation de chaque US, M2, + les exemples/contre-exemples des RG) ; leur *stratégie* se décide
+au plan (M6.5 : automatisé vs démo, non-régression) ; leur *code* s'écrit pendant le développement,
+en même temps que les briques (squelettes Gherkin **générés** depuis le YAML). La **recette** n'est
+pas une phase finale : c'est la **gate** de chaque P-x (démo réelle validée par le commanditaire +
+re-vérification des gates précédentes). La **livraison** est incrémentale : chaque gate passée se
+déploie. Le cycle en V est **replié dans chaque P-x** — jamais de tunnel de dev suivi d'une grande
+recette finale.
+
+**Les 3 piliers** : la chaîne est la colonne vertébrale ; [`conception/`](conception/) (RG ·
+habilitations · tests), [`conformite/`](conformite/) et [`run/`](run/) s'y branchent. Le casting M0
+déclare lesquels sont actifs — solo : `conception/` au minimum ; client : les trois.
 
 ---
 
@@ -105,6 +110,23 @@ run LLM inclus, rétention, quotas — N/A seulement si justifié), points [À A
 Le QUOI, jamais le comment. Aucune brique technique, aucun nom de worker.
 ```
 
+### M1 · RG & habilitations (pilier conception) — prompts
+
+```text
+Lis conception/TEMPLATE-RG.md (dans le kit). Pour chaque règle de gestion de la SPEC, remplis la
+section rg: de us-data.yml : titre, énoncé (une phrase impérative et testable), type
+(invariant/calcul/contrainte/droit_acces/workflow), source, exceptions, et surtout ≥ 1 exemple
+conforme + ≥ 1 contre-exemple rejeté (ils deviendront les tests @RG-x). Zéro invention.
+```
+
+```text
+Lis conception/TEMPLATE-HABILITATIONS.md. À partir des acteurs M0 : propose les rôles métier
+(acteur ≠ rôle, toujours un rôle admin du tenant), remplis la section roles: de us-data.yml,
+puis lance le générateur et QUALIFIE le brouillon matrice-habilitations.generated.md : plus
+aucune cellule en « ? » — chaque ⛔ devient un test négatif, chaque ⚠️ pointe une RG droit_acces.
+Copie le résultat qualifié dans la SPEC M1 : c'est un artefact que le métier signe.
+```
+
 ### 🔍 Relecture M1 (requise) — prompt à lancer dans une session/un agent SÉPARÉ
 
 ```text
@@ -168,9 +190,12 @@ chantier. Pour chaque phase de M5, écris M6-plan-technique/README.md :
 4) la MATRICE DE COUVERTURE US→épic→phase→brique→gate + colonne Statut/révisé le
    (c'est ICI et seulement ici que vit le mapping ; reporte aussi phase/brique dans us-data.yml
    puis relance le générateur pour produire le brouillon matrice-couverture.generated.md à fusionner) ;
-5) stratégie de test : CA couverts par test auto vs démo, et ce qui protège la non-régression
-   des gates précédentes.
-DoD : chaque US a une ligne ; aucune brique sans US.
+5) le PLAN DE TEST de chaque phase (conception/TEMPLATE-TESTS.md) : tagging @US-x/@RG-x/@neg,
+   niveau API par défaut (UI réservé aux @pivot), gate en une commande, non-régression des
+   phases précédentes — pars des squelettes générés dans tests-squelettes/ ;
+6) le mapping habilitations → IAM (§3 de conception/TEMPLATE-HABILITATIONS.md) : rôles métier →
+   rôles/scopes manifest.json, mode SSO par route, compte de service.
+DoD : chaque US a une ligne AVEC sa colonne Tests remplie ; aucune brique sans US.
 ```
 
 ### 🔍 Relecture M6 (requise) — agent séparé : *« lis la matrice verticalement (une ligne par US du YAML ? compare les listes) puis horizontalement (chaque brique sert-elle une US ? une brique a-t-elle été inventée ?). Vérifie que rien de ce que le contrat d'architecture fournit n'est re-codé. »*

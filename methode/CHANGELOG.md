@@ -3,6 +3,29 @@
 > Semver (convention LMVI). Chaque instance note la `KIT-VERSION` copiée et resynce via ce fichier
 > (procédure : README racine, « Resync d'une instance »).
 
+## 1.4.0 — 2026-07-06
+
+Pilier **conception/** + seconde passe d'analyse. Structuration actée : 3 piliers à la racine
+(`conception/` v1.4 · `conformite/` v1.5 · `run/` v1.6), branchés sur la chaîne M0→M7, activables
+via le casting M0 (cf. `AnalyseFable/04-ANALYSE-SECONDE-PASSE.md`, D-8…D-21).
+
+- **conception/TEMPLATE-RG.md** : les RG deviennent des citoyennes de 1ʳᵉ classe — 1 fiche par RG
+  (type, source, cycle de vie actif/modifié/abrogé, US concernées, exemples/contre-exemples → tests).
+- **conception/TEMPLATE-HABILITATIONS.md** : acteurs→rôles métier, matrice rôle × US (✅/⛔/⚠️→RG
+  `droit_acces`) signée par le métier en M1, mapping IAM/manifest en M6, tests négatifs + cross-tenant.
+  Doctrine : RBAC gros grain = IAM Hub ; conditions fines = RG en code ; pas d'ABAC maison.
+- **conception/TEMPLATE-TESTS.md** : plan de test par phase — tests alignés sur les 3 axes (US→
+  acceptation, RG→conforme+rejet, épic→rollup, brique→unitaires, phase→gate scriptée, app→E2E),
+  tagging `@US-x`/`@RG-x`/`@neg`, gate en une commande, rapport archivé comme preuve.
+- **Générateur** : sections YAML optionnelles `rg:`/`roles:` → fiches RG (`M1-spec-besoins/RG/` +
+  index + détection des RG orphelines), brouillon `matrice-habilitations.generated.md`, squelettes
+  Gherkin `tests-squelettes/` (1 scénario par CA, + conforme/rejet par RG). Rétro-compatible.
+- **Matrice de couverture** : + colonne **Tests** (METHODE §3, TEMPLATE-M6).
+- **Dé-solo-isation** (D-6 rôles) : casting complet en M0 (commanditaire, relecteur, métier/PO, dev,
+  recetteur — cumul possible), piliers activés déclarés en M0, estimation paramétrable en M5.
+- `conformite/` et `run/` : README de périmètre (placeholders v1.5/v1.6).
+- USAGE : prompts RG + habilitations (M1) et plan de test (M6) ; piliers dans la carte.
+
 ## 1.3.0 — 2026-07-06
 
 - **Vue globale du cycle de vie** (retour commanditaire) : README racine § « Vue globale » (table

@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.1.0 -->
+<!-- KIT-VERSION: 1.4.0 -->
 # Méthode LMVI — Besoin → Plan (Spec de besoins → US → Épics → Phasage → Plan technique)
 
 > **But** : passer proprement d'un **besoin métier exprimé** à un **plan technique exécutable**, sans
@@ -30,6 +30,13 @@ Un épic **traverse** plusieurs briques ; une brique (ex. un moteur de pipeline)
 métier ; le rattachement US → phase → brique vit **uniquement** dans la **matrice de couverture (M6)**,
 seule source de vérité du mapping entre les 3 axes.
 
+**Les 3 piliers** : la chaîne M0→M7 est la colonne vertébrale ; trois kits de domaine s'y branchent,
+**activables selon le contexte** (déclaré dans le casting M0) — [`conception/`](../conception/)
+(RG · habilitations · tests — ce que le client signe côté produit, et sa preuve),
+[`conformite/`](../conformite/) (recette formelle, RGPD, risques, budget — le contractuel & légal),
+[`run/`](../run/) (environnements, exploitation, CI, doc — la vie après la livraison). En solo :
+`conception/` au minimum ; chez un client : les trois.
+
 ---
 
 ## 1. La chaîne en 8 maillons (M0→M7)
@@ -45,18 +52,22 @@ porteurs de décisions), recommandée ailleurs.
 
 ### M0 — Besoin & Vision
 - **Entrée** : ce que dit le commanditaire (souvent oral, désordonné).
-- **Livrable** : 3–5 lignes de vision + le **principe directeur** + la liste des **acteurs** + les
-  **rôles du chantier** : *commanditaire* (qui valide) et *relecteur* (qui relit M1/M4/M6). En contexte
-  solo + agents IA : commanditaire = soi ; relecteur = un agent IA en revue adversariale, à défaut d'un
-  tiers humain.
+- **Livrable** : 3–5 lignes de vision + le **principe directeur** + la liste des **acteurs** (personas
+  métier — ils donneront les **rôles métier** des habilitations : acteur ≠ rôle, une personne cumule) +
+  le **casting du chantier** (commanditaire, relecteur(s), métier/PO, dev(s), recetteur — une personne
+  peut cumuler ; en solo, les agents IA prennent des rôles, ex. relecteur adversarial) + les **piliers
+  activés** (conception / conformité / run).
 - **Règle** : reformuler et **faire confirmer** avant d'écrire quoi que ce soit d'autre.
 - **DoD** : le commanditaire dit « oui, c'est ça ».
 
 ### M1 — Spécification de besoins (SPEC fonctionnelle)
 - **Entrée** : la vision M0.
 - **Livrable** : `SPEC-*.md` — **concepts & vocabulaire**, **modèle d'entités**, **règles de gestion
-  (RG)**, contrat métier, **exigences non fonctionnelles** (volumétrie, latence, coût par run — LLM
-  inclus, rétention, quotas ; « N/A » accepté si justifié). **Le QUOI, jamais le comment.**
+  en fiches** (1 fiche/RG typée et tracée, pilier conception `TEMPLATE-RG.md` — générables), la
+  **matrice d'habilitations** rôle × US (✅/⛔/⚠️→RG `droit_acces`, pilier conception
+  `TEMPLATE-HABILITATIONS.md` — le métier la signe), contrat métier, **exigences non fonctionnelles**
+  (volumétrie, latence, coût par run — LLM inclus, rétention, quotas ; « N/A » accepté si justifié).
+  **Le QUOI, jamais le comment.**
 - **Règles** : tout terme est défini une fois ; les points non tranchés sont marqués `[À ARBITRER]`
   (deviennent M4) ; la spec **complète** l'existant, ne l'écrase pas.
 - **DoD** : un tiers (le relecteur) comprend le domaine sans connaître le code. **Relecture requise.**
@@ -97,8 +108,9 @@ porteurs de décisions), recommandée ailleurs.
   chantier et **déclaré** dans le livrable M5.
 - **Règles** : chaque phase apporte de la valeur **démontrable** seule ; ⚗️ *règle candidate* — la P-0
   est le socle qui débloque le reste ; ⚗️ *règle candidate* — ré-estimer × 2 (honnêteté budget).
-- **Estimation (statut assumé)** : pas de sizing formel en contexte solo + agents IA ; la règle × 2
-  ci-dessus est le seul mécanisme, assumé comme tel.
+- **Estimation (paramétrable selon le casting)** : la règle × 2 est le plancher ; en solo + agents IA
+  elle suffit (assumé) ; en équipe cliente, un sizing peut s'y ajouter (t-shirt ou autre), **déclaré**
+  dans le livrable M5 — jamais imposé par le kit.
 - **DoD** : chaque phase a une gate formulée comme une démo, pas comme une tâche.
 
 ### M6 — Plan technique + matrice de couverture
@@ -108,10 +120,14 @@ porteurs de décisions), recommandée ailleurs.
   2. **Briques nouvelles** — workers / services / stages / packages, **choisis par nature** (cf. arbre
      V005), pas par épic.
   3. **Modèle de données** (tables, standard THESOCLE).
-  4. **Matrice de couverture** `US → épic → phase → brique` (le garde-fou, **source de vérité du
-     mapping**, cf. §0 et §3).
-  5. **Stratégie de test** — quels CA sont couverts par test automatisé vs démo manuelle, et quels
-     tests protègent la **non-régression** des gates précédentes.
+  4. **Matrice de couverture** `US → épic → phase → brique → tests` (le garde-fou, **source de
+     vérité du mapping**, cf. §0 et §3 — colonne Tests : tags `@US-x`/`@RG-x`/`@neg`).
+  5. **Plan de test** (pilier conception `TEMPLATE-TESTS.md`) — tests alignés sur les 3 axes (US→
+     acceptation, RG→conforme+rejet, brique→unitaires, phase→gate scriptée + non-régression, app→E2E),
+     squelettes Gherkin générables depuis le YAML.
+  6. **Mapping habilitations → IAM** — rôles métier → rôles/scopes `manifest.json`, mode SSO par
+     route, compte de service (pilier conception, doctrine : RBAC gros grain = IAM Hub, conditions
+     fines = RG `droit_acces` en code).
 - **DoD** : chaque US est tracée jusqu'à une brique ; aucune brique orpheline ; aucune US oubliée.
   **Relecture requise.**
 
@@ -155,12 +171,12 @@ suppression** : une US abandonnée reste dans la matrice, barrée, avec sa raiso
 
 C'est l'artefact qui **relie les 3 axes** et prouve qu'on n'a rien oublié ni codé en trop.
 
-| US | Épic (métier) | Phase (livraison) | Brique (technique) | Gate | Statut / révisé le |
-|----|---------------|-------------------|--------------------|------|--------------------|
-| B2 | B — Bibliothèque | P-1 | `prompts` service + UI | « je vois le contrat de sortie avant de lancer » | à faire |
-| C1 | C — Exécution | P-1 | stage `agentia` (pack pipeline) | « 1 prompt → propositions » | à faire |
-| F1 | F — Aperçu/commit | P-1 | stage `Human` + service commit | « je valide avant écriture » | à faire |
-| … | … | … | … | … | … |
+| US | Épic (métier) | Phase (livraison) | Brique (technique) | Tests | Gate | Statut / révisé le |
+|----|---------------|-------------------|--------------------|-------|------|--------------------|
+| B2 | B — Bibliothèque | P-1 | `prompts` service + UI | `@US-B2 @pivot` | « je vois le contrat de sortie avant de lancer » | à faire |
+| C1 | C — Exécution | P-1 | stage `agentia` (pack pipeline) | `@US-C1 @RG-A2` | « 1 prompt → propositions » | à faire |
+| F1 | F — Aperçu/commit | P-1 | stage `Human` + service commit | `@US-F1 @neg` | « je valide avant écriture » | à faire |
+| … | … | … | … | … | … | … |
 
 Lecture : **verticalement** on vérifie la couverture (chaque US a une ligne) ; **horizontalement** on
 voit le chemin besoin→code→démo. C'est **ici** — et seulement ici — que vit le mapping US→phase→brique.
@@ -224,14 +240,15 @@ Besoin2Plan ✓ ; socle-pack-ai spec 50k → non/oui/oui = FromSpec2Plan ✓.)
 
 ## 7. Checklist express
 
-- [ ] M0 Vision reformulée et **confirmée** par le commanditaire ; rôles commanditaire/relecteur définis
-- [ ] M1 Spec de besoins écrite (QUOI), termes définis, **NFR posées**, `[À ARBITRER]` posés — **relue**
+- [ ] M0 Vision reformulée et **confirmée** ; **casting** complet ; **piliers activés** déclarés
+- [ ] M1 Spec de besoins écrite (QUOI), termes définis, **NFR posées**, **fiches RG** +
+      **matrice d'habilitations signée** (pilier conception), `[À ARBITRER]` posés — **relue**
 - [ ] M2 US testables et numérotées, **sans phase ni brique dans la fiche**
 - [ ] M3 US regroupées en épics (un propriétaire chacune, aucune orpheline)
 - [ ] M4 **Toutes** les décisions structurantes tranchées et écrites — **relues**
 - [ ] M5 Phases avec **gate = démo** ; préfixe de phase déclaré ; P-0 = socle *(⚗️ candidate)*
-- [ ] M6 Plan technique + **matrice de couverture** (US→épic→phase→brique, colonne statut) +
-      **stratégie de test** — **relu**
+- [ ] M6 Plan technique + **matrice de couverture** (US→épic→phase→brique→**tests**, colonne statut) +
+      **plan de test** + **mapping habilitations→IAM** — **relu**
 - [ ] M7 Câblage : **inputs rassemblés** (`inputs/`), outils Hub, cible d'exécution, build/deploy
 - [ ] M7 Suivi : un dossier `tracking/<P-x>/` par phase (`STATE/JOURNAL/tasks`), **preuve à chaque
       gate + gates précédentes re-vérifiées**, zéro mock

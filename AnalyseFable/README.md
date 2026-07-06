@@ -8,6 +8,7 @@
 | [`01-ANALYSE.md`](01-ANALYSE.md) | L'analyse critique : 7 points forts (F-1…F-7) à préserver, 7 défauts (D-1…D-7) priorisés |
 | [`02-PLAN-CHANGEMENT.md`](02-PLAN-CHANGEMENT.md) | Le plan : 8 change-sets atomiques (C-1…C-8) en 3 lots, avec DoD chacun |
 | [`03-MATRICE-VERIFICATION.md`](03-MATRICE-VERIFICATION.md) | Le garde-fou : matrice défaut→changement→preuve + non-régression des points forts + gate de clôture |
+| [`04-ANALYSE-SECONDE-PASSE.md`](04-ANALYSE-SECONDE-PASSE.md) | 2ᵉ passe (complétude cycle de vie, contexte client) : D-8 tests · D-9 RG · D-10 habilitations + D-11…D-21 ; structuration en 3 piliers (conception v1.4 / conformité v1.5 / run v1.6) |
 
 **Décision (2026-07-06, commanditaire)** : **Option A** retenue pour C-3 — la fiche US est purement
 métier ; le mapping US→phase→brique vit uniquement dans la matrice de couverture (M6).
