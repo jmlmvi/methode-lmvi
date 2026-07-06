@@ -1,90 +1,78 @@
-# Méthode LMVI — construire une app TheSocle (générique)
+<!-- KIT-VERSION: 1.4.2 -->
+# Méthode LMVI — construire une app TheSocle
 
-> **Le socle partagé** : la **méthode générique** pour bâtir n'importe quelle app TheSocle, son **corpus
-> d'inputs techniques** standard, et le **contrat d'architecture** commun. Une app (ex. Régie) n'est
-> qu'une **instance** : elle applique la méthode et **remplit les slots d'inputs**.
-> Plateforme de référence : **TheSocle 5.8 (5.8.0)**.
+> La **méthode générique** pour bâtir n'importe quelle app TheSocle (solo ou équipe cliente), avec
+> son **corpus d'inputs techniques** et le **contrat d'architecture** commun. Une app (ex. Régie)
+> est une **instance** : elle copie le kit et remplit les slots. Plateforme : **TheSocle 5.8**.
+>
+> 👉 **Pour démarrer un chantier : [`USAGE.md`](USAGE.md)** (pas-à-pas + prompts prêts à coller).
 
-## Contenu
+## Le repo en un coup d'œil
 
-| Élément | Rôle |
-|---|---|
-| **[`USAGE.md`](USAGE.md)** | **Commencer ici pour un nouveau chantier** : pas-à-pas M0→M7 + les **prompts prêts à coller** par maillon (dont relectures adversariales M1/M4/M6). |
-| **[`CONTRAT-ARCHITECTURE.md`](CONTRAT-ARCHITECTURE.md)** | Les règles plateforme que toute app hérite (S3, APIs via Hub, APIM/LLM, minihub, Vault, IAM/SSO, PG THESOCLE, no-mock). **Input #8.** |
-| **[`inputs-corpus/`](inputs-corpus/)** | Définition des **9 slots d'inputs (0→8)** techniques (framework, Hub, front, packs, minihub, PG, contrat d'archi) — un sous-dossier par slot. |
-| **[`conception/`](conception/)** | Pilier 1 (v1.4) — **LE kit de conception** : la méthode **M0→M7** (METHODE + templates + générateur + prompt) **et** les artefacts signables (**fiches RG · matrice d'habilitations · plan de test**). |
-| **[`conformite/`](conformite/)** | Pilier 2 (v1.5, périmètre acté) : PV de recette, RGPD, risques, budget/avenants, audit trail — le contractuel & légal. |
-| **[`run/`](run/)** | Pilier 3 (v1.6, périmètre acté) : environnements, exploitation, CI/revue, doc/formation — la vie après la livraison. |
+```
+methode-lmvi/
+├── USAGE.md                  ← COMMENCER ICI : le mode d'emploi (pas-à-pas + prompts)
+├── CONTRAT-ARCHITECTURE.md   ← les règles plateforme héritées par toute app (jamais redécidées)
+├── CHANGELOG.md              ← versions du kit (base du resync des instances)
+│
+├── conception/               ← PILIER 1 (livré) : concevoir et prouver
+│     la chaîne M0→M7 (METHODE + 10 templates + générateur + YAML exemple)
+│     + fiches RG · matrice d'habilitations · plan de test
+├── conformite/               ← PILIER 2 (v1.5 à venir) : le contractuel & légal
+│     PV de recette · RGPD · risques · budget/avenants · audit trail
+├── run/                      ← PILIER 3 (v1.6 à venir) : la vie après la livraison
+│     environnements · exploitation · CI/revue · doc & formation
+│
+├── inputs-corpus/            ← les 9 slots d'inputs techniques (0→8) qu'une app instancie
+└── AnalyseFable/             ← les revues critiques du kit (archives datées)
+```
 
-## Le principe
+**Un pilier = une famille d'artefacts**, activée ou non selon le contexte (déclaré dans le casting
+M0) : en **solo**, `conception/` suffit ; chez un **client**, on active les trois. La chaîne M0→M7
+vit dans `conception/` parce que concevoir est le cœur de la méthode — les deux autres piliers
+ajoutent leurs artefacts aux mêmes maillons (ex. le PV de recette s'adosse à la gate d'une phase).
+
+## Comment ça s'articule
 
 ```mermaid
 flowchart LR
-  M["Méthode générique M0→M7"] --> INST["Instance app (ex. Régie)"]
-  CORP["Corpus d'inputs (9 slots, 0→8)"] --> INST
-  CONTRAT["Contrat d'architecture"] --> CORP
-  INST --> CODE["App (code)"]
+  subgraph KIT["Ce repo (générique)"]
+    C["conception/ (M0→M7 + RG/hab/tests)"]
+    CF["conformite/"] 
+    R["run/"]
+    CORP["inputs-corpus/ (9 slots)"]
+    CONTRAT["CONTRAT-ARCHITECTURE"]
+  end
+  KIT --> INST["Instance = dossier du chantier dans l'app<br/>(_kit copié + inputs/ remplis + tracking/)"]
+  INST --> CODE["App (code, phase par phase)"]
 ```
 
-## Vue globale — le cycle de vie complet
+## Le cycle de vie d'un chantier
 
-En termes de phases projet classiques, la chaîne M0→M7 se lit ainsi :
-
-| Phase projet | Maillons | Ce qui s'y passe | Et les tests ? |
+| Étape | Maillons | Ce qui s'y passe | Et les tests ? |
 |---|---|---|---|
-| **1 · Conception** | M0 → M1 → M2 → M3 | vision confirmée, spec (QUOI + RG + NFR), US, épics | les **critères d'acceptation** (M2) s'écrivent ici — c'est la matière des futurs tests, posée **avant tout code** |
-| **2 · Arbitrage** | M4 | toutes les décisions structurantes tranchées (spike jetable possible pour instruire une décision) | — |
-| **3 · Découpage & plan** | M5 → M6 | phasage gaté, plan technique, matrice de couverture | la **stratégie de test** se décide en M6 : quoi automatisé vs démontré, quoi protège la non-régression |
-| **4 · Exécution** (répétée par phase P-x) | M7 puis P-0, P-1… | câblage, puis code par incréments | les tests automatisés s'écrivent **avec** le code (CA → tests) |
-| **5 · Recette** | la **gate** de chaque P-x | démo réelle validée par le commanditaire | + re-vérification des gates précédentes (non-régression) |
-| **6 · Livraison** | à chaque gate passée | build → registre → déploiement (cible définie en M7) | livraison **incrémentale**, pas de big-bang final |
+| **1 · Cadrage & spécification** | M0 → M1 → M2 → M3 | vision confirmée, spec (QUOI + RG + habilitations + NFR), US, épics | la **matière des tests** s'écrit ici : CA des US + exemples/contre-exemples des RG — avant tout code |
+| **2 · Arbitrage** | M4 | toutes les décisions structurantes tranchées — **on ne code pas avant** | — |
+| **3 · Plan** | M5 → M6 | phasage gaté, plan technique, matrice de couverture (colonne Tests), mapping IAM | le **plan de test** se décide ici : automatisé vs démo, non-régression |
+| **4 · Réalisation** (répétée par phase P-x) | M7 puis P-0, P-1… | câblage, puis code par incréments | les tests s'écrivent **avec** le code (squelettes Gherkin générés) |
+| **5 · Recette** | la **gate** de chaque P-x | démo réelle validée par le commanditaire | + re-run de toutes les gates précédentes (non-régression) |
+| **6 · Livraison** | à chaque gate passée | build → registre → déploiement | incrémentale — jamais de big-bang final |
 
-```mermaid
-flowchart LR
-  subgraph C["1 · Conception"]
-    M0 --> M1 --> M2 --> M3
-  end
-  subgraph D["2-3 · Arbitrage & plan"]
-    M4 --> M5 --> M6
-  end
-  subgraph X["4-5-6 · Par phase P-x (répété)"]
-    DEV["dev + tests"] --> GATE["gate = démo<br/>(recette)"] --> LIV["livraison"]
-  end
-  C --> D --> M7["M7 câblage"] --> X
-  X -- "phase suivante" --> X
-```
-
-**La clé** : dev / tests / recette / livraison ne sont **pas** des phases finales du projet — le cycle
-en V classique est **replié dans chaque P-x**. Chaque phase est un mini-cycle complet qui se termine
-par une recette (la gate) et une livraison réelle. Détails opérationnels : [`USAGE.md`](USAGE.md).
-
-- La **méthode** (M0→M7) et le **corpus d'inputs** sont **génériques** et vivent **ici**.
-- Les **3 piliers** (`conception/` · `conformite/` · `run/`) se **branchent** sur la chaîne M0→M7,
-  **activables selon le contexte** (déclaré dans le casting M0 : solo = conception au minimum ;
-  client = les trois).
-- Chaque **app** crée son dossier d'instance (méthode appliquée + `inputs/` rempli + `tracking/`).
-- Le **contrat d'architecture** est la source de vérité transversale : aucune app ne le redécide.
+**La clé** : recette et livraison ne sont pas des étapes finales — le cycle en V est **replié dans
+chaque phase P-x**, qui est un mini-cycle complet (dev → tests → recette → livraison).
 
 ## Instances connues
-- **Régie (APP-16)** — 1ʳᵉ instance : `APP-16-REGIES/docs/atelier-decomposition/` (méthode M0→M7
-  appliquée, `inputs/` rempli, `tracking/PA-0`).
-
-## Statut de mise en place
-- ✅ Méthode générique M0→M7 + artefacts signables dans [`conception/`](conception/) — revues Fable
-  appliquées, cf. [`CHANGELOG.md`](CHANGELOG.md) et [`AnalyseFable/`](AnalyseFable/).
-- ✅ Corpus d'inputs (9 slots, 0→8) dans [`inputs-corpus/`](inputs-corpus/).
-- ✅ Contrat d'architecture.
-- ⏳ **Aligner la version** framework **5.8.0 (ligne 5.8)** (input slot #1).
-- ℹ️ L'instance Régie (`APP-16-REGIES/…/atelier-decomposition/`) garde sa **copie vendorée** (repo séparé,
-  kit v1.0.0) ; cette version-ci est la **canonique générique** à copier pour un nouveau chantier.
+- **Régie (APP-16)** — 1ʳᵉ instance : `APP-16-REGIES/docs/atelier-decomposition/` (kit v1.0.0
+  vendoré, à resynchroniser).
 
 ## Resync d'une instance
 
-Chaque fichier du kit porte un marqueur `<!-- KIT-VERSION: x.y.z -->` ; une instance copie le kit à
-une version donnée. Pour resynchroniser :
+Chaque fichier du kit porte `<!-- KIT-VERSION: x.y.z -->` ; une instance copie le kit à une version
+donnée (dossier `_kit/`). Pour resynchroniser :
+1. **Comparer** la `KIT-VERSION` de l'instance au [`CHANGELOG.md`](CHANGELOG.md) → versions manquantes.
+2. **Reporter** les changements pertinents (décrits par version) ; toute divergence volontaire = décision M4 de l'instance.
+3. **Marquer** la nouvelle `KIT-VERSION` dans l'instance.
 
-1. **Comparer** : lire la `KIT-VERSION` des fichiers de l'instance et le
-   [`CHANGELOG.md`](CHANGELOG.md) canonique (racine) → lister les versions manquantes.
-2. **Reporter** : appliquer à l'instance les changements pertinents de chaque version (le CHANGELOG
-   les décrit par change-set) ; toute divergence volontaire est une décision M4 de l'instance.
-3. **Marquer** : mettre à jour la `KIT-VERSION` des fichiers resyncés dans l'instance.
+## Reste à faire
+- ⏳ Piliers `conformite/` (v1.5) et `run/` (v1.6) — périmètres actés dans leurs README.
+- ⏳ Aligner le slot #1 du corpus sur la version framework 5.8.x exacte.

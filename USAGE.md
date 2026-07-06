@@ -1,39 +1,33 @@
-<!-- KIT-VERSION: 1.4.0 -->
-# USAGE — démarrer un nouveau chantier avec le kit Besoin2Plan
+<!-- KIT-VERSION: 1.4.2 -->
+# USAGE — démarrer un nouveau chantier
 
-> Le mode d'emploi opérationnel : **quoi faire, dans quel ordre, et quel prompt lancer** à chaque
-> maillon. La théorie est dans [`conception/METHODE-Besoin2Plan.md`](conception/METHODE-Besoin2Plan.md) —
-> ici, on exécute. Les prompts sont écrits pour un agent type Claude Code ayant accès au repo.
+> Le mode d'emploi : **quoi faire, dans quel ordre, quel prompt lancer**. La théorie est dans
+> [`conception/METHODE-Besoin2Plan.md`](conception/METHODE-Besoin2Plan.md) — ici on exécute.
+> Les prompts sont écrits pour un agent type Claude Code ayant accès au chantier. Une fois le kit
+> copié en `_kit/` (§1), **tous les templates se lisent depuis `_kit/`**.
 
 ---
 
-## La carte avant la route — où tu es, ce qui vient après
-
-Le déroulé complet, en phases projet classiques. Repère-toi ici à tout moment :
+## La carte avant la route
 
 ```
-┌─ 1 · CONCEPTION ──────────┐ ┌─ 2 · ARBITRAGE ─┐ ┌─ 3 · PLAN ─────────┐ ┌─ 4·5·6 · PAR PHASE P-x (répété) ──────────┐
+┌─ 1 · CADRAGE & SPEC ──────┐ ┌─ 2 · ARBITRAGE ─┐ ┌─ 3 · PLAN ─────────┐ ┌─ 4·5·6 · PAR PHASE P-x (répété) ──────────┐
 │ M0 vision → M1 spec       │ │ M4 décisions    │ │ M5 phasage         │ │ M7 câblage, puis pour CHAQUE P-x :        │
-│ → M2 US → M3 épics        │→│ (spike possible)│→│ → M6 plan+matrice  │→│  développement (code + tests auto)        │
-│                           │ │                 │ │   +stratégie tests │ │  → RECETTE (gate = démo au commanditaire) │
-│ 🧪 les CA (M2) = la       │ │ 🚫 on ne code   │ │ 🧪 on décide quoi  │ │  → LIVRAISON (build→registre→déploiement) │
-│ matière des futurs tests  │ │ pas avant       │ │ tester/automatiser │ │  → phase suivante                          │
+│ (+ RG + habilitations)    │→│ (spike possible)│→│ → M6 plan+matrice  │→│  développement (code + tests auto)        │
+│ → M2 US → M3 épics        │ │                 │ │   + plan de test   │ │  → RECETTE (gate = démo au commanditaire) │
+│ 🧪 matière des tests :    │ │ 🚫 on ne code   │ │ 🧪 quoi automatiser│ │  → LIVRAISON (build→registre→déploiement) │
+│ CA des US + ex./contre-ex.│ │ pas avant       │ │ vs démontrer       │ │  → phase suivante                          │
 └───────────────────────────┘ └─────────────────┘ └────────────────────┘ └────────────────────────────────────────────┘
-        que du papier                 décisions            plan                    le code n'existe qu'ici
+        que du papier                décisions            plan                    le code n'existe qu'ici
 ```
 
-**Les tests entrent en scène trois fois** : leur *matière* s'écrit en conception (les critères
-d'acceptation de chaque US, M2, + les exemples/contre-exemples des RG) ; leur *stratégie* se décide
-au plan (M6.5 : automatisé vs démo, non-régression) ; leur *code* s'écrit pendant le développement,
-en même temps que les briques (squelettes Gherkin **générés** depuis le YAML). La **recette** n'est
-pas une phase finale : c'est la **gate** de chaque P-x (démo réelle validée par le commanditaire +
-re-vérification des gates précédentes). La **livraison** est incrémentale : chaque gate passée se
-déploie. Le cycle en V est **replié dans chaque P-x** — jamais de tunnel de dev suivi d'une grande
-recette finale.
+Le cycle en V est **replié dans chaque P-x** : recette = la gate (démo + non-régression),
+livraison = à chaque gate. Jamais de tunnel de dev suivi d'une grande recette finale.
 
-**Les 3 piliers** : la chaîne est la colonne vertébrale ; [`conception/`](conception/) (RG ·
-habilitations · tests), [`conformite/`](conformite/) et [`run/`](run/) s'y branchent. Le casting M0
-déclare lesquels sont actifs — solo : `conception/` au minimum ; client : les trois.
+**Piliers** : ce déroulé utilise [`conception/`](conception/) (qui contient toute la chaîne M0→M7).
+Chez un client, le casting M0 active en plus [`conformite/`](conformite/) (PV de recette, RGPD,
+risques — v1.5) et [`run/`](run/) (environnements, exploitation — v1.6) : leurs artefacts
+s'ajouteront aux mêmes maillons.
 
 ---
 
@@ -52,54 +46,61 @@ Deux réponses sur trois orientent la même méthode → on la prend.
 ## 1. Installer le kit dans le projet
 
 ```bash
-# 1. Récupérer le kit (repo canonique, prendre le dernier tag)
+# 1. Récupérer le kit (dernier tag)
 git clone git@github.com:jmlmvi/methode-lmvi.git /tmp/methode-lmvi
 
 # 2. Créer le dossier d'instance du chantier dans l'app
 APP=/opt/.../APP-XX-MONAPP ; CHANTIER=$APP/docs/mon-chantier
 mkdir -p $CHANTIER/{M0-vision,M1-spec-besoins,M4-arbitrages,M5-phasage,M6-plan-technique,M7-execution,inputs,tracking}
 
-# 3. Vendorer le kit (copie de travail) + noter la version copiée
+# 3. Vendorer le kit de conception + noter la version copiée
 cp -r /tmp/methode-lmvi/conception $CHANTIER/_kit
 grep -m1 KIT-VERSION $CHANTIER/_kit/METHODE-Besoin2Plan.md   # → noter dans le README du chantier
 ```
 
-Arborescence cible d'une instance (modèle : Régie `APP-16-REGIES/docs/atelier-decomposition/`) :
+Arborescence cible de l'instance (modèle : Régie `APP-16-REGIES/docs/atelier-decomposition/`) :
 
 ```
 <app>/docs/<chantier>/
-├── _kit/                    ← copie vendorée du kit (KIT-VERSION notée)
+├── _kit/                         ← copie de conception/ (KIT-VERSION notée)
+├── us-data.yml                   ← SOURCE DE VÉRITÉ des US/RG/rôles (modèle : _kit/us-data.example.yml)
 ├── M0-vision/README.md
 ├── M1-spec-besoins/SPEC-<X>.md
-├── M2-user-stories/         ← GÉNÉRÉ (script)
-├── M3-epics/                ← GÉNÉRÉ (script)
+│   ├── RG/                       ← GÉNÉRÉ : 1 fiche par règle de gestion + index
+│   └── matrice-habilitations.generated.md   ← GÉNÉRÉ : à qualifier puis reporter dans la SPEC
+├── M2-user-stories/              ← GÉNÉRÉ : 1 fiche par US + index
+├── M3-epics/                     ← GÉNÉRÉ : 1 fiche par épic
 ├── M4-arbitrages/README.md
 ├── M5-phasage/README.md
-├── M6-plan-technique/README.md   ← matrice = source de vérité du mapping
+├── M6-plan-technique/README.md   ← matrice de couverture = source de vérité du mapping
 ├── M7-execution/README.md
-├── us-data.yml              ← source de vérité des US (copie de _kit/us-data.example.yml)
-├── inputs/                  ← slots 0→8 instanciés (cf. inputs-corpus/) + inputs métier
-└── tracking/<P-x>/          ← STATE / JOURNAL / BLOCKERS / DECISIONS / tasks
+├── tests-squelettes/             ← GÉNÉRÉ : Gherkin @US-x / @RG-x, à déplacer dans le repo de code
+├── inputs/                       ← slots 0→8 instanciés (cf. inputs-corpus/) + inputs métier
+└── tracking/<P-x>/               ← STATE / JOURNAL / BLOCKERS / DECISIONS / tasks
 ```
+
+Tout ce qui est marqué GÉNÉRÉ sort de `python3 _kit/gen-fiches-us.py us-data.yml` — on édite le
+YAML, jamais les fichiers générés.
 
 ---
 
 ## 2. Dérouler la chaîne M0→M7 — les prompts à lancer
 
-Règle générale : **un maillon à la fois**, on vérifie sa DoD (en bas de chaque template) avant de
-passer au suivant. Relecture **requise** après M1, M4 et M6.
+**Un maillon à la fois** ; on vérifie la DoD (en bas de chaque template) avant de passer au suivant.
+Relecture **requise** après M1, M4 et M6 (par le relecteur du casting, dans une session séparée).
 
-### M0 · Vision — prompt
+### M0 · Vision
 
 ```text
 Lis _kit/TEMPLATE-M0-vision.md et _kit/METHODE-Besoin2Plan.md (§0 et §1·M0).
 Voici mon besoin, en vrac : <<< ...verbatim du commanditaire... >>>
-Reformule en : vision 3–5 lignes, principe directeur, acteurs, rôles du chantier
-(commanditaire / relecteur). Écris M0-vision/README.md depuis le template.
+Reformule en : vision 3–5 lignes, principe directeur, acteurs (personas), casting du chantier
+(commanditaire, relecteur, métier/PO, dev, recetteur — cumul possible) et piliers activés
+(conception / conformité / run). Écris M0-vision/README.md depuis le template.
 NE PASSE PAS à M1 : attends ma confirmation « oui, c'est ça ».
 ```
 
-### M1 · Spec de besoins — prompt
+### M1 · Spec de besoins
 
 ```text
 La vision M0 est confirmée. Lis _kit/TEMPLATE-M1-spec-besoins.md.
@@ -110,131 +111,133 @@ run LLM inclus, rétention, quotas — N/A seulement si justifié), points [À A
 Le QUOI, jamais le comment. Aucune brique technique, aucun nom de worker.
 ```
 
-### M1 · RG & habilitations (pilier conception) — prompts
+### M1 · RG en fiches
 
 ```text
-Lis conception/TEMPLATE-RG.md (dans le kit). Pour chaque règle de gestion de la SPEC, remplis la
-section rg: de us-data.yml : titre, énoncé (une phrase impérative et testable), type
+Lis _kit/TEMPLATE-RG.md. Pour chaque règle de gestion de la SPEC, remplis la section rg: de
+us-data.yml : titre, énoncé (une phrase impérative et testable), type
 (invariant/calcul/contrainte/droit_acces/workflow), source, exceptions, et surtout ≥ 1 exemple
 conforme + ≥ 1 contre-exemple rejeté (ils deviendront les tests @RG-x). Zéro invention.
 ```
 
+### M1 · Habilitations
+
 ```text
-Lis conception/TEMPLATE-HABILITATIONS.md. À partir des acteurs M0 : propose les rôles métier
-(acteur ≠ rôle, toujours un rôle admin du tenant), remplis la section roles: de us-data.yml,
-puis lance le générateur et QUALIFIE le brouillon matrice-habilitations.generated.md : plus
-aucune cellule en « ? » — chaque ⛔ devient un test négatif, chaque ⚠️ pointe une RG droit_acces.
-Copie le résultat qualifié dans la SPEC M1 : c'est un artefact que le métier signe.
+Lis _kit/TEMPLATE-HABILITATIONS.md. À partir des acteurs M0 : propose les rôles métier
+(acteur ≠ rôle ; toujours un rôle admin du tenant), remplis la section roles: de us-data.yml,
+lance le générateur, puis QUALIFIE M1-spec-besoins/matrice-habilitations.generated.md : plus
+aucune cellule en « ? » — chaque ⛔ devient un test négatif (403), chaque ⚠️ pointe une RG
+droit_acces. Reporte la matrice qualifiée dans la SPEC M1 : c'est un artefact que le métier signe.
 ```
 
-### 🔍 Relecture M1 (requise) — prompt à lancer dans une session/un agent SÉPARÉ
+### 🔍 Relecture M1 (requise, session séparée)
 
 ```text
-Tu es relecteur adversarial. Lis M1-spec-besoins/SPEC-<X>.md SANS regarder le code du projet.
+Tu es relecteur adversarial. Lis M1-spec-besoins/ (SPEC + fiches RG + matrice d'habilitations)
+SANS regarder le code du projet.
 1) Réexplique le domaine avec tes mots — si tu n'y arrives pas, la spec échoue sa DoD.
-2) Traque : termes non définis ou définis deux fois, RG ambiguës ou contradictoires, décisions
-   déguisées en descriptions (elles doivent être en [À ARBITRER]), NFR manquantes, COMMENT qui a
-   fui dans le QUOI. Rends une liste de défauts priorisée, rien d'autre.
+2) Traque : termes non définis ou définis deux fois, RG ambiguës/contradictoires ou sans
+   contre-exemple, cellules d'habilitation incohérentes, décisions déguisées en descriptions
+   (→ [À ARBITRER]), NFR manquantes, COMMENT qui a fui dans le QUOI.
+Rends une liste de défauts priorisée, rien d'autre.
 ```
 
-### M2+M3 · User Stories & Épics — voie script (recommandée)
+### M2 + M3 · User Stories & Épics (générés)
 
 ```text
 Lis _kit/PROMPT-generer-fiches-US.md (voie 1) et _kit/us-data.example.yml (modèle).
-À partir de la SPEC M1 (récapitulatif des US), écris us-data.yml : chantier, root, spec (lien
+À partir de la SPEC M1 (récapitulatif des US), complète us-data.yml : chantier, root, spec (lien
 relatif + ancres), epics (lettre → note/titre/intention), us (code → epic, titre, acteur, veux,
 afin, deps, rg, ctx, ca). NE REMPLIS PAS phase/brique (on ne les connaît qu'après M5/M6).
 Zéro invention : chaque US vient de la spec.
 ```
 
-Puis :
-
 ```bash
 python3 $CHANTIER/_kit/gen-fiches-us.py $CHANTIER/us-data.yml
 ```
 
-→ génère `M2-user-stories/` (1 fiche/US + index) et `M3-epics/` (1 fiche/épic). Les fiches sont
-**régénérées intégralement** à chaque run : ne jamais les éditer à la main, éditer le YAML.
-*(Voie sans script : `_kit/PROMPT-generer-fiches-US.md` voie 2.)*
-
-### M4 · Arbitrages — prompt
+### M4 · Arbitrages
 
 ```text
 Lis _kit/TEMPLATE-M4-arbitrages.md. Prends tous les [À ARBITRER] de la SPEC M1 + les questions
-ouvertes apparues depuis. Pour chaque question : 2–3 options, avantages/inconvénients, TA
+ouvertes apparues depuis (dont les arbitrages types d'habilitations, §4 de
+_kit/TEMPLATE-HABILITATIONS.md). Pour chaque question : 2–3 options, avantages/inconvénients, TA
 recommandation argumentée. Présente-les-moi UNE PAR UNE pour que je tranche.
 Après mes décisions : écris M4-arbitrages/README.md (décision + pourquoi + impact) et rapatrie
-chaque décision dans la SPEC M1 (et note la mise à jour dans sa section Révisions).
+chaque décision dans la SPEC M1 (section Révisions mise à jour).
 ```
 
-### 🔍 Relecture M4 (requise) — même principe que M1, agent séparé : *« chaque décision a-t-elle une raison écrite ? une décision structurante reste-t-elle ouverte ? les décisions sont-elles reportées dans la spec ? »*
+🔍 **Relecture M4 (requise, session séparée)** : *« chaque décision a-t-elle une raison écrite ?
+une décision structurante reste-t-elle ouverte ? tout est-il reporté dans la spec ? »*
 
-### M5 · Phasage gaté — prompt
+### M5 · Phasage gaté
 
 ```text
-Lis _kit/TEMPLATE-M5-phasage.md et METHODE §1·M5. À partir des épics (M3) et des décisions (M4),
-propose un phasage P-0…P-n : P-0 = socle qui débloque le reste ; chaque phase = un lot d'épics/US
-qui apporte une valeur démontrable SEULE ; chaque gate formulée comme une DÉMO (« on voit X
-marcher »), jamais comme une tâche. Déclare le préfixe de phase retenu. Ré-estime ×2.
+Lis _kit/TEMPLATE-M5-phasage.md et _kit/METHODE-Besoin2Plan.md (§1·M5). À partir des épics (M3)
+et des décisions (M4), propose un phasage P-0…P-n : P-0 = socle qui débloque le reste ; chaque
+phase = un lot d'épics/US à valeur démontrable SEULE ; chaque gate formulée comme une DÉMO
+(« on voit X marcher »), jamais comme une tâche. Déclare le préfixe de phase. Ré-estime ×2.
 Écris M5-phasage/README.md et attends ma validation.
 ```
 
-### M6 · Plan technique + matrice — prompt
+### M6 · Plan technique + matrice + plan de test
 
 ```text
-Lis _kit/TEMPLATE-M6-plan-technique.md, le CONTRAT-ARCHITECTURE.md du kit, et les inputs/ du
-chantier. Pour chaque phase de M5, écris M6-plan-technique/README.md :
+Lis _kit/TEMPLATE-M6-plan-technique.md, _kit/TEMPLATE-TESTS.md, le CONTRAT-ARCHITECTURE.md du
+repo méthode, et les inputs/ du chantier. Pour chaque phase de M5, écris
+M6-plan-technique/README.md :
 1) réutilisation plateforme (ce qu'on NE code PAS — contrat d'architecture §10) ;
 2) briques nouvelles choisies PAR NATURE (arbre V005), jamais par épic ;
 3) modèle de données (standard THESOCLE) ;
-4) la MATRICE DE COUVERTURE US→épic→phase→brique→gate + colonne Statut/révisé le
-   (c'est ICI et seulement ici que vit le mapping ; reporte aussi phase/brique dans us-data.yml
-   puis relance le générateur pour produire le brouillon matrice-couverture.generated.md à fusionner) ;
-5) le PLAN DE TEST de chaque phase (conception/TEMPLATE-TESTS.md) : tagging @US-x/@RG-x/@neg,
-   niveau API par défaut (UI réservé aux @pivot), gate en une commande, non-régression des
-   phases précédentes — pars des squelettes générés dans tests-squelettes/ ;
-6) le mapping habilitations → IAM (§3 de conception/TEMPLATE-HABILITATIONS.md) : rôles métier →
+4) la MATRICE DE COUVERTURE US→épic→phase→brique→tests→gate + colonne Statut/révisé le
+   (c'est ICI et seulement ici que vit le mapping ; reporte phase/brique dans us-data.yml et
+   relance le générateur pour obtenir le brouillon matrice-couverture.generated.md à fusionner) ;
+5) le PLAN DE TEST par phase (_kit/TEMPLATE-TESTS.md) : tagging @US-x/@RG-x/@neg, niveau API par
+   défaut (UI réservé aux @pivot), gate en une commande, non-régression — pars des squelettes
+   générés dans tests-squelettes/ ;
+6) le mapping habilitations → IAM (§3 de _kit/TEMPLATE-HABILITATIONS.md) : rôles métier →
    rôles/scopes manifest.json, mode SSO par route, compte de service.
 DoD : chaque US a une ligne AVEC sa colonne Tests remplie ; aucune brique sans US.
 ```
 
-### 🔍 Relecture M6 (requise) — agent séparé : *« lis la matrice verticalement (une ligne par US du YAML ? compare les listes) puis horizontalement (chaque brique sert-elle une US ? une brique a-t-elle été inventée ?). Vérifie que rien de ce que le contrat d'architecture fournit n'est re-codé. »*
+🔍 **Relecture M6 (requise, session séparée)** : *« lis la matrice verticalement (une ligne par US
+du YAML ? compare les listes) puis horizontalement (chaque brique sert-elle une US ?). Vérifie que
+rien de ce que le contrat d'architecture fournit n'est re-codé, et qu'aucun ⛔ d'habilitation n'est
+sans test négatif. »*
 
-### M7 · Exécution & câblage — prompt
+### M7 · Exécution & câblage — puis le code
 
 ```text
 Lis _kit/TEMPLATE-M7-execution.md. Écris M7-execution/README.md : où va le code (app/module,
-repo), les inputs/ rassemblés (slots utilisés + versions copiées), les outils Hub/MCP nécessaires
+repo), les inputs/ rassemblés (slots + versions copiées), les outils Hub/MCP nécessaires
 (db_worker, iam, vault, storage, APIM, proxy, install…), la cible d'exécution
-(build → registre → déploiement). Crée tracking/<P-0>/ avec STATE.md, JOURNAL.md, BLOCKERS.md,
-DECISIONS.md, tasks/. Puis on code la P-0 par incréments atomiques — zéro mock, preuve réelle
-à la gate.
+(build → registre → déploiement). Crée tracking/<P-0>/ (STATE, JOURNAL, BLOCKERS, DECISIONS,
+tasks/). Puis on code la P-0 par incréments atomiques — zéro mock, preuve réelle à la gate
+(démo + re-run des gates précédentes).
 ```
 
 ---
 
-## 3. Pendant l'exécution — les boucles de retour (méthode §2)
+## 3. Pendant la réalisation — les boucles de retour (méthode §2)
 
-- **Gate échouée** → prompt : *« La gate de <P-x> a échoué : <constat>. Applique METHODE §2.1 :
-  consigne dans tracking/<P-x>/BLOCKERS.md, propose-moi redémo / descope / retour M4 ou M6 avec ta
-  recommandation, et journalise ma décision dans DECISIONS.md. »*
+- **Gate échouée** → *« La gate de <P-x> a échoué : <constat>. Applique METHODE §2.1 : consigne
+  dans tracking/<P-x>/BLOCKERS.md, propose-moi redémo / descope / retour M4 ou M6 avec ta
+  recommandation, journalise ma décision dans DECISIONS.md. »*
 - **Un apprentissage invalide la spec** → §2.2 : entrée datée dans la section **Révisions** de la
-  SPEC + ligne de matrice mise à jour (colonne « Statut / révisé le »). La matrice reste la source
-  de vérité à tout moment.
+  SPEC + ligne de matrice mise à jour (colonne « Statut / révisé le »).
 - **US à splitter/abandonner** → §2.3 : jamais de suppression ; `splittée → US-x.1/x.2` (dans le
   YAML puis régénérer) ou `abandonnée` avec raison en M4, ligne barrée dans la matrice.
-- **À chaque gate passée** : mettre à jour la colonne Statut de la matrice + preuve réelle dans
-  `tracking/<P-x>/` (démo + re-vérification des gates précédentes).
+- **À chaque gate passée** : colonne Statut de la matrice à jour + preuve réelle archivée dans
+  `tracking/<P-x>/`.
 
 ---
 
 ## 4. Resync du kit (quand le canonique évolue)
 
-1. Comparer la `KIT-VERSION` de `_kit/` avec [`CHANGELOG.md`](CHANGELOG.md) (racine) du repo
-   canonique (`github.com/jmlmvi/methode-lmvi`, prendre les tags).
-2. Reporter les changements pertinents dans `_kit/` (le CHANGELOG les décrit par change-set) ;
-   toute divergence volontaire = décision M4 de l'instance.
-3. Mettre à jour les marqueurs `KIT-VERSION` des fichiers resyncés.
+1. Comparer la `KIT-VERSION` de `_kit/` au [`CHANGELOG.md`](CHANGELOG.md) du repo canonique
+   (`github.com/jmlmvi/methode-lmvi`, prendre les tags).
+2. Reporter les changements pertinents dans `_kit/` ; toute divergence volontaire = décision M4.
+3. Mettre à jour les marqueurs `KIT-VERSION` resyncés.
 
 ---
 

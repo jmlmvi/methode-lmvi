@@ -3,6 +3,16 @@
 > Semver (convention LMVI). Chaque instance note la `KIT-VERSION` copiée et resynce via ce fichier
 > (procédure : README racine, « Resync d'une instance »).
 
+## 1.4.2 — 2026-07-06
+
+**README et USAGE réécrits à neuf** (ils étaient devenus des empilements de retouches 1.1→1.4.1) :
+- levée de l'ambiguïté « conception » : le **pilier** `conception/` (le kit : chaîne M0→M7 +
+  RG/habilitations/tests) ≠ l'**étape** du cycle de vie, renommée « Cadrage & spécification » ;
+- README : arborescence commentée du repo, articulation kit→instance→app, cycle de vie 6 étapes ;
+- USAGE : chemins unifiés sur `_kit/` dans tous les prompts, arborescence d'instance complétée
+  (RG/ générés, matrice-habilitations, tests-squelettes/), prompt M0 aligné casting+piliers,
+  relecture M1 étendue aux fiches RG et à la matrice d'habilitations.
+
 ## 1.4.1 — 2026-07-06
 
 **Restructuration (⚠️ cassante pour les chemins)** : le dossier `methode/` est **fusionné à plat
