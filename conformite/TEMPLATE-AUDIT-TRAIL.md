@@ -1,4 +1,5 @@
 <!-- KIT-VERSION: 1.5.0 -->
+<!-- PROUVE-SUR: — -->
 # Audit trail métier — {{nom du chantier}}
 
 > Template du **registre des événements auditables** (pilier conformité). « Qui a fait quoi,

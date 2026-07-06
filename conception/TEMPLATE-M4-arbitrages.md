@@ -1,4 +1,5 @@
 <!-- KIT-VERSION: 1.1.0 -->
+<!-- PROUVE-SUR: Régie/atelier-décomposition (kit v1.0) -->
 # M4 · Arbitrages — {{nom du chantier}}
 
 > Template. **On ne passe pas au plan tant qu'une décision structurante est ouverte.**

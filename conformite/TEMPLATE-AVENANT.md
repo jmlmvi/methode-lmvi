@@ -1,4 +1,5 @@
 <!-- KIT-VERSION: 1.5.0 -->
+<!-- PROUVE-SUR: — -->
 # Fiche d'impact & avenant — {{nom du chantier}} · {{CHG-n}}
 
 > Template de la **fiche de changement de périmètre** (pilier conformité). Prolonge la boucle de

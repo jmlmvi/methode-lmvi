@@ -1,4 +1,5 @@
 <!-- KIT-VERSION: 1.6.0 -->
+<!-- PROUVE-SUR: — -->
 # CI & revue de code — {{nom du chantier}}
 
 > Template du **flux qualité du code** (pilier run). Se pose en **M7**, s'applique à chaque

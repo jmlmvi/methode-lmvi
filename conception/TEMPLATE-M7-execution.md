@@ -1,4 +1,5 @@
 <!-- KIT-VERSION: 1.1.0 -->
+<!-- PROUVE-SUR: Régie/atelier-décomposition (kit v1.0) -->
 # M7 · Exécution & câblage — {{nom du chantier}}
 
 > Template. **Le pont entre le plan (M6) et le code.** Répond à : *où* le code, *quels* inputs, *quels*

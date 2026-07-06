@@ -6,8 +6,13 @@
 > (conception / [conformité](../conformite/) v1.5 / [run](../run/) v1.6), activés via le casting M0.
 > Copier **ce dossier** comme `_kit/` d'un nouveau chantier (cf. [`../USAGE.md`](../USAGE.md)).
 
-- 📘 **[`METHODE-Besoin2Plan.md`](METHODE-Besoin2Plan.md)** — la méthodologie de référence (M0→M7,
-  3 axes, piliers, boucles de retour, matrice de couverture). **À lire en premier.**
+- 📘 **[`METHODE-Besoin2Plan.md`](METHODE-Besoin2Plan.md)** — la méthodologie de référence (preuve
+  externe, 3 axes, piliers, boucles de retour dont §2.4 arrêt, matrice). **À lire en premier**
+  (après [`../ESSENTIEL.md`](../ESSENTIEL.md)).
+- 🎚️ **[`PROFILS.md`](PROFILS.md)** — seuil d'entrée, mode d'entrée (besoin exprimé / **CdC
+  fourni** avec ingestion tracée), profils express / solo / client.
+- 📊 **[`TEMPLATE-RETEX.md`](TEMPLATE-RETEX.md)** — le post-mortem méthode d'un chantier : ce qui
+  fait évoluer le kit (1 version = 1 RETEX ; fait vivre les marqueurs `PROUVE-SUR`).
 - 🛠️ **[`gen-fiches-us.py`](gen-fiches-us.py)** — générateur **générique** : fiches US/Épic/RG,
   matrice d'habilitations, squelettes de tests Gherkin. Données dans un **YAML externe** :
   `python3 gen-fiches-us.py <us-data.yml>` — modèle : [`us-data.example.yml`](us-data.example.yml).

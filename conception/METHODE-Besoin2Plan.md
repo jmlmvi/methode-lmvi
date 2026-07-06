@@ -13,9 +13,28 @@
 
 ---
 
-## 0. Le principe fondateur : 3 axes orthogonaux
+## 0. Les principes fondateurs
 
-On ne mélange jamais ces trois axes. C'est la clé de la méthode.
+### 0.1 Premier principe — la preuve externe (comment croire)
+
+> **Tout artefact doit être prouvé par quelque chose d'extérieur à lui.**
+
+| Artefact | Sa preuve externe |
+|---|---|
+| US | son test d'acceptation (`@US-x`) |
+| RG | son contre-exemple rejeté (`@RG-x`) |
+| Matrice de couverture | ses deux lectures (verticale : couverture ; horizontale : chemin) |
+| Phase | sa gate = démo réelle + non-régression |
+| Backup | sa restauration exécutée |
+| Doc utilisateur | sa rejouabilité (elle permet de refaire la démo) |
+| Spec | un relecteur **qui ne l'a pas écrite** (différent en nature, cf. §1) |
+| **Le kit lui-même** | un **chantier réel** (RETEX — un template jamais instancié reste ⚗️) |
+
+Un artefact sans preuve externe est une opinion bien formatée.
+
+### 0.2 Deuxième principe — les 3 axes orthogonaux (comment ranger)
+
+On ne mélange jamais ces trois axes.
 
 | Axe | Objet | Répond à |
 |---|---|---|
@@ -48,16 +67,25 @@ M0 Besoin & Vision  →  M1 Spec de besoins  →  M2 User Stories  →  M3 Épic
 ```
 
 Chaque maillon a une **entrée**, un **livrable**, des **règles**, et une **définition de fini (DoD)**.
-Chaque livrable est relisible ; la relecture est **requise** pour **M1, M4 et M6** (les maillons
-porteurs de décisions), recommandée ailleurs.
+Chaque livrable est relisible ; la relecture est **requise** pour **M1, M4 et M6** — par un relecteur
+**différent en nature** du producteur (humain métier, ou **autre modèle LLM** : opencode/minimax,
+glm47 via APIM…) : une autre session du même modèle est une relecture de confort, insuffisante seule.
+
+**Deux modes d'entrée** (déclarés en M0, cf. `PROFILS.md`) :
+- **besoin exprimé** (vrac, oral) → M0/M1 s'écrivent en reformulant ;
+- **CdC / spec fourni** (document existant, même volumineux) → M0/M1 s'**extraient** : la SPEC
+  méthodique est produite **depuis** le CdC avec **traçabilité** (chaque US/RG référence son § du
+  CdC), les trous et contradictions du CdC deviennent les `[À ARBITRER]`. Le CdC reste la référence
+  contractuelle ; la SPEC devient l'artefact opératoire. Zéro invention : rien qui ne soit dans le
+  CdC ou tranché en M4.
 
 ### M0 — Besoin & Vision
 - **Entrée** : ce que dit le commanditaire (souvent oral, désordonné).
 - **Livrable** : 3–5 lignes de vision + le **principe directeur** + la liste des **acteurs** (personas
   métier — ils donneront les **rôles métier** des habilitations : acteur ≠ rôle, une personne cumule) +
-  le **casting du chantier** (commanditaire, relecteur(s), métier/PO, dev(s), recetteur — une personne
-  peut cumuler ; en solo, les agents IA prennent des rôles, ex. relecteur adversarial) + les **piliers
-  activés** (conception / conformité / run).
+  le **casting du chantier** (commanditaire, relecteur(s) — dont le relecteur hors-famille,
+  métier/PO, dev(s), recetteur — une personne peut cumuler) + le **profil** (express / solo / client,
+  cf. `PROFILS.md`) + le **mode d'entrée** (besoin exprimé / CdC fourni) + les **piliers activés**.
 - **Règle** : reformuler et **faire confirmer** avant d'écrire quoi que ce soit d'autre.
 - **DoD** : le commanditaire dit « oui, c'est ça ».
 
@@ -165,6 +193,13 @@ pas seulement au moment du plan.
 `à faire → en cours → livrée`, plus deux états d'exception : **`splittée`** (→ `US-x.1`, `US-x.2` ;
 la fiche d'origine pointe vers ses filles) et **`abandonnée`** (raison consignée en M4). **Jamais de
 suppression** : une US abandonnée reste dans la matrice, barrée, avec sa raison.
+
+### 2.4 Arrêter un chantier (kill criterion)
+La méthode sait échouer une gate ; elle doit aussi savoir **abandonner**. Déclencheurs : **2 gates
+consécutives ajournées sur la même phase**, ou budget consommé sans valeur démontrée, ou décision
+du commanditaire. Procédure : le pilote **propose** l'arrêt (jamais ne le décide), le commanditaire
+tranche (décision M4 finale) ; post-mortem obligatoire (`TEMPLATE-RETEX.md`) ; artefacts archivés,
+jamais effacés. Un chantier arrêté proprement vaut mieux qu'un chantier zombie.
 
 ---
 

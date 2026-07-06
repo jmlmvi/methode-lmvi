@@ -1,4 +1,5 @@
 <!-- KIT-VERSION: 1.1.0 -->
+<!-- PROUVE-SUR: Régie/atelier-décomposition (kit v1.0) -->
 # M2 · User Stories — {{nom du chantier}}
 
 > Template. Une US = une intention **testable**, sans solution technique.

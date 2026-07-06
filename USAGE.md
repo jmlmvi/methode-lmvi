@@ -32,7 +32,10 @@ maillon de branchement de chaque artefact ; le prompt pilote les applique automa
 
 ---
 
-## 0. Est-ce la bonne méthode ? (30 secondes)
+## 0. Est-ce la bonne méthode, et à quel niveau ? (30 secondes)
+
+D'abord le **seuil** : si l'intention tient dans un message et se prouve par un test → **aucune
+méthode** (cf. [`conception/PROFILS.md`](conception/PROFILS.md)). Sinon :
 
 | # | Question | Oui → | Non → |
 |---|---|---|---|
@@ -40,7 +43,12 @@ maillon de branchement de chaque artefact ; le prompt pilote les applique automa
 | 2 | Vend-on une **spec contractuelle** (la spec est le livrable) ? | FromSpec2Plan | Besoin2Plan |
 | 3 | Le périmètre dépasse-t-il ~1 app ? | FromSpec2Plan | Besoin2Plan |
 
-Deux réponses sur trois orientent la même méthode → on la prend.
+Deux réponses sur trois orientent la même méthode → on la prend. Puis on choisit dans
+[`conception/PROFILS.md`](conception/PROFILS.md) : le **mode d'entrée** (besoin exprimé / **CdC
+fourni** — un cahier des charges existant, même de 36 pages, s'INGÈRE : M0/M1 s'extraient avec
+traçabilité §CdC→US/RG, ses trous deviennent les `[À ARBITRER]`) et le **profil**
+(express / solo / client — le profil contraint les artefacts et les arrêts, **jamais** la taille
+des documents).
 
 ---
 
@@ -90,11 +98,13 @@ YAML, jamais les fichiers générés.
 ### Mode normal : LE prompt pilote (un seul prompt pour tout le chantier)
 
 Colle le prompt de [`conception/PROMPT-PILOTE.md`](conception/PROMPT-PILOTE.md) (copié dans
-`_kit/PROMPT-PILOTE.md`) avec ton besoin dedans : **l'agent enchaîne lui-même M0→M7** — livrables,
-YAML, générateur, DoD, relectures adversariales — et ne s'arrête qu'aux **6 points de décision**
-qui te reviennent : ① confirmer la vision · ② signer RG + habilitations · ③ trancher les
-arbitrages · ④ valider le phasage · ⑤ valider le plan · ⑥ donner le go du code. Il tient
-`PILOTAGE.md` à jour ; si la session casse : *« Lis PILOTAGE.md et continue le chantier. »*
+`_kit/PROMPT-PILOTE.md`) avec ton besoin — **ou le chemin de ton CdC** — dedans : **l'agent
+enchaîne lui-même M0→M7** selon le profil — livrables, YAML, générateur, DoD, **relectures
+adversariales par un autre modèle (opencode)** archivées en preuve — et ne s'arrête qu'aux points
+de décision qui te reviennent (6 en solo/client, 3 en express) : ① confirmer la vision · ② signer
+RG + habilitations · ③ trancher les arbitrages · ④ valider le phasage · ⑤ valider le plan ·
+⑥ donner le go du code. Il tient `PILOTAGE.md` (avec mesures : durées, allers-retours) et
+`KIT-FRICTIONS.md` ; si la session casse : *« Lis PILOTAGE.md et continue le chantier. »*
 
 ### Mode manuel : les prompts unitaires (secours & reprise)
 

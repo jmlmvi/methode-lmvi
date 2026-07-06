@@ -1,4 +1,5 @@
 <!-- KIT-VERSION: 1.5.0 -->
+<!-- PROUVE-SUR: — -->
 # Interfaces & reprise de l'existant — {{nom du chantier}}
 
 > Template **brownfield** : dès que l'app doit **coexister avec des systèmes existants** ou

@@ -1,4 +1,5 @@
 <!-- KIT-VERSION: 1.1.0 -->
+<!-- PROUVE-SUR: Régie/atelier-décomposition (kit v1.0) -->
 # M3 · Épics — {{nom du chantier}}
 
 > Template. L'épic **regroupe** des US par axe de valeur. Relation de regroupement, pas étape stricte.

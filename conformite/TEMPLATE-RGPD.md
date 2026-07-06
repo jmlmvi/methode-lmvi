@@ -1,4 +1,5 @@
 <!-- KIT-VERSION: 1.5.0 -->
+<!-- PROUVE-SUR: — -->
 # RGPD / données personnelles — {{nom du chantier}}
 
 > Template du **volet données personnelles** (pilier conformité). Se remplit avec la SPEC **M1**

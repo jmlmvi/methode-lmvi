@@ -11,9 +11,10 @@
 
 ```
 methode-lmvi/
-├── USAGE.md                  ← COMMENCER ICI : le mode d'emploi (pas-à-pas + prompts)
+├── ESSENTIEL.md              ← LIRE EN PREMIER : la philosophie en 1 page (preuve externe, 3 axes)
+├── USAGE.md                  ← puis le mode d'emploi (pas-à-pas + prompts + PILOTE)
 ├── CONTRAT-ARCHITECTURE.md   ← les règles plateforme héritées par toute app (jamais redécidées)
-├── CHANGELOG.md              ← versions du kit (base du resync des instances)
+├── CHANGELOG.md              ← versions du kit (cadence : 1 version = 1 RETEX de chantier réel)
 │
 ├── conception/               ← PILIER 1 : concevoir et prouver
 │     la chaîne M0→M7 (METHODE + templates + générateur + PROMPT-PILOTE)
@@ -27,10 +28,15 @@ methode-lmvi/
 └── AnalyseFable/             ← les revues critiques du kit (archives datées)
 ```
 
-**Un pilier = une famille d'artefacts**, activée ou non selon le contexte (déclaré dans le casting
-M0) : en **solo**, `conception/` suffit ; chez un **client**, on active les trois. La chaîne M0→M7
-vit dans `conception/` parce que concevoir est le cœur de la méthode — les deux autres piliers
-ajoutent leurs artefacts aux mêmes maillons (ex. le PV de recette s'adosse à la gate d'une phase).
+**Un pilier = une famille d'artefacts**, activée selon le **profil** déclaré au casting M0
+(`conception/PROFILS.md` : express / solo / client, + mode d'entrée besoin-exprimé / **CdC
+fourni**). La chaîne M0→M7 vit dans `conception/` parce que concevoir est le cœur de la méthode —
+les deux autres piliers ajoutent leurs artefacts aux mêmes maillons.
+
+**Cadence du kit** : chaque template porte `PROUVE-SUR:` (les chantiers réels qui l'ont éprouvé —
+« — » = encore ⚗️ spéculatif). Le canonique est **gelé pendant un chantier** (frictions notées
+dans l'instance, `KIT-FRICTIONS.md`) ; **une version du kit = un RETEX de chantier réel**
+(`conception/TEMPLATE-RETEX.md`).
 
 ## Comment ça s'articule
 

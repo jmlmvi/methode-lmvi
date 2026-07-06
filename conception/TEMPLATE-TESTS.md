@@ -1,4 +1,5 @@
 <!-- KIT-VERSION: 1.4.0 -->
+<!-- PROUVE-SUR: — -->
 # Plan de test — {{nom du chantier}} · phase {{P-x}}
 
 > Template du **plan de test par phase** (s'écrit en **M6.5**, s'exécute à la gate de {{P-x}}).

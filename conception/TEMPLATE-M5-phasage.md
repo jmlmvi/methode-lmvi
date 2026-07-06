@@ -1,4 +1,5 @@
 <!-- KIT-VERSION: 1.1.0 -->
+<!-- PROUVE-SUR: Régie/atelier-décomposition (kit v1.0) -->
 # M5 · Phasage gaté — {{nom du chantier}}
 
 > Template. Une phase = un lot d'épics/US livré ensemble, avec une **gate = démo vérifiable**.

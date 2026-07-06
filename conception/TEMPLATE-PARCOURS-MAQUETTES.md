@@ -1,4 +1,5 @@
 <!-- KIT-VERSION: 1.5.0 -->
+<!-- PROUVE-SUR: — -->
 # Parcours & maquettes — {{nom du chantier}}
 
 > Template **optionnel mais fortement recommandé en contexte client** : le client valide sur des

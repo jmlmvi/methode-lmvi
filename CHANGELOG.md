@@ -3,6 +3,31 @@
 > Semver (convention LMVI). Chaque instance note la `KIT-VERSION` copiée et resynce via ce fichier
 > (procédure : README racine, « Resync d'une instance »).
 
+## 1.7.0 — 2026-07-06
+
+**Transformation « préparation au premier cas pratique réel »** (plan `AnalyseFable/06`, lot A —
+issu de l'analyse Gestalt `AnalyseFable/05`). Après ce tag : **canonique GELÉ** jusqu'à la fin du
+cas pratique (BilanSocle) ; règle de cadence : **1 version = 1 RETEX de chantier réel**.
+
+- **T-1 Principe unificateur** : METHODE §0.1 « tout artefact doit être prouvé par quelque chose
+  d'extérieur à lui » + table de déclinaison (y compris : le kit → chantier réel). Les 3 axes
+  deviennent §0.2. **ESSENTIEL.md** (T-7) : la philosophie en 1 page, à lire en premier.
+- **T-2 `conception/PROFILS.md`** : 2 dimensions — **mode d'entrée** (besoin exprimé / **CdC
+  fourni** : ingestion tracée §CdC→US/RG, les trous du CdC = les `[À ARBITRER]`) × **profil**
+  (express 3 arrêts / solo / client). Règle d'or : un profil ne contraint JAMAIS la taille des
+  documents (correction commanditaire : un CdC de 36 pages est un mode d'entrée, pas une lourdeur).
+- **T-3 Seuil d'entrée** (« un message + un test → aucune méthode ») + METHODE **§2.4 arrêter un
+  chantier** (kill criterion, le pilote propose, le commanditaire tranche, RETEX obligatoire).
+- **T-4 Relecteur hors-famille** : relectures M1/M4/M6 par un autre modèle — le pilote **pilote
+  opencode** (décision commanditaire) et archive les sorties en preuve. Prouvé ce jour :
+  `AnalyseFable/preuves/relecture-opencode-essentiel.md` (MiniMax-M3, relecture réelle).
+- **T-5 Dispositif de preuve terrain** : `TEMPLATE-RETEX.md`, marqueur `PROUVE-SUR:` sur les 25
+  templates (honnêteté : chaîne M0→M7/US/EPIC = Régie v1.0 ; le reste = « — »), gel + journal
+  `KIT-FRICTIONS.md` tenu par le pilote.
+- **T-6 Instrumentation** : PILOTAGE.md mesure durées/allers-retours/latences par maillon →
+  section « économie » du RETEX.
+- PROMPT-PILOTE v2 : profil + mode CdC + opencode + mesures + proposition d'arrêt §2.4.
+
 ## 1.6.0 — 2026-07-06
 
 Pilier **run/** livré (la vie après la livraison, D-12/14/17/20) — les 3 piliers sont complets :

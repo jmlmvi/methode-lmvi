@@ -114,29 +114,30 @@ templates (avec « Régie (M0→M7 v1.0) » là où c'est vrai, « — » ailleu
 
 ---
 
-## Matrice de vérification du lot A
+## Matrice de vérification du lot A — EXÉCUTÉ le 2026-07-06
 
 | # | Changement | Critère objectif | Preuve | Statut |
 |---|---|---|---|---|
-| T-1 | Principe unificateur en §0 | METHODE ouvre sur la preuve externe + table de déclinaison | lecture + grep « prouvé par » | à faire |
-| T-2 | Profils express/solo/client | `PROFILS.md` existe ; pilote adapte ses arrêts ; express ≤ 5 fichiers | déroulé express à blanc (2 US) | à faire |
-| T-3 | Seuil d'entrée + §2.4 arrêt | les 2 règles écrites, pilote les connaît | lecture | à faire |
-| T-4 | Relecteur hors-famille | règle écrite avec options plateforme + 1 relecture réelle par autre modèle | sortie de la relecture jointe | à faire |
-| T-5 | RETEX + gel + PROUVE-SUR | template livré ; cadence écrite ; `grep -L "PROUVE-SUR" conception/TEMPLATE-*.md …` vide | grep + lecture | à faire |
-| T-6 | Instrumentation PILOTAGE | format de mesure dans PROMPT-PILOTE | lecture | à faire |
-| T-7 | ESSENTIEL.md 1 page | ≤ 1 page, zéro template mentionné | wc -l + relecture tiers | à faire |
+| T-1 | Principe unificateur en §0 | METHODE ouvre sur la preuve externe + table de déclinaison | METHODE §0.1 (8 lignes de table, dont « kit → chantier réel ») | ✅ |
+| T-2 | Profils + **modes d'entrée** | `PROFILS.md` ; **aucun plafond de taille** (correction commanditaire : un CdC de 36 pages = mode d'entrée « CdC fourni », ingestion tracée §CdC→US/RG) ; express ≤ 5 artefacts rédigés | déroulé express à blanc : **5 artefacts rédigés** (M0, SPEC, M4, matrice, YAML), le reste généré (2 fiches US + épic + squelettes) | ✅ |
+| T-3 | Seuil d'entrée + §2.4 arrêt | les 2 règles écrites, pilote les connaît | PROFILS §seuil ; METHODE §2.4 ; PILOTE règle 5 | ✅ |
+| T-4 | Relecteur hors-famille = **opencode** (décision commanditaire) | 1 relecture réelle par un autre modèle | [`preuves/relecture-opencode-essentiel.md`](preuves/relecture-opencode-essentiel.md) — MiniMax-M3, liste de défauts priorisée P0/P1 réelle | ✅ |
+| T-5 | RETEX + gel + PROUVE-SUR | template livré ; cadence « 1 version = 1 RETEX » écrite ; grep -L PROUVE-SUR vide | grep vide sur les 25 templates ; honnêteté : chaîne M0→M7/US/EPIC = « Régie v1.0 », 15 templates = « — » | ✅ |
+| T-6 | Instrumentation PILOTAGE | format de mesure dans PROMPT-PILOTE | PILOTE règle 4 (durées, allers-retours, latences) + RETEX §5 | ✅ |
+| T-7 | ESSENTIEL.md 1 page | 1 page, zéro template mentionné | 48 lignes ; relu par opencode (preuve T-4) — ses P1 « rôles/seuil absents » confirment le rôle de chapeau : ils vivent dans PROFILS/METHODE, pointés en pied de page | ✅ |
 
-**Gate du lot A** : un mini-chantier **express** déroulé à blanc de bout en bout (2 US) avec le
-pilote v1.7 — profil respecté, mesures enregistrées, RETEX d'une ligne produit. Puis tag `v1.7.0`
-et **gel jusqu'à la fin du cas pratique**.
+**Gate du lot A : PASSÉE** (chantier express à blanc + preuve opencode). Tag `v1.7.0`.
 
----
+## 🧊 GEL DU CANONIQUE
 
-## Points à trancher par le commanditaire avant d'exécuter
+À compter du tag `v1.7.0` : plus aucune modification du kit jusqu'à la fin du cas pratique
+**BilanSocle** (`ExempleCdc.md`, CdC v5.0, 804 lignes — profil pressenti : **client**, mode
+d'entrée : **CdC fourni**). Frictions → `KIT-FRICTIONS.md` de l'instance. Prochaine version =
+**v1.8.0, distillée du RETEX BilanSocle** (lot C).
 
-1. **Contenu du profil express** (T-2) : la coupe proposée (M0-5-lignes · M1-1-page · M4 ·
-   matrice mini · 1 phase) te va-t-elle ?
-2. **Relecteur hors-famille par défaut** (T-4) : minimax via APIM ? opencode ? un humain sur le
-   cas pratique ?
-3. Le **cas pratique** : profil pressenti (solo ou client ?) — ça décide quels piliers passeront
-   leur épreuve du feu.
+## Décisions commanditaire (2026-07-06)
+
+1. Profil express : **pas de plafond de taille de documents** — le profil contraint artefacts et
+   arrêts, le mode d'entrée gère les CdC volumineux. ✔ intégré (PROFILS règle d'or).
+2. Relecteur hors-famille : **opencode** (piloté par l'agent). ✔ intégré (PILOTE règle 3) + prouvé.
+3. Cas pratique : **BilanSocle** (`ExempleCdc.md`). Profil/piliers à confirmer au M0 du chantier.

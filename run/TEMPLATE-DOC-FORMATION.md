@@ -1,4 +1,5 @@
 <!-- KIT-VERSION: 1.6.0 -->
+<!-- PROUVE-SUR: — -->
 # Documentation utilisateur & formation — {{nom du chantier}}
 
 > Template du **volet doc & formation** (pilier run). Principe : **la doc se livre avec la gate**

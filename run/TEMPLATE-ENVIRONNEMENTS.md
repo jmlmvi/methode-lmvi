@@ -1,4 +1,5 @@
 <!-- KIT-VERSION: 1.6.0 -->
+<!-- PROUVE-SUR: — -->
 # Environnements & promotion — {{nom du chantier}}
 
 > Template des **environnements** (pilier run). Se pose en **M7** (câblage) : où le code tourne à

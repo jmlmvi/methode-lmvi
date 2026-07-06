@@ -1,4 +1,5 @@
 <!-- KIT-VERSION: 1.1.0 -->
+<!-- PROUVE-SUR: Régie/atelier-décomposition (kit v1.0) -->
 # Épic {{lettre}} · {{titre}}
 
 > Template d'une **fiche épic** (maillon M3 — le regroupement). Nom de fichier `{{lettre}}-{{slug}}.md`.

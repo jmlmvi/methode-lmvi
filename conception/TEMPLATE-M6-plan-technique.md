@@ -1,4 +1,5 @@
 <!-- KIT-VERSION: 1.4.0 -->
+<!-- PROUVE-SUR: Régie/atelier-décomposition (kit v1.0) -->
 # M6 · Plan technique + matrice de couverture — {{nom du chantier}}
 
 > Template. Choisir les briques **par nature** (arbre V005), **jamais par épic**. Réutiliser la plateforme.

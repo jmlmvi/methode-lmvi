@@ -1,4 +1,5 @@
 <!-- KIT-VERSION: 1.5.0 -->
+<!-- PROUVE-SUR: — -->
 # PV de recette — {{nom du chantier}} · phase {{P-x}}
 
 > Template du **procès-verbal de recette** (pilier conformité). S'adosse à la **gate** de chaque

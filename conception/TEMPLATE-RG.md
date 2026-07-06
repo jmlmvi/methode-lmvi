@@ -1,4 +1,5 @@
 <!-- KIT-VERSION: 1.4.0 -->
+<!-- PROUVE-SUR: — -->
 ---
 aliases: ["{{RG-x}}"]
 tags: [rg, "type/{{type}}"]

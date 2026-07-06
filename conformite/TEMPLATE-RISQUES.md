@@ -1,4 +1,5 @@
 <!-- KIT-VERSION: 1.5.0 -->
+<!-- PROUVE-SUR: — -->
 # Registre des risques — {{nom du chantier}}
 
 > Template du **registre des risques** (pilier conformité). Posé au cadrage (M0/M5), **relu à

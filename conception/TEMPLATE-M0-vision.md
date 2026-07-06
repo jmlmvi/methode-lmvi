@@ -1,4 +1,5 @@
 <!-- KIT-VERSION: 1.4.0 -->
+<!-- PROUVE-SUR: Régie/atelier-décomposition (kit v1.0) -->
 # M0 · Vision — {{nom du chantier}}
 
 > Template. Remplacer les `{{…}}`. **DoD** : le commanditaire dit « oui, c'est ça ».

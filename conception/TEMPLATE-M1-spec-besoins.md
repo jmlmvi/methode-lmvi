@@ -1,4 +1,5 @@
 <!-- KIT-VERSION: 1.1.0 -->
+<!-- PROUVE-SUR: Régie/atelier-décomposition (kit v1.0) -->
 # M1 · Spec de besoins — {{nom du chantier}}
 
 > Template. **QUOI, jamais le comment.** DoD : un tiers comprend le domaine sans voir le code.

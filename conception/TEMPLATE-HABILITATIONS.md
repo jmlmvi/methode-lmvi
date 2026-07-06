@@ -1,4 +1,5 @@
 <!-- KIT-VERSION: 1.4.0 -->
+<!-- PROUVE-SUR: — -->
 # Habilitations — {{nom du chantier}}
 
 > Template de la **matrice d'habilitations** (s'écrit en **M1**, le métier la signe ; se mappe en
