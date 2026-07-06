@@ -25,9 +25,10 @@ Chaque phase P-x est un **mini-cycle complet** : dev + tests, puis recette = la 
 non-régression), puis livraison. Jamais de tunnel de dev suivi d'une grande recette finale.
 
 **Piliers** : ce déroulé utilise [`conception/`](conception/) (qui contient toute la chaîne M0→M7).
-Chez un client, le casting M0 active en plus [`conformite/`](conformite/) (PV de recette, RGPD,
-risques — v1.5) et [`run/`](run/) (environnements, exploitation — v1.6) : leurs artefacts
-s'ajouteront aux mêmes maillons.
+Le casting M0 active en plus [`conformite/`](conformite/) (PV de recette à chaque gate, RGPD en M1,
+risques au cadrage, fiche d'avenant à chaque changement) et [`run/`](run/) (environnements et CI en
+M7, dossier d'exploitation avant la prod, doc livrée avec chaque gate) — leurs README indiquent le
+maillon de branchement de chaque artefact ; le prompt pilote les applique automatiquement.
 
 ---
 

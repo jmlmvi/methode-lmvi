@@ -3,6 +3,20 @@
 > Semver (convention LMVI). Chaque instance note la `KIT-VERSION` copiée et resynce via ce fichier
 > (procédure : README racine, « Resync d'une instance »).
 
+## 1.6.0 — 2026-07-06
+
+Pilier **run/** livré (la vie après la livraison, D-12/14/17/20) — les 3 piliers sont complets :
+- **TEMPLATE-ENVIRONNEMENTS** : dev/staging/recette client/prod (recette ≠ prod, toujours), 4 règles
+  de promotion, **même image du staging à la prod**, jeu de test réaliste (volumétrie NFR).
+- **TEMPLATE-EXPLOITATION** : qui opère + SLA, sauvegardes avec **restauration réellement prouvée**
+  (un backup jamais restauré n'est pas un backup), indicateurs métier avec seuils, top 5 runbooks.
+- **TEMPLATE-CI-REVUE** : incréments atomiques bornés, revue (adversariale en solo, PR en équipe —
+  obligatoire sur pivots et code d'habilitations), CI 6 étapes exécutant les suites taggées du
+  pilier conception, versionnage pom+build.properties+tag Docker en une fois.
+- **TEMPLATE-DOC-FORMATION** : doc **due à chaque gate** (ligne dans la matrice), organisée par rôle
+  métier (matrice d'habilitations), formations calées sur les recettes, boucle support→doc.
+- README racine et USAGE alignés (3 piliers livrés).
+
 ## 1.5.0 — 2026-07-06
 
 Pilier **conformite/** livré (le contractuel & légal, D-11/13/18/19/21) + brownfield/UX dans

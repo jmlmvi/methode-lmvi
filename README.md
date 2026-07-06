@@ -15,12 +15,12 @@ methode-lmvi/
 ├── CONTRAT-ARCHITECTURE.md   ← les règles plateforme héritées par toute app (jamais redécidées)
 ├── CHANGELOG.md              ← versions du kit (base du resync des instances)
 │
-├── conception/               ← PILIER 1 (livré) : concevoir et prouver
-│     la chaîne M0→M7 (METHODE + 10 templates + générateur + YAML exemple)
-│     + fiches RG · matrice d'habilitations · plan de test
-├── conformite/               ← PILIER 2 (v1.5 à venir) : le contractuel & légal
-│     PV de recette · RGPD · risques · budget/avenants · audit trail
-├── run/                      ← PILIER 3 (v1.6 à venir) : la vie après la livraison
+├── conception/               ← PILIER 1 : concevoir et prouver
+│     la chaîne M0→M7 (METHODE + templates + générateur + PROMPT-PILOTE)
+│     + RG · habilitations · tests · parcours/maquettes · interfaces/reprise
+├── conformite/               ← PILIER 2 : le contractuel & légal
+│     PV de recette · RGPD · risques · avenants · audit trail
+├── run/                      ← PILIER 3 : la vie après la livraison
 │     environnements · exploitation · CI/revue · doc & formation
 │
 ├── inputs-corpus/            ← les 9 slots d'inputs techniques (0→8) qu'une app instancie
@@ -74,5 +74,5 @@ donnée (dossier `_kit/`). Pour resynchroniser :
 3. **Marquer** la nouvelle `KIT-VERSION` dans l'instance.
 
 ## Reste à faire
-- ⏳ Piliers `conformite/` (v1.5) et `run/` (v1.6) — périmètres actés dans leurs README.
 - ⏳ Aligner le slot #1 du corpus sur la version framework 5.8.x exacte.
+- ⏳ Resynchroniser l'instance Régie (kit v1.0.0 → courant).
