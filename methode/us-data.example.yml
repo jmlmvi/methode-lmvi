@@ -1,0 +1,707 @@
+# Exemple de données pour gen-fiches-us.py — chantier Régie (APP-16), kit v1.1.
+# Copier ce fichier pour un nouveau chantier ; phase/brique sont OPTIONNELS (Option A :
+# s'ils sont présents, ils alimentent la matrice M6 générée, JAMAIS la fiche US).
+chantier: Atelier de décomposition — Régie (APP-16)
+root: /opt/2026-TheHub4TheSocle/APP-16-REGIES/docs/atelier-decomposition
+spec: ../M1-spec-besoins/SPEC-ATELIER-DECOMPOSITION.md
+spec_us_anchor: '#11-récapitulatif-des-user-stories'
+spec_rg_anchor: '#12-règles-de-gestion-rg'
+epics:
+  A:
+    note: A-source
+    titre: Source & indexation
+    intention: déposer et indexer le texte (tiers 0/1)
+  B:
+    note: B-bibliotheque
+    titre: Bibliothèque de prompts
+    intention: recettes fournies + perso + seed tenant
+  C:
+    note: C-execution
+    titre: Exécution des prompt-actions
+    intention: l'IA produit des entités candidates
+  D:
+    note: D-entites
+    titre: Entités produites
+    intention: personnages/costumes/décors/scènes/associations/shorts
+  E:
+    note: E-pipeline
+    titre: Enchaînement & pipeline
+    intention: chaîner les prompts en DAG socle-pack-pipeline
+  F:
+    note: F-apercu-commit
+    titre: Aperçu → commit
+    intention: validation humaine avant écriture
+  G:
+    note: G-tracabilite
+    titre: Traçabilité / coûts / reprise
+    intention: lineage, coûts, resume
+  H:
+    note: H-pont-video
+    titre: Pont vidéo
+    intention: shorts → génération vidéo P1
+  I:
+    note: I-visualisation
+    titre: Visualisation & liens (in-app dès V1)
+    intention: graphes entités/pipeline/lineage dans l'app
+  J:
+    note: J-llm-apim
+    titre: Passerelle LLM (APIM)
+    intention: appel LLM via API Hub APIM, minimax + fallback
+us:
+  A1:
+    epic: A
+    titre: Déposer un texte source
+    acteur: metteur en scène
+    veux: déposer un texte source (pièce de théâtre) dans un projet
+    afin: disposer de la matière première
+    deps: []
+    rg:
+    - RG-A7
+    ctx: 'Point d''entrée de l''atelier : le texte est la matière que tous les prompts vont décomposer.
+      Théâtre en v1.'
+    ca:
+    - Je peux uploader un fichier (format pièce) dans un projet.
+    - Le document est stocké et rattaché au projet.
+    - Format/taille validés.
+    phase: PA-0
+    brique: atelier.source + frontend (upload)
+  A2:
+    epic: A
+    titre: Indexer le texte (tiers 0/1)
+    acteur: metteur en scène
+    veux: voir le texte indexé (Actes/Scènes/Répliques) et ancré
+    afin: que les prompts s'y ancrent et citent les passages
+    deps:
+    - A1
+    rg:
+    - RG-A7
+    - RG-A8
+    ctx: Tier 1 (structure éditoriale) dérivé mécaniquement ; Tier 0 (offset caractère) posé sur chaque
+      unité.
+    ca:
+    - Actes/Scènes/Répliques détectés automatiquement.
+    - Chaque unité porte un span caractère (Tier 0).
+    - Le découpage est visible.
+    phase: PA-0
+    brique: atelier.source (parseur théâtre, sans IA)
+  A3:
+    epic: A
+    titre: Cibler une portion
+    acteur: metteur en scène
+    veux: lancer une action sur tout le texte ou une portion (acte, scène, entité)
+    afin: cibler le bon périmètre
+    deps:
+    - A2
+    rg: []
+    ctx: La portée d'entrée conditionne ce que le prompt reçoit.
+    ca:
+    - Je choisis tout / un acte / une scène / des entités comme entrée.
+    - La portée est transmise au pipeline.
+    phase: PA-1
+    brique: atelier.run (portée d'entrée)
+  B1:
+    epic: B
+    titre: Bibliothèque prête à l'emploi
+    acteur: metteur en scène
+    veux: une bibliothèque de prompts prêts à l'emploi
+    afin: démarrer vite
+    deps: []
+    rg:
+    - RG-A9
+    ctx: 7 recettes fournies (découpe personnage/décor/scène, N scénettes, 3 associations) + kit ~10.
+    ca:
+    - Je vois les recettes fournies.
+    - Je peux en lancer une sans la réécrire.
+    phase: PA-1
+    brique: atelier.prompts (seed)
+  B2:
+    epic: B
+    titre: Contrat de sortie visible (PIVOT)
+    acteur: metteur en scène
+    veux: voir le contrat de sortie d'un prompt avant de le lancer
+    afin: savoir ce que j'obtiens
+    deps:
+    - B1
+    rg:
+    - RG-A5
+    ctx: PIVOT. Le contrat = types produits + champs (base+libres) + cardinalité, affiché SANS exécuter
+      l'IA.
+    ca:
+    - Le contrat s'affiche sans appeler l'IA.
+    - Distingue champs de base (garantis) et champs libres (demandés).
+    - Type cible inexistant → refus + proposition de le créer.
+    phase: PA-1
+    brique: atelier.prompts + frontend
+  B3:
+    epic: B
+    titre: Écrire ses propres prompts
+    acteur: metteur en scène
+    veux: écrire mes propres prompts et choisir le type cible
+    afin: garder ma liberté créative
+    deps:
+    - B1
+    rg:
+    - RG-A5
+    ctx: Le metteur en scène n'est pas limité au catalogue.
+    ca:
+    - Je saisis un prompt en langage naturel.
+    - Je choisis le type d'entité cible (+ champs libres).
+    phase: PA-1
+    brique: atelier.prompts
+  B4:
+    epic: B
+    titre: Paramétrer un prompt
+    acteur: metteur en scène
+    veux: paramétrer un prompt (N, langue, style, granularité)
+    afin: réutiliser sans réécrire
+    deps:
+    - B3
+    rg: []
+    ctx: Les paramètres évitent la duplication de recettes.
+    ca:
+    - Je règle N/langue/style/granularité.
+    - La même recette sert plusieurs cas.
+    phase: PA-1
+    brique: atelier.prompts
+  B5:
+    epic: B
+    titre: Gérer la bibliothèque
+    acteur: producteur
+    veux: gérer/versionner/partager la bibliothèque
+    afin: capitaliser les recettes
+    deps:
+    - B1
+    rg: []
+    ctx: CRUD + versionnage des recettes.
+    ca:
+    - Créer/dupliquer/renommer/catégoriser une recette.
+    - Historique des versions.
+    phase: PA-1
+    brique: atelier.prompts
+  B6:
+    epic: B
+    titre: Bibliothèque par tenant
+    acteur: producteur
+    veux: une bibliothèque par tenant
+    afin: isoler les recettes entre entreprises
+    deps: []
+    rg:
+    - RG-A9
+    ctx: Cloisonnement multi-société.
+    ca:
+    - Une entreprise ne voit pas les recettes d'une autre.
+    phase: PA-1
+    brique: atelier.prompts (portée tenant)
+  B7:
+    epic: B
+    titre: Seed à la création du tenant
+    acteur: producteur
+    veux: ~10 recettes copiées à la création du tenant
+    afin: démarrer avec un kit prêt
+    deps:
+    - B6
+    rg:
+    - RG-A9
+    ctx: Copie (pas référence) → modifiable librement.
+    ca:
+    - À la création d'un tenant, ~10 recettes sont copiées.
+    - Elles sont éditables sans impacter les autres tenants.
+    phase: PA-1
+    brique: atelier.prompts (seed hook)
+  B8:
+    epic: B
+    titre: MàJ catalogue proposée (pas écrasée)
+    acteur: producteur
+    veux: qu'une amélioration du catalogue système soit proposée, pas écrasée
+    afin: garder mes retouches
+    deps:
+    - B7
+    rg:
+    - RG-A9
+    ctx: Même logique que seeds z_type_composant système + surcharge tenant.
+    ca:
+    - Nouveauté catalogue → proposée à l'import.
+    - Jamais d'écrasement silencieux d'une copie retouchée.
+    phase: PA-1
+    brique: atelier.prompts (import catalogue)
+  C1:
+    epic: C
+    titre: Lancer un prompt → entités
+    acteur: metteur en scène
+    veux: 'lancer un prompt : l''IA lit l''entrée et produit des entités'
+    afin: décomposer l'œuvre
+    deps:
+    - A3
+    - B1
+    - J1
+    rg:
+    - RG-A1
+    ctx: 'Cœur de l''atelier : exécution via pipeline, stage E appelle l''API LLM APIM (minimax).'
+    ca:
+    - Le prompt s'exécute via le pipeline.
+    - Des entités candidates sont produites (statut proposé).
+    phase: PA-1
+    brique: atelier.pipeline (stage E) + API LLM APIM
+  C2:
+    epic: C
+    titre: Citation source (PIVOT)
+    acteur: metteur en scène
+    veux: que chaque entité produite cite son passage source
+    afin: vérifier et faire confiance
+    deps:
+    - C1
+    - A2
+    rg:
+    - RG-A2
+    ctx: PIVOT. Sans ancrage, pas de confiance ni de traçabilité.
+    ca:
+    - Chaque entité candidate référence un span (Tier 0).
+    - Sans ancrage → marquée « sans ancrage » et signalée.
+    phase: PA-1
+    brique: stage E (ancrage)
+  C3:
+    epic: C
+    titre: Idempotence
+    acteur: metteur en scène
+    veux: relancer un prompt sans doublon ni écrasement de mes ajustements
+    afin: itérer sereinement
+    deps:
+    - C1
+    rg:
+    - RG-A3
+    ctx: Reprise/relance sans casse.
+    ca:
+    - Relancer ne crée pas de doublons.
+    - Conflits résolus par créer/mettre à jour/ignorer par entité.
+    phase: PA-2
+    brique: atelier.run + pack (exactly-once)
+  C4:
+    epic: C
+    titre: Anti-remplissage (PIVOT)
+    acteur: metteur en scène
+    veux: être alerté si l'objectif chiffré est inatteignable
+    afin: éviter le contenu inventé
+    deps:
+    - C1
+    rg:
+    - RG-A4
+    ctx: 'PIVOT. Clause NO-SIMULATION : jamais d''entités inventées pour atteindre N.'
+    ca:
+    - Objectif N non atteint → arrêt + signalement.
+    - Jamais d'entités inventées.
+    - Proposition de descendre d'un cran de granularité.
+    phase: PA-2
+    brique: stage E + run
+  D1:
+    epic: D
+    titre: Un dossier par personnage
+    acteur: metteur en scène
+    veux: un dossier par personnage (image principale, photo acteur, costumes 0..n)
+    afin: préparer les personnages
+    deps:
+    - C1
+    rg: []
+    ctx: Le costume est 0..n par personnage (le prompt dit s'il y en a plusieurs).
+    ca:
+    - 1 personnage/rôle créé.
+    - Image principale + photo acteur + 0..n costumes.
+    phase: PA-1
+    brique: atelier.entities
+  D2:
+    epic: D
+    titre: Découpe par décor
+    acteur: metteur en scène
+    veux: la liste des décors
+    afin: organiser les décors
+    deps:
+    - C1
+    rg: []
+    ctx: Chaque décor ancré aux passages concernés.
+    ca:
+    - Les décors sont listés.
+    - Chacun rattaché à ses passages.
+    phase: PA-2
+    brique: atelier.entities
+  D3:
+    epic: D
+    titre: Découpe par scène
+    acteur: metteur en scène
+    veux: la liste ordonnée des scènes
+    afin: structurer la pièce
+    deps:
+    - C1
+    rg: []
+    ctx: Scènes avec résumé + passage source.
+    ca:
+    - Liste ordonnée des scènes.
+    - Résumé + span par scène.
+    phase: PA-2
+    brique: atelier.entities
+  D4:
+    epic: D
+    titre: Associations
+    acteur: metteur en scène
+    veux: les associations (comédien↔scène, scène↔décor, personnage↔costume)
+    afin: relier les éléments
+    deps:
+    - D2
+    - D3
+    rg: []
+    ctx: Relations plusieurs-à-plusieurs.
+    ca:
+    - Je crée/visualise les liens entre entités.
+    - Les incohérences sont signalées.
+    phase: PA-2
+    brique: atelier.entities (associations)
+  D5:
+    epic: D
+    titre: N scénettes-shorts
+    acteur: metteur en scène
+    veux: N scénettes-shorts ordonnées
+    afin: alimenter la production vidéo
+    deps:
+    - C1
+    - A2
+    rg:
+    - RG-A4
+    ctx: Paramètre N (ex. 150). Interaction granularité (descendre d'un cran si besoin).
+    ca:
+    - N dossiers-shorts ordonnés.
+    - Prêts pour la génération vidéo.
+    - Si N > unités, proposition de descendre d'un cran (pas d'invention).
+    phase: PA-2
+    brique: atelier.entities → tr_dossier
+  D6:
+    epic: D
+    titre: Types & champs paramétrables
+    acteur: producteur
+    veux: définir les types d'entités et leurs champs
+    afin: adapter au métier
+    deps: []
+    rg:
+    - RG-A5
+    ctx: 'Décision Q-5 : v1 = champs libres sur types existants ; création de nouveaux types = PA-2+.'
+    ca:
+    - J'ajoute des champs libres à un type existant (v1).
+    - La création de nouveaux types arrive en PA-2+.
+    phase: PA-0
+    brique: atelier.entities (modèle)
+  E1:
+    epic: E
+    titre: Enchaîner les prompts
+    acteur: metteur en scène
+    veux: enchaîner les prompts (le 2ᵉ consomme le résultat du 1ᵉ)
+    afin: construire ma décomposition
+    deps:
+    - C1
+    rg:
+    - RG-A10
+    ctx: « découpe en scènes » puis « associe scène↔décor ».
+    ca:
+    - Je chaîne 2+ prompts.
+    - Le résultat amont alimente l'aval.
+    phase: PA-2
+    brique: atelier.pipeline (DAG pack)
+  E2:
+    epic: E
+    titre: Prérequis & incohérences
+    acteur: metteur en scène
+    veux: être prévenu des prérequis et incohérences d'ordre
+    afin: éviter les erreurs
+    deps:
+    - E1
+    rg: []
+    ctx: Associer scène↔décor exige scènes ET décors.
+    ca:
+    - L'app connaît les prérequis d'une recette.
+    - Elle prévient si l'ordre est incohérent (sans bloquer arbitrairement).
+    phase: PA-2
+    brique: pipeline validate (pack)
+  E3:
+    epic: E
+    titre: Rejouer une étape
+    acteur: metteur en scène
+    veux: rejouer une étape isolée et voir l'impact aval
+    afin: corriger sans tout refaire
+    deps:
+    - E1
+    rg: []
+    ctx: Les associations dérivées peuvent devenir obsolètes.
+    ca:
+    - Je rejoue une étape.
+    - L'impact aval est signalé.
+    phase: PA-3
+    brique: pipeline stage_retry + run
+  E4:
+    epic: E
+    titre: Séquence réutilisable
+    acteur: metteur en scène
+    veux: sauvegarder un enchaînement comme séquence réutilisable
+    afin: industrialiser une méthode
+    deps:
+    - E1
+    rg: []
+    ctx: Ex. « préparation pièce de théâtre standard ».
+    ca:
+    - Je sauvegarde un enchaînement.
+    - Je le réapplique sur un autre projet.
+    phase: PA-3
+    brique: pipeline catalogue (pack)
+  E5:
+    epic: E
+    titre: Pipeline socle-pack-pipeline visible
+    acteur: producteur
+    veux: que l'enchaînement soit un pipeline socle-pack-pipeline visible
+    afin: réutiliser reprise/idempotence/lineage plateforme
+    deps: []
+    rg:
+    - RG-A10
+    ctx: 'Fondation : prompt=stage, aperçu=stage H, enchaînement=DAG. Pas d''orchestrateur maison.'
+    ca:
+    - L'enchaînement est un pipeline du pack.
+    - Étapes typées + statut visibles.
+    phase: PA-0
+    brique: socle-pack-pipeline (embarqué)
+  F1:
+    epic: F
+    titre: Aperçu puis valider (PIVOT)
+    acteur: metteur en scène
+    veux: prévisualiser puis valider (aperçu → commit)
+    afin: garder le contrôle
+    deps:
+    - C1
+    rg:
+    - RG-A1
+    ctx: PIVOT. Rien n'entre dans le projet sans commit humain.
+    ca:
+    - L'IA produit une proposition (hors projet).
+    - J'aperçois la liste, vérifie les citations, édite/rejette par item.
+    - Au commit, les entités retenues entrent dans le projet.
+    phase: PA-1
+    brique: stage H + run + frontend
+  F2:
+    epic: F
+    titre: Corriger à la main
+    acteur: metteur en scène
+    veux: corriger une entité produite à la main
+    afin: affiner sans l'IA
+    deps:
+    - F1
+    rg: []
+    ctx: Renommer, fusionner, réordonner.
+    ca:
+    - Je modifie une entité sans repasser par l'IA.
+    phase: PA-1
+    brique: entities + frontend
+  F3:
+    epic: F
+    titre: Annuler / révoquer
+    acteur: metteur en scène
+    veux: annuler une proposition ou révoquer un commit
+    afin: garder le dernier mot
+    deps:
+    - F1
+    rg:
+    - RG-A6
+    ctx: Réversibilité totale.
+    ca:
+    - J'annule une proposition (rien écrit).
+    - Je révoque un commit déjà appliqué (revert).
+    phase: PA-1
+    brique: atelier.run (revert)
+  G1:
+    epic: G
+    titre: Lineage
+    acteur: metteur en scène
+    veux: le lineage de chaque entité
+    afin: tracer et rejouer
+    deps:
+    - C1
+    rg:
+    - RG-A6
+    ctx: Quel prompt / modèle / run a produit quoi.
+    ca:
+    - Chaque entité porte son lineage.
+    - Je peux rejouer/annuler cette production.
+    phase: PA-3
+    brique: pack (lineage)
+  G2:
+    epic: G
+    titre: Coûts
+    acteur: producteur
+    veux: le coût par exécution et par projet
+    afin: maîtriser le budget
+    deps:
+    - C1
+    rg: []
+    ctx: Crédits/tokens par run + récap projet.
+    ca:
+    - Coût affiché par exécution.
+    - Récapitulatif par projet.
+    phase: PA-3
+    brique: pack metrics + usage LLM (APIM)
+  G3:
+    epic: G
+    titre: Reprise
+    acteur: metteur en scène
+    veux: reprendre une décomposition interrompue
+    afin: ne rien perdre
+    deps:
+    - E1
+    rg: []
+    ctx: Reprise sûre depuis la DB.
+    ca:
+    - Une décomposition interrompue reprend où elle en était.
+    phase: PA-3
+    brique: pack (resume_run)
+  G4:
+    epic: G
+    titre: Comparer deux exécutions
+    acteur: metteur en scène
+    veux: comparer deux exécutions d'un même prompt avant commit
+    afin: choisir la meilleure
+    deps:
+    - C1
+    rg: []
+    ctx: Versions/modèles comparés.
+    ca:
+    - Je compare 2 runs côte à côte.
+    - Je choisis lequel committer.
+    phase: PA-3
+    brique: run + frontend
+  H1:
+    epic: H
+    titre: Shorts → génération vidéo
+    acteur: metteur en scène
+    veux: envoyer les shorts vers la génération vidéo
+    afin: enchaîner la production
+    deps:
+    - D5
+    rg: []
+    ctx: Réutilise le pipeline vidéo P1 déjà livré.
+    ca:
+    - Un short produit part en génération (image+prompt → candidates → retenue) sans ressaisie.
+    phase: PA-4
+    brique: stage « émettre shorts » → GenerationService (P1)
+  H2:
+    epic: H
+    titre: Réutiliser perso/costume/décor
+    acteur: metteur en scène
+    veux: réutiliser personnages/costumes/décors dans les shorts
+    afin: cohérence visuelle
+    deps:
+    - D1
+    - D2
+    rg: []
+    ctx: Image principale = première frame, costume = variante, décor = arrière-plan.
+    ca:
+    - Les entités produites deviennent des références réutilisables dans les shorts.
+    phase: PA-4
+    brique: entities + P1 (références)
+  H3:
+    epic: H
+    titre: Machine à états au commit
+    acteur: metteur en scène
+    veux: démarrer la machine à états au commit d'un short
+    afin: suivre l'avancement
+    deps:
+    - F1
+    - D5
+    rg: []
+    ctx: Le dossier démarre à Initié/Enrichi (SPECS §6.3).
+    ca:
+    - Au commit d'un short, sa machine à états démarre.
+    phase: PA-4
+    brique: run + Régie (machine à états)
+  I1:
+    epic: I
+    titre: Graphe des entités in-app (PIVOT)
+    acteur: metteur en scène
+    veux: voir le graphe des entités dans l'application (dès V1)
+    afin: comprendre la structure d'un coup d'œil
+    deps:
+    - D1
+    rg:
+    - RG-A11
+    ctx: Personnage ↔ scène ↔ décor ↔ costume ↔ short, DANS l'app (exigence commanditaire).
+    ca:
+    - Le graphe des entités s'affiche dans l'app.
+    - Il reflète les liens réels.
+    phase: PA-1
+    brique: frontend graphe entités
+  I2:
+    epic: I
+    titre: Graphe du pipeline in-app
+    acteur: metteur en scène
+    veux: voir le graphe du pipeline dans l'application (dès V1)
+    afin: suivre les étapes et leur statut
+    deps:
+    - E5
+    rg:
+    - RG-A11
+    ctx: Réutilise la projection graph_view (React Flow) du pack.
+    ca:
+    - Le graphe du pipeline (étapes + statut) s'affiche dans l'app.
+    phase: PA-1
+    brique: frontend graph_view (pack)
+  I3:
+    epic: I
+    titre: Navigation nœud → élément
+    acteur: metteur en scène
+    veux: cliquer un nœud (entité ou étape) pour ouvrir l'élément
+    afin: naviguer entités/étapes
+    deps:
+    - I1
+    - I2
+    rg: []
+    ctx: Le graphe est navigable, pas seulement décoratif.
+    ca:
+    - Cliquer un nœud ouvre l'élément correspondant.
+    phase: PA-1
+    brique: frontend (navigation)
+  I4:
+    epic: I
+    titre: Graphe de lineage
+    acteur: metteur en scène
+    veux: voir le lineage en graphe
+    afin: savoir quel prompt a produit quoi
+    deps:
+    - G1
+    rg:
+    - RG-A11
+    ctx: Le lineage devient visuel.
+    ca:
+    - Le graphe de lineage relie prompts/runs/entités.
+    phase: PA-3
+    brique: frontend graphe lineage
+  J1:
+    epic: J
+    titre: Appel LLM via APIM du Hub
+    acteur: metteur en scène
+    veux: appeler le LLM via l'API APIM du Hub (minimax par défaut)
+    afin: découpler le modèle de l'app
+    deps: []
+    rg:
+    - RG-A12
+    ctx: Aucun provider en dur ; modèle changeable sans toucher l'app.
+    ca:
+    - La décomposition appelle l'API LLM du Hub (APIM).
+    - Modèle par défaut minimax, surchargeable par prompt.
+    phase: PA-1
+    brique: stage E → API LLM Hub (APIM)
+  J2:
+    epic: J
+    titre: Fallback LLM (PIVOT)
+    acteur: metteur en scène
+    veux: un fallback LLM automatique
+    afin: ne pas être bloqué par un modèle indisponible
+    deps:
+    - J1
+    rg:
+    - RG-A12
+    ctx: PIVOT. Indispo/quota → bascule automatique, sans échec de l'atelier.
+    ca:
+    - Modèle indisponible/quota → fallback automatique.
+    - L'atelier n'échoue pas ; aucun code provider dans l'app.
+    phase: PA-1
+    brique: API APIM (fallback)
