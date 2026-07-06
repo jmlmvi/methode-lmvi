@@ -21,8 +21,8 @@
         que du papier                décisions            plan                    le code n'existe qu'ici
 ```
 
-Le cycle en V est **replié dans chaque P-x** : recette = la gate (démo + non-régression),
-livraison = à chaque gate. Jamais de tunnel de dev suivi d'une grande recette finale.
+Chaque phase P-x est un **mini-cycle complet** : dev + tests, puis recette = la gate (démo +
+non-régression), puis livraison. Jamais de tunnel de dev suivi d'une grande recette finale.
 
 **Piliers** : ce déroulé utilise [`conception/`](conception/) (qui contient toute la chaîne M0→M7).
 Chez un client, le casting M0 active en plus [`conformite/`](conformite/) (PV de recette, RGPD,

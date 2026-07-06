@@ -50,8 +50,8 @@ via le casting M0 (cf. `AnalyseFable/04-ANALYSE-SECONDE-PASSE.md`, D-8…D-21).
 - **Vue globale du cycle de vie** (retour commanditaire) : README racine § « Vue globale » (table
   phases projet classiques ↔ maillons + mermaid) et USAGE.md § « La carte avant la route » (schéma
   ASCII + entrée en scène des tests en 3 temps : CA en M2, stratégie en M6, code des tests en P-x).
-  Message clé : dev/tests/recette/livraison ne sont pas des phases finales — le cycle en V est
-  **replié dans chaque P-x** (recette = gate, livraison incrémentale à chaque gate).
+  Message clé : dev/tests/recette/livraison ne sont pas des phases finales — chaque P-x est un
+  **mini-cycle complet** (recette = gate, livraison incrémentale à chaque gate).
 
 ## 1.2.0 — 2026-07-06
 

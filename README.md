@@ -58,8 +58,8 @@ flowchart LR
 | **5 · Recette** | la **gate** de chaque P-x | démo réelle validée par le commanditaire | + re-run de toutes les gates précédentes (non-régression) |
 | **6 · Livraison** | à chaque gate passée | build → registre → déploiement | incrémentale — jamais de big-bang final |
 
-**La clé** : recette et livraison ne sont pas des étapes finales — le cycle en V est **replié dans
-chaque phase P-x**, qui est un mini-cycle complet (dev → tests → recette → livraison).
+**La clé** : recette et livraison ne sont pas des étapes finales — chaque phase P-x est un
+**mini-cycle complet** (dev → tests → recette → livraison).
 
 ## Instances connues
 - **Régie (APP-16)** — 1ʳᵉ instance : `APP-16-REGIES/docs/atelier-decomposition/` (kit v1.0.0
