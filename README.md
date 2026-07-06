@@ -9,6 +9,7 @@
 
 | Élément | Rôle |
 |---|---|
+| **[`USAGE.md`](USAGE.md)** | **Commencer ici pour un nouveau chantier** : pas-à-pas M0→M7 + les **prompts prêts à coller** par maillon (dont relectures adversariales M1/M4/M6). |
 | **[`CONTRAT-ARCHITECTURE.md`](CONTRAT-ARCHITECTURE.md)** | Les règles plateforme que toute app hérite (S3, APIs via Hub, APIM/LLM, minihub, Vault, IAM/SSO, PG THESOCLE, no-mock). **Input #8.** |
 | **[`inputs-corpus/`](inputs-corpus/)** | Définition des **9 slots d'inputs (0→8)** techniques (framework, Hub, front, packs, minihub, PG, contrat d'archi) — un sous-dossier par slot. |
 | **[`methode/`](methode/)** | La méthode **M0→M7** générique : `METHODE-Besoin2Plan.md` + **10 templates** (M0→M7 + fiche US + fiche épic) + **générateur** + **prompt**. |

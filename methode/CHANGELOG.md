@@ -3,6 +3,14 @@
 > Semver (convention LMVI). Chaque instance note la `KIT-VERSION` copiée et resynce via ce fichier
 > (procédure : README racine, « Resync d'une instance »).
 
+## 1.2.0 — 2026-07-06
+
+- **USAGE.md** (racine du repo) : mode d'emploi opérationnel pour un nouveau chantier — choix de
+  méthode (3 questions), installation/vendoring du kit (`_kit/` + arborescence d'instance), **prompts
+  prêts à coller par maillon** (M0→M7, dont les 3 relectures adversariales requises), prompts des
+  boucles de retour, procédure de resync. Aucun autre fichier modifié (leurs `KIT-VERSION` restent
+  1.1.0) ; référencé depuis le README racine.
+
 ## 1.1.0 — 2026-07-06
 
 Révision issue de la revue Fable (`../AnalyseFable/` : analyse, plan C-1…C-8, matrice de vérification).
