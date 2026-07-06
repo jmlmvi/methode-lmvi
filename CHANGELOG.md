@@ -3,6 +3,15 @@
 > Semver (convention LMVI). Chaque instance note la `KIT-VERSION` copiée et resynce via ce fichier
 > (procédure : README racine, « Resync d'une instance »).
 
+## 1.4.3 — 2026-07-06
+
+**PROMPT-PILOTE** (`conception/PROMPT-PILOTE.md`) : le mode normal devient UN SEUL prompt — l'agent
+enchaîne M0→M7 seul (livrables, YAML, générateur, DoD, relectures adversariales en agent séparé) et
+ne s'arrête qu'aux **6 décisions du commanditaire** (① vision ② signature RG/habilitations
+③ arbitrages un par un ④ phasage ⑤ plan ⑥ go du code). Journal `PILOTAGE.md` pour reprise de
+session (« Lis PILOTAGE.md et continue »). Les prompts unitaires de USAGE §2 deviennent le mode
+manuel (secours, reprise d'un maillon, autre agent).
+
 ## 1.4.2 — 2026-07-06
 
 **README et USAGE réécrits à neuf** (ils étaient devenus des empilements de retouches 1.1→1.4.1) :

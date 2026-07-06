@@ -11,6 +11,8 @@
 - 🛠️ **[`gen-fiches-us.py`](gen-fiches-us.py)** — générateur **générique** : fiches US/Épic/RG,
   matrice d'habilitations, squelettes de tests Gherkin. Données dans un **YAML externe** :
   `python3 gen-fiches-us.py <us-data.yml>` — modèle : [`us-data.example.yml`](us-data.example.yml).
+- 🎛️ **[`PROMPT-PILOTE.md`](PROMPT-PILOTE.md)** — **LE prompt unique** qui déroule tout le chantier
+  M0→M7 (l'agent avance seul, ne s'arrête qu'aux 6 décisions du commanditaire, tient `PILOTAGE.md`).
 - 💬 **[`PROMPT-generer-fiches-US.md`](PROMPT-generer-fiches-US.md)** — (re)générer les fiches
   (script **ou** prompt agent IA).
 

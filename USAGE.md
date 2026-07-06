@@ -84,8 +84,20 @@ YAML, jamais les fichiers générés.
 
 ---
 
-## 2. Dérouler la chaîne M0→M7 — les prompts à lancer
+## 2. Dérouler la chaîne M0→M7
 
+### Mode normal : LE prompt pilote (un seul prompt pour tout le chantier)
+
+Colle le prompt de [`conception/PROMPT-PILOTE.md`](conception/PROMPT-PILOTE.md) (copié dans
+`_kit/PROMPT-PILOTE.md`) avec ton besoin dedans : **l'agent enchaîne lui-même M0→M7** — livrables,
+YAML, générateur, DoD, relectures adversariales — et ne s'arrête qu'aux **6 points de décision**
+qui te reviennent : ① confirmer la vision · ② signer RG + habilitations · ③ trancher les
+arbitrages · ④ valider le phasage · ⑤ valider le plan · ⑥ donner le go du code. Il tient
+`PILOTAGE.md` à jour ; si la session casse : *« Lis PILOTAGE.md et continue le chantier. »*
+
+### Mode manuel : les prompts unitaires (secours & reprise)
+
+Pour reprendre **un maillon isolé**, corriger après relecture, ou travailler avec un autre agent.
 **Un maillon à la fois** ; on vérifie la DoD (en bas de chaque template) avant de passer au suivant.
 Relecture **requise** après M1, M4 et M6 (par le relecteur du casting, dans une session séparée).
 
