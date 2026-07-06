@@ -3,6 +3,24 @@
 > Semver (convention LMVI). Chaque instance note la `KIT-VERSION` copiée et resynce via ce fichier
 > (procédure : README racine, « Resync d'une instance »).
 
+## 1.5.0 — 2026-07-06
+
+Pilier **conformite/** livré (le contractuel & légal, D-11/13/18/19/21) + brownfield/UX dans
+conception (D-15/D-16) :
+- **TEMPLATE-PV-RECETTE** : PV adossé à la gate — réserves qualifiées (bloquante = gate refusée),
+  délais, garantie, non-régression jointe en preuve.
+- **TEMPLATE-RGPD** : revue de chaque entité M1 (oui/non explicite), **cas LLM = arbitrage M4
+  obligatoire** (données perso dans les prompts via APIM ?), droits des personnes outillés par RG.
+- **TEMPLATE-RISQUES** : registre proactif, 7 familles types évaluées au cadrage, relu à chaque gate.
+- **TEMPLATE-AVENANT** : fiche d'impact de tout changement de périmètre (4 axes dont budget) —
+  prolonge la boucle §2.2 côté contractuel, pas de dérive silencieuse.
+- **TEMPLATE-AUDIT-TRAIL** : événements auditables (M1) → table immuable `tr_audit_*` (M6),
+  identité SSO, consultation habilitée, prouvé par tests.
+- **conception/TEMPLATE-PARCOURS-MAQUETTES** (D-15) : parcours des US pivots maquettés (Penpot,
+  charte contrat §7) et **validés avant M6** — états vide/erreur/`en_attente` inclus.
+- **conception/TEMPLATE-INTERFACES-REPRISE** (D-16) : contrats IF-x (via Hub/APIM, source de
+  vérité, indisponibilité honnête) + reprise legacy = **phase dédiée** avec gate et rapport de rejets.
+
 ## 1.4.3 — 2026-07-06
 
 **PROMPT-PILOTE** (`conception/PROMPT-PILOTE.md`) : le mode normal devient UN SEUL prompt — l'agent

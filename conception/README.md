@@ -31,6 +31,8 @@
 | [`TEMPLATE-RG.md`](TEMPLATE-RG.md) | **fiche règle de gestion** (M1 — typée, tracée, testable) |
 | [`TEMPLATE-HABILITATIONS.md`](TEMPLATE-HABILITATIONS.md) | **matrice rôle × US** (M1, signée métier) + mapping IAM (M6) |
 | [`TEMPLATE-TESTS.md`](TEMPLATE-TESTS.md) | **plan de test par phase** (M6.5, gate scriptée) |
+| [`TEMPLATE-PARCOURS-MAQUETTES.md`](TEMPLATE-PARCOURS-MAQUETTES.md) | **parcours + maquettes des US pivots** (entre M2 et M5, validés avant M6 — recommandé client) |
+| [`TEMPLATE-INTERFACES-REPRISE.md`](TEMPLATE-INTERFACES-REPRISE.md) | **brownfield** : contrats d'interface (IF-x) + reprise de données legacy (phase dédiée) |
 
 **Règle** : chaque instance remplace les `{{placeholders}}`, garde la section **Relations (mermaid)**,
 et vérifie sa **DoD** avant le maillon suivant. Relecture **requise** M1/M4/M6. Versions :
