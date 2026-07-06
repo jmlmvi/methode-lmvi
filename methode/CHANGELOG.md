@@ -3,6 +3,14 @@
 > Semver (convention LMVI). Chaque instance note la `KIT-VERSION` copiée et resynce via ce fichier
 > (procédure : README racine, « Resync d'une instance »).
 
+## 1.3.0 — 2026-07-06
+
+- **Vue globale du cycle de vie** (retour commanditaire) : README racine § « Vue globale » (table
+  phases projet classiques ↔ maillons + mermaid) et USAGE.md § « La carte avant la route » (schéma
+  ASCII + entrée en scène des tests en 3 temps : CA en M2, stratégie en M6, code des tests en P-x).
+  Message clé : dev/tests/recette/livraison ne sont pas des phases finales — le cycle en V est
+  **replié dans chaque P-x** (recette = gate, livraison incrémentale à chaque gate).
+
 ## 1.2.0 — 2026-07-06
 
 - **USAGE.md** (racine du repo) : mode d'emploi opérationnel pour un nouveau chantier — choix de

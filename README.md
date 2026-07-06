@@ -24,6 +24,38 @@ flowchart LR
   INST --> CODE["App (code)"]
 ```
 
+## Vue globale — le cycle de vie complet
+
+En termes de phases projet classiques, la chaîne M0→M7 se lit ainsi :
+
+| Phase projet | Maillons | Ce qui s'y passe | Et les tests ? |
+|---|---|---|---|
+| **1 · Conception** | M0 → M1 → M2 → M3 | vision confirmée, spec (QUOI + RG + NFR), US, épics | les **critères d'acceptation** (M2) s'écrivent ici — c'est la matière des futurs tests, posée **avant tout code** |
+| **2 · Arbitrage** | M4 | toutes les décisions structurantes tranchées (spike jetable possible pour instruire une décision) | — |
+| **3 · Découpage & plan** | M5 → M6 | phasage gaté, plan technique, matrice de couverture | la **stratégie de test** se décide en M6 : quoi automatisé vs démontré, quoi protège la non-régression |
+| **4 · Exécution** (répétée par phase P-x) | M7 puis P-0, P-1… | câblage, puis code par incréments | les tests automatisés s'écrivent **avec** le code (CA → tests) |
+| **5 · Recette** | la **gate** de chaque P-x | démo réelle validée par le commanditaire | + re-vérification des gates précédentes (non-régression) |
+| **6 · Livraison** | à chaque gate passée | build → registre → déploiement (cible définie en M7) | livraison **incrémentale**, pas de big-bang final |
+
+```mermaid
+flowchart LR
+  subgraph C["1 · Conception"]
+    M0 --> M1 --> M2 --> M3
+  end
+  subgraph D["2-3 · Arbitrage & plan"]
+    M4 --> M5 --> M6
+  end
+  subgraph X["4-5-6 · Par phase P-x (répété)"]
+    DEV["dev + tests"] --> GATE["gate = démo<br/>(recette)"] --> LIV["livraison"]
+  end
+  C --> D --> M7["M7 câblage"] --> X
+  X -- "phase suivante" --> X
+```
+
+**La clé** : dev / tests / recette / livraison ne sont **pas** des phases finales du projet — le cycle
+en V classique est **replié dans chaque P-x**. Chaque phase est un mini-cycle complet qui se termine
+par une recette (la gate) et une livraison réelle. Détails opérationnels : [`USAGE.md`](USAGE.md).
+
 - La **méthode** (M0→M7) et le **corpus d'inputs** sont **génériques** et vivent **ici**.
 - Chaque **app** crée son dossier d'instance (méthode appliquée + `inputs/` rempli + `tracking/`).
 - Le **contrat d'architecture** est la source de vérité transversale : aucune app ne le redécide.

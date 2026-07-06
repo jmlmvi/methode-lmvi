@@ -1,9 +1,34 @@
-<!-- KIT-VERSION: 1.2.0 -->
+<!-- KIT-VERSION: 1.3.0 -->
 # USAGE — démarrer un nouveau chantier avec le kit Besoin2Plan
 
 > Le mode d'emploi opérationnel : **quoi faire, dans quel ordre, et quel prompt lancer** à chaque
 > maillon. La théorie est dans [`methode/METHODE-Besoin2Plan.md`](methode/METHODE-Besoin2Plan.md) —
 > ici, on exécute. Les prompts sont écrits pour un agent type Claude Code ayant accès au repo.
+
+---
+
+## La carte avant la route — où tu es, ce qui vient après
+
+Le déroulé complet, en phases projet classiques. Repère-toi ici à tout moment :
+
+```
+┌─ 1 · CONCEPTION ──────────┐ ┌─ 2 · ARBITRAGE ─┐ ┌─ 3 · PLAN ─────────┐ ┌─ 4·5·6 · PAR PHASE P-x (répété) ──────────┐
+│ M0 vision → M1 spec       │ │ M4 décisions    │ │ M5 phasage         │ │ M7 câblage, puis pour CHAQUE P-x :        │
+│ → M2 US → M3 épics        │→│ (spike possible)│→│ → M6 plan+matrice  │→│  développement (code + tests auto)        │
+│                           │ │                 │ │   +stratégie tests │ │  → RECETTE (gate = démo au commanditaire) │
+│ 🧪 les CA (M2) = la       │ │ 🚫 on ne code   │ │ 🧪 on décide quoi  │ │  → LIVRAISON (build→registre→déploiement) │
+│ matière des futurs tests  │ │ pas avant       │ │ tester/automatiser │ │  → phase suivante                          │
+└───────────────────────────┘ └─────────────────┘ └────────────────────┘ └────────────────────────────────────────────┘
+        que du papier                 décisions            plan                    le code n'existe qu'ici
+```
+
+**Les tests entrent en scène trois fois** : leur *matière* s'écrit en conception (les critères
+d'acceptation de chaque US, M2) ; leur *stratégie* se décide au plan (M6.5 : automatisé vs démo,
+non-régression) ; leur *code* s'écrit pendant le développement, en même temps que les briques
+(CA → tests). La **recette** n'est pas une phase finale : c'est la **gate** de chaque P-x (démo
+réelle validée par le commanditaire + re-vérification des gates précédentes). La **livraison** est
+incrémentale : chaque gate passée se déploie. Le cycle en V est **replié dans chaque P-x** — jamais
+de tunnel de dev suivi d'une grande recette finale.
 
 ---
 
