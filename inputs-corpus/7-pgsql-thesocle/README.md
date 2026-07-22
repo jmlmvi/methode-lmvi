@@ -1,3 +1,4 @@
+<!-- KIT-VERSION: 1.7.1 -->
 # Slot 7 · Standard tables PostgreSQL (THESOCLE)
 
 Le standard des tables — **embarqué dans la méthode** (pas seulement pointé).

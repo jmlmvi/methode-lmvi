@@ -1,3 +1,4 @@
+<!-- KIT-VERSION: 1.7.1 -->
 # Slot · TheSocleHub — catalogue de services (APIs & agents)
 
 - **Source canonique** : doc Hub + MCP `admin.thesocle.net`

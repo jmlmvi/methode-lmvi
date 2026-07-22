@@ -1,3 +1,4 @@
+<!-- KIT-VERSION: 1.7.1 -->
 # Slot · socle-pack-ia (agents IA / LLM)
 
 - **Source canonique** : repo/pack `socle-pack-ai`

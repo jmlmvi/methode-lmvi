@@ -1,4 +1,7 @@
-# Exemple de données pour gen-fiches-us.py — chantier Régie (APP-16), kit v1.1.
+# Exemple de données pour gen-fiches-us.py — chantier Régie (APP-16), schéma kit v1.8.
+# Kit >= 1.8 : hiérarchie Épic → Feature → US OBLIGATOIRE — section `features:` requise ;
+# chaque US porte `feature:` (son épic est dérivé). Régie est antérieure au niveau Feature :
+# on illustre avec des features-enveloppes 1:1 (même périmètre que l'épic).
 # Copier ce fichier pour un nouveau chantier ; phase/brique sont OPTIONNELS (Option A :
 # s'ils sont présents, ils alimentent la matrice M6 générée, JAMAIS la fiche US).
 chantier: Atelier de décomposition — Régie (APP-16)
@@ -47,9 +50,50 @@ epics:
     note: J-llm-apim
     titre: Passerelle LLM (APIM)
     intention: appel LLM via API Hub APIM, minimax + fallback
+features:
+  F-A1:
+    epic: A
+    titre: Source & indexation (enveloppe)
+    intention: feature-enveloppe de l'épic A — déposer et indexer le texte (tiers 0/1)
+  F-B1:
+    epic: B
+    titre: Bibliothèque de prompts (enveloppe)
+    intention: feature-enveloppe de l'épic B — recettes fournies + perso + seed tenant
+  F-C1:
+    epic: C
+    titre: Exécution des prompt-actions (enveloppe)
+    intention: feature-enveloppe de l'épic C — l'IA produit des entités candidates
+  F-D1:
+    epic: D
+    titre: Entités produites (enveloppe)
+    intention: feature-enveloppe de l'épic D — personnages/costumes/décors/scènes/associations/shorts
+  F-E1:
+    epic: E
+    titre: Enchaînement & pipeline (enveloppe)
+    intention: feature-enveloppe de l'épic E — chaîner les prompts en DAG socle-pack-pipeline
+  F-F1:
+    epic: F
+    titre: Aperçu → commit (enveloppe)
+    intention: feature-enveloppe de l'épic F — validation humaine avant écriture
+  F-G1:
+    epic: G
+    titre: Traçabilité / coûts / reprise (enveloppe)
+    intention: feature-enveloppe de l'épic G — lineage, coûts, resume
+  F-H1:
+    epic: H
+    titre: Pont vidéo (enveloppe)
+    intention: feature-enveloppe de l'épic H — shorts → génération vidéo P1
+  F-I1:
+    epic: I
+    titre: Visualisation & liens (in-app dès V1) (enveloppe)
+    intention: feature-enveloppe de l'épic I — graphes entités/pipeline/lineage dans l'app
+  F-J1:
+    epic: J
+    titre: Passerelle LLM (APIM) (enveloppe)
+    intention: feature-enveloppe de l'épic J — appel LLM via API Hub APIM, minimax + fallback
 us:
   A1:
-    epic: A
+    feature: F-A1
     titre: Déposer un texte source
     acteur: metteur en scène
     veux: déposer un texte source (pièce de théâtre) dans un projet
@@ -66,7 +110,7 @@ us:
     phase: PA-0
     brique: atelier.source + frontend (upload)
   A2:
-    epic: A
+    feature: F-A1
     titre: Indexer le texte (tiers 0/1)
     acteur: metteur en scène
     veux: voir le texte indexé (Actes/Scènes/Répliques) et ancré
@@ -85,7 +129,7 @@ us:
     phase: PA-0
     brique: atelier.source (parseur théâtre, sans IA)
   A3:
-    epic: A
+    feature: F-A1
     titre: Cibler une portion
     acteur: metteur en scène
     veux: lancer une action sur tout le texte ou une portion (acte, scène, entité)
@@ -100,7 +144,7 @@ us:
     phase: PA-1
     brique: atelier.run (portée d'entrée)
   B1:
-    epic: B
+    feature: F-B1
     titre: Bibliothèque prête à l'emploi
     acteur: metteur en scène
     veux: une bibliothèque de prompts prêts à l'emploi
@@ -115,7 +159,7 @@ us:
     phase: PA-1
     brique: atelier.prompts (seed)
   B2:
-    epic: B
+    feature: F-B1
     titre: Contrat de sortie visible (PIVOT)
     acteur: metteur en scène
     veux: voir le contrat de sortie d'un prompt avant de le lancer
@@ -133,7 +177,7 @@ us:
     phase: PA-1
     brique: atelier.prompts + frontend
   B3:
-    epic: B
+    feature: F-B1
     titre: Écrire ses propres prompts
     acteur: metteur en scène
     veux: écrire mes propres prompts et choisir le type cible
@@ -149,7 +193,7 @@ us:
     phase: PA-1
     brique: atelier.prompts
   B4:
-    epic: B
+    feature: F-B1
     titre: Paramétrer un prompt
     acteur: metteur en scène
     veux: paramétrer un prompt (N, langue, style, granularité)
@@ -164,7 +208,7 @@ us:
     phase: PA-1
     brique: atelier.prompts
   B5:
-    epic: B
+    feature: F-B1
     titre: Gérer la bibliothèque
     acteur: producteur
     veux: gérer/versionner/partager la bibliothèque
@@ -179,7 +223,7 @@ us:
     phase: PA-1
     brique: atelier.prompts
   B6:
-    epic: B
+    feature: F-B1
     titre: Bibliothèque par tenant
     acteur: producteur
     veux: une bibliothèque par tenant
@@ -193,7 +237,7 @@ us:
     phase: PA-1
     brique: atelier.prompts (portée tenant)
   B7:
-    epic: B
+    feature: F-B1
     titre: Seed à la création du tenant
     acteur: producteur
     veux: ~10 recettes copiées à la création du tenant
@@ -209,7 +253,7 @@ us:
     phase: PA-1
     brique: atelier.prompts (seed hook)
   B8:
-    epic: B
+    feature: F-B1
     titre: MàJ catalogue proposée (pas écrasée)
     acteur: producteur
     veux: qu'une amélioration du catalogue système soit proposée, pas écrasée
@@ -225,7 +269,7 @@ us:
     phase: PA-1
     brique: atelier.prompts (import catalogue)
   C1:
-    epic: C
+    feature: F-C1
     titre: Lancer un prompt → entités
     acteur: metteur en scène
     veux: 'lancer un prompt : l''IA lit l''entrée et produit des entités'
@@ -243,7 +287,7 @@ us:
     phase: PA-1
     brique: atelier.pipeline (stage E) + API LLM APIM
   C2:
-    epic: C
+    feature: F-C1
     titre: Citation source (PIVOT)
     acteur: metteur en scène
     veux: que chaque entité produite cite son passage source
@@ -260,7 +304,7 @@ us:
     phase: PA-1
     brique: stage E (ancrage)
   C3:
-    epic: C
+    feature: F-C1
     titre: Idempotence
     acteur: metteur en scène
     veux: relancer un prompt sans doublon ni écrasement de mes ajustements
@@ -276,7 +320,7 @@ us:
     phase: PA-2
     brique: atelier.run + pack (exactly-once)
   C4:
-    epic: C
+    feature: F-C1
     titre: Anti-remplissage (PIVOT)
     acteur: metteur en scène
     veux: être alerté si l'objectif chiffré est inatteignable
@@ -293,7 +337,7 @@ us:
     phase: PA-2
     brique: stage E + run
   D1:
-    epic: D
+    feature: F-D1
     titre: Un dossier par personnage
     acteur: metteur en scène
     veux: un dossier par personnage (image principale, photo acteur, costumes 0..n)
@@ -308,7 +352,7 @@ us:
     phase: PA-1
     brique: atelier.entities
   D2:
-    epic: D
+    feature: F-D1
     titre: Découpe par décor
     acteur: metteur en scène
     veux: la liste des décors
@@ -323,7 +367,7 @@ us:
     phase: PA-2
     brique: atelier.entities
   D3:
-    epic: D
+    feature: F-D1
     titre: Découpe par scène
     acteur: metteur en scène
     veux: la liste ordonnée des scènes
@@ -338,7 +382,7 @@ us:
     phase: PA-2
     brique: atelier.entities
   D4:
-    epic: D
+    feature: F-D1
     titre: Associations
     acteur: metteur en scène
     veux: les associations (comédien↔scène, scène↔décor, personnage↔costume)
@@ -354,7 +398,7 @@ us:
     phase: PA-2
     brique: atelier.entities (associations)
   D5:
-    epic: D
+    feature: F-D1
     titre: N scénettes-shorts
     acteur: metteur en scène
     veux: N scénettes-shorts ordonnées
@@ -372,7 +416,7 @@ us:
     phase: PA-2
     brique: atelier.entities → tr_dossier
   D6:
-    epic: D
+    feature: F-D1
     titre: Types & champs paramétrables
     acteur: producteur
     veux: définir les types d'entités et leurs champs
@@ -387,7 +431,7 @@ us:
     phase: PA-0
     brique: atelier.entities (modèle)
   E1:
-    epic: E
+    feature: F-E1
     titre: Enchaîner les prompts
     acteur: metteur en scène
     veux: enchaîner les prompts (le 2ᵉ consomme le résultat du 1ᵉ)
@@ -403,7 +447,7 @@ us:
     phase: PA-2
     brique: atelier.pipeline (DAG pack)
   E2:
-    epic: E
+    feature: F-E1
     titre: Prérequis & incohérences
     acteur: metteur en scène
     veux: être prévenu des prérequis et incohérences d'ordre
@@ -418,7 +462,7 @@ us:
     phase: PA-2
     brique: pipeline validate (pack)
   E3:
-    epic: E
+    feature: F-E1
     titre: Rejouer une étape
     acteur: metteur en scène
     veux: rejouer une étape isolée et voir l'impact aval
@@ -433,7 +477,7 @@ us:
     phase: PA-3
     brique: pipeline stage_retry + run
   E4:
-    epic: E
+    feature: F-E1
     titre: Séquence réutilisable
     acteur: metteur en scène
     veux: sauvegarder un enchaînement comme séquence réutilisable
@@ -448,7 +492,7 @@ us:
     phase: PA-3
     brique: pipeline catalogue (pack)
   E5:
-    epic: E
+    feature: F-E1
     titre: Pipeline socle-pack-pipeline visible
     acteur: producteur
     veux: que l'enchaînement soit un pipeline socle-pack-pipeline visible
@@ -463,7 +507,7 @@ us:
     phase: PA-0
     brique: socle-pack-pipeline (embarqué)
   F1:
-    epic: F
+    feature: F-F1
     titre: Aperçu puis valider (PIVOT)
     acteur: metteur en scène
     veux: prévisualiser puis valider (aperçu → commit)
@@ -480,7 +524,7 @@ us:
     phase: PA-1
     brique: stage H + run + frontend
   F2:
-    epic: F
+    feature: F-F1
     titre: Corriger à la main
     acteur: metteur en scène
     veux: corriger une entité produite à la main
@@ -494,7 +538,7 @@ us:
     phase: PA-1
     brique: entities + frontend
   F3:
-    epic: F
+    feature: F-F1
     titre: Annuler / révoquer
     acteur: metteur en scène
     veux: annuler une proposition ou révoquer un commit
@@ -510,7 +554,7 @@ us:
     phase: PA-1
     brique: atelier.run (revert)
   G1:
-    epic: G
+    feature: F-G1
     titre: Lineage
     acteur: metteur en scène
     veux: le lineage de chaque entité
@@ -526,7 +570,7 @@ us:
     phase: PA-3
     brique: pack (lineage)
   G2:
-    epic: G
+    feature: F-G1
     titre: Coûts
     acteur: producteur
     veux: le coût par exécution et par projet
@@ -541,7 +585,7 @@ us:
     phase: PA-3
     brique: pack metrics + usage LLM (APIM)
   G3:
-    epic: G
+    feature: F-G1
     titre: Reprise
     acteur: metteur en scène
     veux: reprendre une décomposition interrompue
@@ -555,7 +599,7 @@ us:
     phase: PA-3
     brique: pack (resume_run)
   G4:
-    epic: G
+    feature: F-G1
     titre: Comparer deux exécutions
     acteur: metteur en scène
     veux: comparer deux exécutions d'un même prompt avant commit
@@ -570,7 +614,7 @@ us:
     phase: PA-3
     brique: run + frontend
   H1:
-    epic: H
+    feature: F-H1
     titre: Shorts → génération vidéo
     acteur: metteur en scène
     veux: envoyer les shorts vers la génération vidéo
@@ -584,7 +628,7 @@ us:
     phase: PA-4
     brique: stage « émettre shorts » → GenerationService (P1)
   H2:
-    epic: H
+    feature: F-H1
     titre: Réutiliser perso/costume/décor
     acteur: metteur en scène
     veux: réutiliser personnages/costumes/décors dans les shorts
@@ -599,7 +643,7 @@ us:
     phase: PA-4
     brique: entities + P1 (références)
   H3:
-    epic: H
+    feature: F-H1
     titre: Machine à états au commit
     acteur: metteur en scène
     veux: démarrer la machine à états au commit d'un short
@@ -614,7 +658,7 @@ us:
     phase: PA-4
     brique: run + Régie (machine à états)
   I1:
-    epic: I
+    feature: F-I1
     titre: Graphe des entités in-app (PIVOT)
     acteur: metteur en scène
     veux: voir le graphe des entités dans l'application (dès V1)
@@ -630,7 +674,7 @@ us:
     phase: PA-1
     brique: frontend graphe entités
   I2:
-    epic: I
+    feature: F-I1
     titre: Graphe du pipeline in-app
     acteur: metteur en scène
     veux: voir le graphe du pipeline dans l'application (dès V1)
@@ -645,7 +689,7 @@ us:
     phase: PA-1
     brique: frontend graph_view (pack)
   I3:
-    epic: I
+    feature: F-I1
     titre: Navigation nœud → élément
     acteur: metteur en scène
     veux: cliquer un nœud (entité ou étape) pour ouvrir l'élément
@@ -660,7 +704,7 @@ us:
     phase: PA-1
     brique: frontend (navigation)
   I4:
-    epic: I
+    feature: F-I1
     titre: Graphe de lineage
     acteur: metteur en scène
     veux: voir le lineage en graphe
@@ -675,7 +719,7 @@ us:
     phase: PA-3
     brique: frontend graphe lineage
   J1:
-    epic: J
+    feature: F-J1
     titre: Appel LLM via APIM du Hub
     acteur: metteur en scène
     veux: appeler le LLM via l'API APIM du Hub (minimax par défaut)
@@ -690,7 +734,7 @@ us:
     phase: PA-1
     brique: stage E → API LLM Hub (APIM)
   J2:
-    epic: J
+    feature: F-J1
     titre: Fallback LLM (PIVOT)
     acteur: metteur en scène
     veux: un fallback LLM automatique

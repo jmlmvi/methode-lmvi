@@ -1,3 +1,4 @@
+<!-- KIT-VERSION: 1.7.1 -->
 # Slot · socle-pack-pipeline (moteur DAG)
 
 - **Source canonique** : `/opt/2026-TheHub4TheSocle/socle-pack-pipeline/`

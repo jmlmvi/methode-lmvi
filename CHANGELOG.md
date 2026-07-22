@@ -1,7 +1,51 @@
-# CHANGELOG — kit méthode Besoin2Plan
+# CHANGELOG — méthode AgileIA (kit Besoin2Plan)
 
 > Semver (convention LMVI). Chaque instance note la `KIT-VERSION` copiée et resynce via ce fichier
-> (procédure : README racine, « Resync d'une instance »).
+> (procédure : README racine, « Resync d'une instance »). Ce fichier est auto-versionné par ses
+> entrées (pas de marqueur `KIT-VERSION`, cf. charte U-DOCS §3).
+
+## 1.8.0 — 2026-07-22
+
+**Niveau Feature** — la hiérarchie métier devient **Épic → Feature → US**, obligatoire (petit
+chantier → une **feature-enveloppe** par épic). **Décision commanditaire du 2026-07-22** :
+dérogation explicite au gel posé en 1.7.0, journalisée ici ; la règle « 1 version = 1 RETEX »
+reprend après cette entrée — le niveau Feature reste **⚗️ non prouvé** tant qu'un chantier réel
+(BilanSocle) ne l'a pas éprouvé.
+
+- **METHODE** : §0.2 axe métier à 3 étages (la hiérarchie vit dans les fiches — le mapping
+  inter-axes reste dans la seule matrice M6) ; §1·M3 « Features & Épics » réécrit (feature =
+  capacité démontrable d'un bloc, granularité repère 2–8 US ; US transverse → une seule feature
+  propriétaire, épic dérivé) ; §1·M5 phase = lot de **features**/US ; §3 matrice + colonne Feature ;
+  §7 checklist.
+- **TEMPLATE-FEATURE.md** (nouveau) ; TEMPLATE-US (feature propriétaire, tags `feature/x`),
+  TEMPLATE-EPIC (regroupe ses features), TEMPLATE-M2/M3/M5/M6 alignés. Les `PROUVE-SUR` des
+  templates modifiés repassent « — » (honnêteté : la variante features n'est prouvée sur rien).
+- **Générateur** : section `features:` **requise** (erreur explicite sinon), `feature:` par US avec
+  épic **dérivé** (un `epic:` incohérent = erreur), validation de la hiérarchie + alerte features
+  vides, fiches feature (M3), colonne Feature dans la matrice générée, tags Gherkin `@feat-x`,
+  index M2 par épic → features. **Prouvé** : run réel sur les données Régie (42 US + 10
+  features-enveloppes + 10 épics générés, gardes d'erreur testées).
+- **us-data.example.yml** : schéma v1.8 (10 features-enveloppes — Régie est antérieure au niveau
+  Feature) ; ESSENTIEL / PRESENTATION / README / USAGE / prompts alignés.
+
+## 1.7.1 — 2026-07-22
+
+**Correctifs de cohérence** (aucune évolution de méthode — le gel 1.7.0 est respecté) :
+
+- **Marqueurs remis en vérité** : README, USAGE, METHODE et conception/README avaient été modifiés
+  en 1.7.0 **sans bump** de leur `KIT-VERSION` (resync d'instance trompé) ; `KIT-VERSION` **ajouté
+  aux 13 fichiers qui n'en portaient pas** (CONTRAT-ARCHITECTURE, ExempleCdc, corpus 0→8) ;
+  versionite purgée (« Statut : v1.1 » retiré de METHODE — un fichier n'a qu'une version, sa
+  KIT-VERSION) ; CHANGELOG retitré « méthode AgileIA ». Exemptions actées (charte §3) :
+  CHANGELOG et archives datées (`AnalyseFable/`).
+- **URL de clone corrigée** : le remote réel est `github.com/jmlmvi/methode-lmvi.git`
+  (USAGE §1 et §4 — la première commande du mode d'emploi échouait).
+- **Vendoring `_kit/` complété** : `CONTRAT-ARCHITECTURE.md` copié dans `_kit/` (le prompt M6 le
+  lisait « dans le repo méthode », inexistant côté instance) ; profil **client** → `conformite/` et
+  `run/` vendorés aussi (le PROMPT-PILOTE les promettait sans qu'ils soient installés).
+- **Renvois chapeau U-DOCS** : section dédiée dans le README (DOCTRINE, GLOSSAIRE, CHARTE) +
+  caveat sur les liens `../../` quand le kit est cloné seul ou vendoré ; README complété des
+  sections « non-négociables » (squelette charte §1).
 
 ## 1.7.0 — 2026-07-06
 

@@ -1,3 +1,4 @@
+<!-- KIT-VERSION: 1.7.1 -->
 ### Création de Table PostgreSQL
 
 **Nom de la Table**: [NomDeLaTable]

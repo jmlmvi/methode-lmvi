@@ -1,3 +1,4 @@
+<!-- KIT-VERSION: 1.7.1 -->
 # Slot · FrontEnd React V005 (design system)
 
 - **Source canonique** : shell React V005 + `appdemo` (pattern UI de référence) + charte violet

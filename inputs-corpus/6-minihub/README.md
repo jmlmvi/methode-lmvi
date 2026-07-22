@@ -1,3 +1,4 @@
+<!-- KIT-VERSION: 1.7.1 -->
 # Slot · MiniHub (déploiement distribué)
 
 - **Source canonique** : doc minihub + mémoires `reference_minihub_*`

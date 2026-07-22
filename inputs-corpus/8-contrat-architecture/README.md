@@ -1,3 +1,4 @@
+<!-- KIT-VERSION: 1.7.1 -->
 # Slot · Contrat d'architecture plateforme
 
 - **Source canonique** : [`../../CONTRAT-ARCHITECTURE.md`](../../CONTRAT-ARCHITECTURE.md)

@@ -1,8 +1,9 @@
-<!-- KIT-VERSION: 1.1.0 -->
-<!-- PROUVE-SUR: Régie/atelier-décomposition (kit v1.0) -->
+<!-- KIT-VERSION: 1.8.0 -->
+<!-- PROUVE-SUR: — (niveau Feature v1.8 non prouvé ; chaîne de base prouvée sur Régie kit v1.0) -->
 # M5 · Phasage gaté — {{nom du chantier}}
 
-> Template. Une phase = un lot d'épics/US livré ensemble, avec une **gate = démo vérifiable**.
+> Template. Une phase = un lot de **features**/US livré ensemble, avec une **gate = démo vérifiable**
+> (la feature — capacité démontrable — est l'unité naturelle du découpage).
 > **Convention de nommage des phases** : `{{préfixe}}` (`P-x` par défaut ; une instance peut choisir
 > un autre préfixe) — **unique** pour le chantier, déclaré ici.
 
@@ -10,7 +11,7 @@
 Ordonner la livraison en incréments démontrables (axe LIVRAISON).
 
 ## 2. Entrée
-**Épics** (M3) + **Décisions** (M4).
+**Features & épics** (M3) + **Décisions** (M4).
 
 ## 3. Livrable
 Phases `P-0…P-n`, chacune avec contenu (épics/US) + **gate**. Estimation : ré-estimer × 2
@@ -26,7 +27,7 @@ flowchart LR
 ```
 
 ## 5. Contenu
-| Phase | Contenu (épics/US) | Gate (démo) |
+| Phase | Contenu (features/US) | Gate (démo) |
 |---|---|---|
 | `{{P-0}}` | `{{…}}` | `{{« on voit X marcher »}}` |
 

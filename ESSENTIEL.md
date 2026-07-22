@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.7.0 -->
+<!-- KIT-VERSION: 1.8.0 -->
 # L'essentiel de la méthode — en une page
 
 > La philosophie, sans un seul template. À lire avant tout le reste.
@@ -12,7 +12,7 @@ par ses chantiers réels. Ce qui n'a pas de preuve externe est une opinion bien 
 
 ## 2. Les 3 axes orthogonaux (comment ranger)
 
-**Métier** (ce qu'on promet : les US, groupées en épics) · **Technique** (avec quoi on le fait :
+**Métier** (ce qu'on promet : les US, groupées en features, elles-mêmes groupées en épics) · **Technique** (avec quoi on le fait :
 les briques) · **Livraison** (quand et comment on le démontre : les phases et leurs gates).
 On ne les mélange jamais : un artefact ne porte qu'un axe ; le seul lieu où les trois se croisent
 est la **matrice de couverture** — chaque promesse y est tracée jusqu'à sa brique, son test et sa

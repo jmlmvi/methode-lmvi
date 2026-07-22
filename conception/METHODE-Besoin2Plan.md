@@ -1,12 +1,13 @@
-<!-- KIT-VERSION: 1.4.0 -->
-# Méthode LMVI — Besoin → Plan (Spec de besoins → US → Épics → Phasage → Plan technique)
+<!-- KIT-VERSION: 1.8.0 -->
+# Méthode AgileIA — Besoin → Plan (Spec de besoins → US → Features → Épics → Phasage → Plan technique)
 
 > **But** : passer proprement d'un **besoin métier exprimé** à un **plan technique exécutable**, sans
-> trou et sans big-bang. Méthode **légère, orientée produit** — complément du `FromSpec2Plan` (lourd,
-> pensé pour une spec contractuelle de grande ampleur). Ici on part d'un besoin déjà cadré et on le
-> déroule en incréments livrables.
+> trou et sans big-bang. Méthode **orientée produit** : on part d'un besoin (déjà cadré, ou fourni
+> sous forme de CdC) et on le déroule en incréments livrables. C'est **la** méthode forward AgileIA ;
+> le cas « spec contractuelle de grande ampleur » est couvert par le **mode d'entrée « CdC fourni »**
+> (`PROFILS.md`), pas par une méthode séparée.
 >
-> **Statut** : v1.1 (2026-07-06). Distillée de la conception réelle de l'**Atelier de décomposition** de
+> **Origine** : distillée de la conception réelle de l'**Atelier de décomposition** de
 > Régie (APP-16), révisée suite à la revue Fable (`../AnalyseFable/`). Réutilisable pour toute
 > feature/app portée par un besoin métier. Les règles issues du seul chantier Régie sont marquées
 > **⚗️ règle candidate** (N=1, à confirmer sur instance 2).
@@ -38,16 +39,17 @@ On ne mélange jamais ces trois axes.
 
 | Axe | Objet | Répond à |
 |---|---|---|
-| **Métier** | **Épic** (regroupe des US) | *quelle capacité on promet à l'utilisateur* |
+| **Métier** | **Épic → Feature → US** (l'épic regroupe des features ; la feature, des US) | *quelle capacité on promet à l'utilisateur* |
 | **Technique** | Worker / service / stage / package | *avec quelles briques on le fait* |
 | **Livraison** | **Phase** (avec une *gate* démontrable) | *quand, et comment on le démontre* |
 
 Un épic **traverse** plusieurs briques ; une brique (ex. un moteur de pipeline) **sert** plusieurs épics.
 → **Jamais de mapping 1:1 « épic = worker ».**
 
-**Corollaire (artefacts)** : chaque artefact ne porte **que son axe**. La fiche US (M2) est purement
-métier ; le rattachement US → phase → brique vit **uniquement** dans la **matrice de couverture (M6)**,
-seule source de vérité du mapping entre les 3 axes.
+**Corollaire (artefacts)** : chaque artefact ne porte **que son axe**. La hiérarchie
+**Épic → Feature → US** est interne à l'axe métier : elle vit dans les fiches (M2/M3). La fiche US
+reste purement métier ; le rattachement US → phase → brique, lui, vit **uniquement** dans la
+**matrice de couverture (M6)**, seule source de vérité du mapping entre les 3 axes.
 
 **Les 3 piliers** : la chaîne M0→M7 vit dans le pilier **`conception/`** (ce dossier), avec les
 artefacts signables (fiches RG · matrice d'habilitations · plan de test — `TEMPLATE-RG`,
@@ -62,7 +64,7 @@ client : les trois.
 ## 1. La chaîne en 8 maillons (M0→M7)
 
 ```
-M0 Besoin & Vision  →  M1 Spec de besoins  →  M2 User Stories  →  M3 Épics  →  M4 Arbitrages
+M0 Besoin & Vision  →  M1 Spec de besoins  →  M2 User Stories  →  M3 Features & Épics  →  M4 Arbitrages
         →  M5 Phasage gaté  →  M6 Plan technique  →  M7 Exécution & câblage  →  (Code + suivi par phase)
 ```
 
@@ -110,16 +112,23 @@ glm47 via APIM…) : une autre session du même modèle est une relecture de con
   couverture (M6), cf. §0.
 - **DoD** : chaque US est démontrable par un test d'acceptation.
 
-### M3 — Épics (regroupement)
+### M3 — Features & Épics (le regroupement, à deux étages)
 - **Entrée** : les US M2.
-- **Livrable** : les US **rangées en épics** (thèmes de valeur), ex. A–H.
-- **Règle importante** : épic ↔ US est une **relation de regroupement**, pas une étape temporelle stricte.
-  On itère : on esquisse les épics comme thèmes, on détaille les US, on regroupe. (Bottom-up « US puis
-  épics » **ou** top-down « épics puis US » — les deux marchent.)
-- **US transverse** : une US a toujours **un seul épic propriétaire** (celui de la matrice) ; des épics
-  secondaires sont possibles via les tags `epic/x` du frontmatter — la matrice ne compte que le
-  propriétaire.
-- **DoD** : toute US a exactement un épic propriétaire ; aucun épic vide.
+- **Livrable** : les US rangées en **features** — une feature = une **capacité démontrable d'un
+  bloc**, plus fine que l'épic, plus large que l'US — elles-mêmes rangées en **épics** (thèmes de
+  valeur), ex. A–H. La hiérarchie **Épic → Feature → US est obligatoire** : un petit chantier crée
+  au minimum une **feature-enveloppe** par épic (même périmètre que l'épic, déclarée comme telle
+  dans sa fiche).
+- **Règle importante** : c'est une **relation de regroupement**, pas une étape temporelle stricte.
+  On itère : on esquisse les épics comme thèmes, on détaille les US, on regroupe en features.
+  (Bottom-up **ou** top-down — les deux marchent.)
+- **Granularité** (repère, pas dogme) : une feature = 2–8 US démontrables ensemble ; un épic =
+  1–5 features. Au-delà, splitter ; en deçà, la feature-enveloppe suffit.
+- **US transverse** : une US a toujours **une seule feature propriétaire** — et donc un seul épic
+  propriétaire, celui de sa feature (c'est ce que compte la matrice) ; des regroupements
+  secondaires sont possibles via les tags `feature/x` / `epic/x` du frontmatter.
+- **DoD** : toute US a exactement une feature propriétaire ; toute feature a exactement un épic ;
+  aucune feature ni aucun épic vide.
 
 ### M4 — Arbitrages (décisions tranchées)  ← *maillon souvent oublié*
 - **Entrée** : les `[À ARBITRER]` de M1 + les questions ouvertes.
@@ -130,8 +139,9 @@ glm47 via APIM…) : une autre session du même modèle est une relecture de con
   **Relecture requise.**
 
 ### M5 — Phasage gaté
-- **Entrée** : épics + décisions.
-- **Livrable** : des **phases**, chacune = un sous-ensemble d'épics/US livré ensemble, avec une
+- **Entrée** : features & épics (M3) + décisions (M4).
+- **Livrable** : des **phases**, chacune = un sous-ensemble de features/US livré ensemble (la
+  feature — capacité démontrable — est l'unité naturelle de découpage), avec une
   **gate = démo vérifiable** (« on voit X marcher »). **Convention de nommage** : `P-0, P-1…` dans le
   kit ; une instance peut choisir son préfixe (ex. `PA-x` chez Régie) mais il est **unique** pour le
   chantier et **déclaré** dans le livrable M5.
@@ -207,12 +217,15 @@ jamais effacés. Un chantier arrêté proprement vaut mieux qu'un chantier zombi
 
 C'est l'artefact qui **relie les 3 axes** et prouve qu'on n'a rien oublié ni codé en trop.
 
-| US | Épic (métier) | Phase (livraison) | Brique (technique) | Tests | Gate | Statut / révisé le |
-|----|---------------|-------------------|--------------------|-------|------|--------------------|
-| B2 | B — Bibliothèque | P-1 | `prompts` service + UI | `@US-B2 @pivot` | « je vois le contrat de sortie avant de lancer » | à faire |
-| C1 | C — Exécution | P-1 | stage `agentia` (pack pipeline) | `@US-C1 @RG-A2` | « 1 prompt → propositions » | à faire |
-| F1 | F — Aperçu/commit | P-1 | stage `Human` + service commit | `@US-F1 @neg` | « je valide avant écriture » | à faire |
-| … | … | … | … | … | … | … |
+| US | Feature | Épic (métier) | Phase (livraison) | Brique (technique) | Tests | Gate | Statut / révisé le |
+|----|---------|---------------|-------------------|--------------------|-------|------|--------------------|
+| B2 | F-B1 | B — Bibliothèque | P-1 | `prompts` service + UI | `@US-B2 @pivot` | « je vois le contrat de sortie avant de lancer » | à faire |
+| C1 | F-C1 | C — Exécution | P-1 | stage `agentia` (pack pipeline) | `@US-C1 @RG-A2` | « 1 prompt → propositions » | à faire |
+| F1 | F-F1 | F — Aperçu/commit | P-1 | stage `Human` + service commit | `@US-F1 @neg` | « je valide avant écriture » | à faire |
+| … | … | … | … | … | … | … | … |
+
+*(Exemple issu de Régie, antérieure au niveau Feature — colonnes illustrées avec ses
+features-enveloppes.)*
 
 Lecture : **verticalement** on vérifie la couverture (chaque US a une ligne) ; **horizontalement** on
 voit le chemin besoin→code→démo. C'est **ici** — et seulement ici — que vit le mapping US→phase→brique.
@@ -223,7 +236,7 @@ voit le chemin besoin→code→démo. C'est **ici** — et seulement ici — que
 
 - **Réutilisation plateforme** : on n'écrit aucune brique déjà fournie (auth, secrets, storage, LLM,
   pipeline…). Anti-extrapolation.
-- **Aucun mock, aucune simulation, aucune régression** (clause LMVI). Sans dépendance réelle → état
+- **Aucun mock, aucune simulation, aucune régression** (clause AgileIA). Sans dépendance réelle → état
   **honnête** (`en_attente`), jamais un faux résultat.
 - **Contrat de sortie explicite** : à chaque étape, on sait **ce qu'elle produit** avant de la lancer.
   (Vrai pour un prompt… et pour chaque maillon de cette méthode.)
@@ -248,29 +261,30 @@ voit le chemin besoin→code→démo. C'est **ici** — et seulement ici — que
 | **M6** | Réutilise `socle-pack-pipeline` (prompt=stage, aperçu=stage H, enchaînement=DAG), LLM via APIM, `storage` ; briques nouvelles = parseur théâtre, adaptateurs de stages, CRUD, front ; **~0 nouveau worker**. |
 | **M7** | Câblage : code dans `APP-16-REGIES/regies/` ; inputs rassemblés (`inputs/` : pack + framework + baseline) ; outils Hub (db/iam/vault/storage/APIM/proxy/install) ; cible minihub minim4 → `regie.thesocle.net` ; suivi `tracking/PA-0…PA-4`. |
 
-> Note : l'instance Régie a été conçue avec le kit v1 (fiches US portant phase/brique). Elle resyncera
-> vers v1.1 à son rythme (cf. « Resync d'une instance » dans le README racine).
+> Note : l'instance Régie a été conçue avec le kit v1 (fiches US portant phase/brique) — et elle
+> est antérieure au niveau **Feature** (kit ≥ 1.8) : ses épics regroupent directement les US. Au
+> resync, des features-enveloppes (1 par épic) suffisent. (Cf. « Resync d'une instance », README racine.)
 
 ---
 
-## 6. Positionnement vs les autres méthodes LMVI
+## 6. Positionnement : un seul forward, deux modes d'entrée
 
-- **`FromSpec2Plan`** (lourd) : greenfield d'un produit contractuel (investigation de références → spec
-  parent monolithique → sous-specs → phasage → plans de tests). À utiliser quand on **invente** un
-  domaine et qu'on **vend une spec**.
-- **Cette méthode `Besoin2Plan`** (léger) : une feature/app portée par un **besoin déjà exprimé** qu'on
-  déroule en incréments. Les deux partagent le **phasage gaté** et l'**anti-extrapolation**.
+`methode-AgileIA` est **la** méthode forward AgileIA. Elle absorbe, via ses deux **modes d'entrée**
+(`PROFILS.md`), les deux cas qu'on distinguait autrefois par deux méthodes séparées :
 
-**Règle de choix (3 questions fermées)** :
+- **Mode « besoin exprimé »** (léger) : une feature/app portée par un **besoin déjà cadré**, déroulé
+  en incréments.
+- **Mode « CdC fourni »** (lourd) : un **cahier des charges existant** ou une **spec contractuelle de
+  grande ampleur** — dont la **rétro-spec d'un existant** produite par `RefonteApplication` — ingéré
+  avec traçabilité §CdC→US/RG, ses trous devenant les `[À ARBITRER]`. Correspondance des artefacts
+  d'une rétro-spec → maillons M0→M7 : `../../GLOSSAIRE.md` §3 *(chapeau U-DOCS ; kit vendoré ou
+  cloné seul → voir le repo `2026-U-DOCS`)*.
 
-| # | Question | Oui → | Non → |
-|---|---|---|---|
-| 1 | Le domaine est-il déjà cadré (le commanditaire sait décrire ce qu'il veut) ? | Besoin2Plan | FromSpec2Plan |
-| 2 | Vend-on une **spec contractuelle** (la spec est le livrable) ? | FromSpec2Plan | Besoin2Plan |
-| 3 | Le périmètre dépasse-t-il ~1 app (plateforme, plusieurs produits) ? | FromSpec2Plan | Besoin2Plan |
+Dans les deux cas, mêmes invariants : **phasage gaté**, **anti-extrapolation**, gate = démo.
 
-Deux réponses sur trois orientent la même méthode → on la prend. (Contrôle : Régie → oui/non/non =
-Besoin2Plan ✓ ; socle-pack-ai spec 50k → non/oui/oui = FromSpec2Plan ✓.)
+> Note historique : ces deux modes remplacent l'ancien couple de méthodes distinctes (`Besoin2Plan`
+> léger / `FromSpec2Plan` lourd). **`FromSpec2Plan` est déprécié** — son usage est entièrement
+> couvert par le mode « CdC fourni ».
 
 ---
 
@@ -280,7 +294,7 @@ Besoin2Plan ✓ ; socle-pack-ai spec 50k → non/oui/oui = FromSpec2Plan ✓.)
 - [ ] M1 Spec de besoins écrite (QUOI), termes définis, **NFR posées**, **fiches RG** +
       **matrice d'habilitations signée** (pilier conception), `[À ARBITRER]` posés — **relue**
 - [ ] M2 US testables et numérotées, **sans phase ni brique dans la fiche**
-- [ ] M3 US regroupées en épics (un propriétaire chacune, aucune orpheline)
+- [ ] M3 US regroupées en **features**, features en épics (une propriétaire chacune, aucune vide)
 - [ ] M4 **Toutes** les décisions structurantes tranchées et écrites — **relues**
 - [ ] M5 Phases avec **gate = démo** ; préfixe de phase déclaré ; P-0 = socle *(⚗️ candidate)*
 - [ ] M6 Plan technique + **matrice de couverture** (US→épic→phase→brique→**tests**, colonne statut) +

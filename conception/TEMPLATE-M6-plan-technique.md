@@ -1,5 +1,5 @@
-<!-- KIT-VERSION: 1.4.0 -->
-<!-- PROUVE-SUR: Régie/atelier-décomposition (kit v1.0) -->
+<!-- KIT-VERSION: 1.8.0 -->
+<!-- PROUVE-SUR: — (niveau Feature v1.8 non prouvé ; chaîne de base prouvée sur Régie kit v1.0) -->
 # M6 · Plan technique + matrice de couverture — {{nom du chantier}}
 
 > Template. Choisir les briques **par nature** (arbre V005), **jamais par épic**. Réutiliser la plateforme.
@@ -24,13 +24,13 @@ des gates précédentes) · 6. **Mapping habilitations → IAM** (rôles métier
 flowchart LR
   M5["M5 Phases"] --> M6["M6 Plan"]
   M6 --> EX["Exécution + suivi"]
-  US["US"] --> EP["Épic"] --> PH["Phase"] --> BR["Brique"]
+  US["US"] --> FT["Feature"] --> EP["Épic"] --> PH["Phase"] --> BR["Brique"]
 ```
 
 ## 5. Matrice de couverture (le garde-fou)
-| US | Épic | Phase | Brique technique | Tests | Gate | Statut / révisé le |
-|----|------|-------|------------------|-------|------|--------------------|
-| `{{X1}}` | `{{A}}` | `{{P-0}}` | `{{service/stage/worker}}` | `{{@US-X1 (+@RG-x, +@neg)}}` | `{{démo}}` | `{{à faire}}` |
+| US | Feature | Épic | Phase | Brique technique | Tests | Gate | Statut / révisé le |
+|----|---------|------|-------|------------------|-------|------|--------------------|
+| `{{X1}}` | `{{F-X1}}` | `{{A}}` | `{{P-0}}` | `{{service/stage/worker}}` | `{{@US-X1 (+@RG-x, +@neg)}}` | `{{démo}}` | `{{à faire}}` |
 
 ## 6. Definition of Done
 - [ ] Chaque US tracée jusqu'à une brique (aucune orpheline)

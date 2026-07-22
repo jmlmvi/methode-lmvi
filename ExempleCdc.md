@@ -1,3 +1,4 @@
+<!-- KIT-VERSION: 1.7.1 -->
 # Cahier des Charges — Plateforme BilanSocle
 
 *Multi-tenant · Moteur de parcours générique · Planning intelligent · Constructeur visuel*

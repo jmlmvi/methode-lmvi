@@ -1,5 +1,5 @@
-<!-- KIT-VERSION: 1.4.2 -->
-# Méthode LMVI — construire une app TheSocle
+<!-- KIT-VERSION: 1.8.0 -->
+# Méthode AgileIA — construire une app TheSocle
 
 > La **méthode générique** pour bâtir n'importe quelle app TheSocle (solo ou équipe cliente), avec
 > son **corpus d'inputs techniques** et le **contrat d'architecture** commun. Une app (ex. Régie)
@@ -10,7 +10,7 @@
 ## Le repo en un coup d'œil
 
 ```
-methode-lmvi/
+methode-AgileIA/
 ├── ESSENTIEL.md              ← LIRE EN PREMIER : la philosophie en 1 page (preuve externe, 3 axes)
 ├── USAGE.md                  ← puis le mode d'emploi (pas-à-pas + prompts + PILOTE)
 ├── CONTRAT-ARCHITECTURE.md   ← les règles plateforme héritées par toute app (jamais redécidées)
@@ -57,7 +57,7 @@ flowchart LR
 
 | Étape | Maillons | Ce qui s'y passe | Et les tests ? |
 |---|---|---|---|
-| **1 · Cadrage & spécification** | M0 → M1 → M2 → M3 | vision confirmée, spec (QUOI + RG + habilitations + NFR), US, épics | la **matière des tests** s'écrit ici : CA des US + exemples/contre-exemples des RG — avant tout code |
+| **1 · Cadrage & spécification** | M0 → M1 → M2 → M3 | vision confirmée, spec (QUOI + RG + habilitations + NFR), US, features, épics | la **matière des tests** s'écrit ici : CA des US + exemples/contre-exemples des RG — avant tout code |
 | **2 · Arbitrage** | M4 | toutes les décisions structurantes tranchées — **on ne code pas avant** | — |
 | **3 · Plan** | M5 → M6 | phasage gaté, plan technique, matrice de couverture (colonne Tests), mapping IAM | le **plan de test** se décide ici : automatisé vs démo, non-régression |
 | **4 · Réalisation** (répétée par phase P-x) | M7 puis P-0, P-1… | câblage, puis code par incréments | les tests s'écrivent **avec** le code (squelettes Gherkin générés) |
@@ -66,6 +66,24 @@ flowchart LR
 
 **La clé** : recette et livraison ne sont pas des étapes finales — chaque phase P-x est un
 **mini-cycle complet** (dev → tests → recette → livraison).
+
+## Les non-négociables
+
+**Preuve externe pour tout artefact** · **zéro mock / simulation / faux vert** (sans dépendance
+réelle → état honnête `en_attente`) · **gate = démo réelle**, jamais une liste cochée ·
+**décisions avant plan** (M4 bloquant) · **un artefact = un axe** — hiérarchie métier
+**Épic → Feature → US** ; le mapping inter-axes vit dans la seule matrice de couverture (M6) ·
+**réutilisation plateforme** (le contrat d'architecture s'hérite, ne se redécide pas) ·
+**relecture requise M1/M4/M6** par un relecteur différent en nature.
+
+## Le chapeau U-DOCS
+
+Ce repo est le côté **forward** du référentiel `2026-U-DOCS` (le backward est `RefonteApplication`,
+dont la rétro-spec alimente ce kit en mode « CdC fourni ») : [`../README.md`](../README.md) ·
+doctrine commune [`../DOCTRINE.md`](../DOCTRINE.md) · vocabulaire partagé
+[`../GLOSSAIRE.md`](../GLOSSAIRE.md) (§3 : correspondance rétro-spec → M0→M7) ·
+[`../CHARTE-DOCUMENTAIRE.md`](../CHARTE-DOCUMENTAIRE.md). *(Liens valides quand le repo vit dans
+U-DOCS ; cloné seul ou vendoré en `_kit/`, se référer au repo chapeau.)*
 
 ## Instances connues
 - **Régie (APP-16)** — 1ʳᵉ instance : `APP-16-REGIES/docs/atelier-decomposition/` (kit v1.0.0

@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.7.0 -->
+<!-- KIT-VERSION: 1.7.1 -->
 <!-- PROUVE-SUR: — -->
 # PROMPT-PILOTE — dérouler tout le chantier avec UN seul prompt
 
@@ -12,7 +12,8 @@
 
 ```text
 Tu es le chef de chantier de ce projet. Le kit méthode est dans _kit/ : lis d'abord
-_kit/METHODE-Besoin2Plan.md (en entier) et _kit/PROFILS.md, puis pilote le chantier maillon par
+_kit/METHODE-Besoin2Plan.md (en entier) et _kit/PROFILS.md (pour M6 : _kit/CONTRAT-ARCHITECTURE.md),
+puis pilote le chantier maillon par
 maillon en utilisant les templates _kit/TEMPLATE-*.md et le générateur _kit/gen-fiches-us.py.
 
 MON ENTRÉE (une des deux lignes, supprime l'autre) :

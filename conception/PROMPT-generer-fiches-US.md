@@ -1,8 +1,11 @@
-<!-- KIT-VERSION: 1.1.0 -->
-# Prompt — générer les fiches US & Épic (maillons M2/M3)
+<!-- KIT-VERSION: 1.8.0 -->
+# Prompt — générer les fiches US, Feature & Épic (maillons M2/M3)
 
 > Kit de génération réutilisable pour découper les US en **fiches nommées, reliées** (Obsidian `[[…]]`
 > + mermaid). Deux voies : **le script** (déterministe) ou **le prompt** (pour un agent IA).
+> **Hiérarchie métier obligatoire (kit ≥ 1.8)** : Épic → Feature → US — section `features:` requise
+> dans le YAML, chaque US porte `feature:` (son épic est **dérivé**) ; petit chantier → une
+> feature-enveloppe par épic.
 > **Option A (méthode §0)** : la fiche US est purement métier — ni phase ni brique ; le mapping vit
 > dans la matrice de couverture (M6).
 
@@ -11,13 +14,15 @@
 Fichier : [`gen-fiches-us.py`](gen-fiches-us.py) — **générique**, toutes les données vivent dans un
 YAML (modèle : [`us-data.example.yml`](us-data.example.yml) = le chantier Régie). Il génère :
 - `M2-user-stories/<CODE>-<nom>.md` — 1 fiche par US (frontmatter `aliases: [<CODE>]` +
-  `tags: [us, "epic/<lettre>"]`, histoire, contexte, CA, dépendances amont/aval, RG, mermaid, `[[…]]`) ;
-- `M3-epics/<lettre>-<nom>.md` — 1 fiche par épic (regroupe et pointe vers ses US) ;
+  `tags: [us, "feature/<code>", "epic/<lettre>"]`, feature + épic propriétaires, histoire, contexte,
+  CA, dépendances amont/aval, RG, mermaid, `[[…]]`) ;
+- `M3-epics/<F-code>-<nom>.md` — 1 fiche par **feature** (ses US, sa capacité démontrable) ;
+- `M3-epics/<lettre>-<nom>.md` — 1 fiche par épic (regroupe et pointe vers ses features) ;
 - `M2-user-stories/README.md` — l'index ;
 - `M6-plan-technique/matrice-couverture.generated.md` — **si** le YAML fournit `phase`/`brique` par US
   (brouillon à fusionner dans le README M6, la source de vérité du mapping).
 
-**Réutiliser** : copier `us-data.example.yml`, remplacer `chantier`/`root`/`spec`/`epics`/`us`, puis :
+**Réutiliser** : copier `us-data.example.yml`, remplacer `chantier`/`root`/`spec`/`epics`/`features`/`us`, puis :
 ```bash
 python3 gen-fiches-us.py mon-chantier/us-data.yml
 ```
@@ -34,15 +39,18 @@ alias frontmatter.
 > **récapitulatif d'US**. Respecte strictement :
 >
 > 1. **Une fiche par US**, fichier `M2-user-stories/<CODE>-<slug-du-nom>.md`. Frontmatter
->    `aliases: ["<CODE>"]` + `tags: [us, "epic/<lettre>"]` (épic secondaire éventuel = tag `epic/<y>`
->    additionnel ; **jamais de tag phase**).
+>    `aliases: ["<CODE>"]` + `tags: [us, "feature/<code>", "epic/<lettre>"]` (regroupement secondaire
+>    éventuel = tag `feature/<y>` / `epic/<y>` additionnel ; **jamais de tag phase**).
 > 2. Structure de chaque fiche (voir [`TEMPLATE-US.md`](TEMPLATE-US.md)) : titre `# <CODE> · <Nom>`,
->    table (Nom, Code, Épic propriétaire `[[…]]`, RG liées, Statut — **ni Phase ni Brique** : renvoi
+>    table (Nom, Code, **Feature propriétaire** `[[…]]`, Épic propriétaire (celui de la feature),
+>    RG liées, Statut — **ni Phase ni Brique** : renvoi
 >    vers la matrice M6), **Histoire** (En tant que… je veux… afin de…), **Contexte** (1–3 phrases
 >    explicites), **Critères d'acceptation** (2–3, plus riches sur les pivots — option Gherkin),
 >    **Dépendances** (Amont/Aval en `[[…]]`), **Relations (mermaid)**, **Liens**.
-> 3. **Une fiche par épic**, `M3-epics/<lettre>-<slug>.md` (voir [`TEMPLATE-EPIC.md`](TEMPLATE-EPIC.md)) :
->    regroupe et **pointe** vers ses US ; ne duplique pas leur contenu ; pas de colonne phase.
+> 3. **Une fiche par feature**, `M3-epics/<F-code>-<slug>.md` (voir
+>    [`TEMPLATE-FEATURE.md`](TEMPLATE-FEATURE.md)) : la capacité démontrable + ses US. **Une fiche
+>    par épic**, `M3-epics/<lettre>-<slug>.md` (voir [`TEMPLATE-EPIC.md`](TEMPLATE-EPIC.md)) :
+>    regroupe et **pointe** vers ses features ; ne duplique pas leur contenu ; pas de colonne phase.
 > 4. **Tout est relié au NOM COMPLET du fichier** (résolution Obsidian fiable) :
 >    - liens Obsidian `[[<CODE>-<slug>]]` — US ↔ épic ↔ dépendances ;
 >    - **dans le mermaid** : les **labels** portent le nom complet (`{{ID}} · {{titre}}`) **et** chaque

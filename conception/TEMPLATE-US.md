@@ -1,8 +1,8 @@
-<!-- KIT-VERSION: 1.1.0 -->
-<!-- PROUVE-SUR: Régie/atelier-décomposition (kit v1.0) -->
+<!-- KIT-VERSION: 1.8.0 -->
+<!-- PROUVE-SUR: — (niveau Feature v1.8 non prouvé ; chaîne de base prouvée sur Régie kit v1.0) -->
 ---
 aliases: ["{{ID}}"]
-tags: [us, "epic/{{lettre}}"]
+tags: [us, "feature/{{code-feature}}", "epic/{{lettre}}"]
 ---
 # {{ID}} · {{titre}}
 
@@ -11,13 +11,15 @@ tags: [us, "epic/{{lettre}}"]
 > **matrice de couverture (M6)**, seule source de vérité du mapping (méthode §0).
 > **Convention de liens** : liens Obsidian et nœuds mermaid au **nom complet du fichier**
 > (`[[{{ID}}-{{slug}}]]`, `click {{ID}} "{{ID}}-{{slug}}.md"`) → navigables dans Obsidian.
-> US transverse : un seul épic **propriétaire** ; épics secondaires via tags `epic/{{y}}` additionnels.
+> US transverse : une seule feature **propriétaire** (l'épic propriétaire = celui de la feature) ;
+> regroupements secondaires via tags `feature/{{y}}` / `epic/{{y}}` additionnels.
 
 | | |
 |---|---|
 | **Nom** | {{titre}} |
 | **Code** | `{{ID}}` (identifiant stable) |
-| **Épic (propriétaire)** | [[{{epic-note}}]] · {{lettre}} — {{titre épic}} |
+| **Feature (propriétaire)** | [[{{feature-fichier}}]] · {{code-feature}} — {{titre feature}} |
+| **Épic (propriétaire)** | [[{{epic-note}}]] · {{lettre}} — {{titre épic}} *(celui de la feature)* |
 | **RG liées** | {{RG-Ax, …}} |
 | **Statut** | à faire *(cycle : à faire · en cours · livrée · splittée → US filles · abandonnée, raison en M4)* |
 
@@ -41,12 +43,14 @@ tags: [us, "epic/{{lettre}}"]
 ## Relations (mermaid)
 ```mermaid
 flowchart LR
-  {{ID}}["{{ID}} · {{titre}}"] --> EP["Épic {{lettre}} · {{titre épic}}"]
+  {{ID}}["{{ID}} · {{titre}}"] --> FT["{{code-feature}} · {{titre feature}}"]
+  FT --> EP["Épic {{lettre}} · {{titre épic}}"]
   {{DEP}}["{{DEP}} · {{nom dép}}"] --> {{ID}}
   click {{ID}} "{{ID}}-{{slug}}.md"
+  click FT "../M3-epics/{{feature-fichier}}.md"
   click EP "../M3-epics/{{epic-note}}.md"
   click {{DEP}} "{{DEP}}-{{slug}}.md"
 ```
 
 ## Liens
-Épic [[{{epic-note}}]] · dépend de {{[[Dep1-nom]]}} · requis par {{[[Aval1-nom]]}} · [Spec]({{lien-spec}})
+Feature [[{{feature-fichier}}]] · Épic [[{{epic-note}}]] · dépend de {{[[Dep1-nom]]}} · requis par {{[[Aval1-nom]]}} · [Spec]({{lien-spec}})

@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# KIT-VERSION: 1.4.0
-"""Génère les fiches US (M2), épics (M3) et — pilier conception — fiches RG, matrice
-d'habilitations et squelettes de tests Gherkin d'un chantier Besoin2Plan, avec liens
-Obsidian [[...]] + mermaid. Déterministe, idempotent, GÉNÉRIQUE : toutes les données
+# KIT-VERSION: 1.8.0
+"""Génère les fiches US (M2), features & épics (M3) et — pilier conception — fiches RG,
+matrice d'habilitations et squelettes de tests Gherkin d'un chantier Besoin2Plan, avec
+liens Obsidian [[...]] + mermaid. Déterministe, idempotent, GÉNÉRIQUE : toutes les données
 vivent dans un fichier YAML passé en argument (voir us-data.example.yml ; sections
 optionnelles `rg:` et `roles:`).
+
+Kit >= 1.8 : la hiérarchie métier Épic → Feature → US est OBLIGATOIRE — section
+`features:` requise (code -> {epic, titre, [intention]}), chaque US porte `feature:`
+(son épic est DÉRIVÉ de sa feature). Petit chantier : une feature-enveloppe par épic.
 
 Usage :
     python3 gen-fiches-us.py <us-data.yml>
@@ -44,8 +48,32 @@ SPEC = DATA.get("spec")                      # lien relatif depuis M2 vers la sp
 SPEC_US = (SPEC + DATA.get("spec_us_anchor", "")) if SPEC else None
 SPEC_RG = (SPEC + DATA.get("spec_rg_anchor", "")) if SPEC else None
 EPICS = DATA["epics"]                        # lettre -> {note, titre, intention}
-US = DATA["us"]                              # code  -> {epic, titre, acteur, veux, afin,
+FEATURES = DATA.get("features")              # code -> {epic, titre, [intention]} — REQUIS (kit >= 1.8)
+if not FEATURES:
+    sys.exit("Section `features:` requise (kit >= 1.8, hiérarchie Épic → Feature → US) :\n"
+             "  features:\n    F-A1: {epic: A, titre: ...}\n"
+             "Petit chantier : une feature-enveloppe par épic (même périmètre que l'épic).")
+US = DATA["us"]                              # code  -> {feature, titre, acteur, veux, afin,
                                              #           deps, rg, ctx, ca, [phase], [brique], [statut]}
+
+# --- validation de la hiérarchie (obligatoire) : US -> feature -> épic ---
+_errs = []
+for fc, fv in FEATURES.items():
+    if fv.get("epic") not in EPICS:
+        _errs.append(f"feature {fc} : épic inconnu ou absent ({fv.get('epic')!r})")
+for u, v in US.items():
+    fc = v.get("feature")
+    if fc not in FEATURES:
+        _errs.append(f"US {u} : feature inconnue ou absente ({fc!r})")
+    elif v.get("epic") and v["epic"] != FEATURES[fc]["epic"]:
+        _errs.append(f"US {u} : epic explicite ({v['epic']}) != épic de sa feature {fc} "
+                     f"({FEATURES[fc]['epic']}) — retirer `epic:` (dérivé de la feature)")
+if _errs:
+    sys.exit("Hiérarchie Épic → Feature → US invalide :\n  - " + "\n  - ".join(_errs))
+EPIC_OF = {u: FEATURES[v["feature"]]["epic"] for u, v in US.items()}   # épic dérivé
+_empty = [fc for fc in FEATURES if not any(v["feature"] == fc for v in US.values())]
+if _empty:
+    print(f"⚠️  features sans US (DoD M3 : aucune feature vide) : {', '.join(sorted(_empty))}")
 RG = DATA.get("rg") or {}                    # OPTIONNEL (pilier conception) : code -> {titre, enonce,
                                              #   type, source, [exceptions], [exemples],
                                              #   [contre_exemples], [statut]}
@@ -73,6 +101,7 @@ def slug(s):
 
 # nom de fichier = CODE-nom (code = ID stable + tri ; nom = lisibilité)
 FN = {c: f"{c}-{slug(v['titre'])}" for c, v in US.items()}
+FFN = {c: f"{c}-{slug(v['titre'])}" for c, v in FEATURES.items()}      # fiches feature (M3)
 RGFN = {c: f"{c}-{slug(v.get('titre', c))}" for c, v in RG.items()}
 def wl(c):                                   # [[A1-deposer-un-texte-source]]
     return f"[[{FN[c]}]]"
@@ -89,7 +118,8 @@ for u, v in US.items():
         rg_us.setdefault(r, []).append(u)
 
 def us_fiche(uid, v):
-    e = v["epic"]; enote, etitle = EPICS[e]["note"], EPICS[e]["titre"]
+    fc = v["feature"]; ftitle = FEATURES[fc]["titre"]
+    e = EPIC_OF[uid]; enote, etitle = EPICS[e]["note"], EPICS[e]["titre"]
     deps = v.get("deps", []); deps_l = " ".join(wl(d) for d in deps) or "—"
     aval = " ".join(wl(d) for d in dependents.get(uid, [])) or "—"
     rg = ", ".join(rg_link(r) for r in v.get("rg", [])) or "—"
@@ -97,11 +127,13 @@ def us_fiche(uid, v):
     statut = v.get("statut", "à faire")
     def lab(c): return f'{c} · {US[c]["titre"]}'
     mm = ['```mermaid', 'flowchart LR',
-          f'  {uid}["{lab(uid)}"] --> EP["Épic {e} · {etitle}"]']
+          f'  {uid}["{lab(uid)}"] --> FT["{fc} · {ftitle}"]',
+          f'  FT --> EP["Épic {e} · {etitle}"]']
     for d in deps:
         mm.append(f'  {d}["{lab(d)}"] --> {uid}')
     # nœuds cliquables → fiche (Obsidian ; ignoré par GitHub securityLevel strict)
     mm.append(f'  click {uid} "{FN[uid]}.md"')
+    mm.append(f'  click FT "../M3-epics/{FFN[fc]}.md"')
     mm.append(f'  click EP "../M3-epics/{enote}.md"')
     for d in deps:
         mm.append(f'  click {d} "{FN[d]}.md"')
@@ -110,7 +142,7 @@ def us_fiche(uid, v):
     spec_l = f" · [Spec]({SPEC_US})" if SPEC_US else ""
     return f"""---
 aliases: ["{uid}"]
-tags: [us, "epic/{e}"]
+tags: [us, "feature/{fc}", "epic/{e}"]
 ---
 # {uid} · {v['titre']}
 
@@ -118,7 +150,8 @@ tags: [us, "epic/{e}"]
 |---|---|
 | **Nom** | {v['titre']} |
 | **Code** | `{uid}` (identifiant stable) |
-| **Épic (propriétaire)** | [[{enote}]] · {e} — {etitle} |
+| **Feature (propriétaire)** | [[{FFN[fc]}]] · {fc} — {ftitle} |
+| **Épic (propriétaire)** | [[{enote}]] · {e} — {etitle} *(celui de la feature)* |
 | **RG liées** | {rg} |
 | **Statut** | {statut} |
 
@@ -142,31 +175,81 @@ tags: [us, "epic/{e}"]
 {mm}
 
 ## Liens
-Épic [[{enote}]] · dépend de {deps_l} · requis par {aval}{spec_l}
+Feature [[{FFN[fc]}]] · Épic [[{enote}]] · dépend de {deps_l} · requis par {aval}{spec_l}
 """
 
-def epic_fiche(letter):
-    ep = EPICS[letter]; enote, etitle, intent = ep["note"], ep["titre"], ep["intention"]
-    us_ids = [k for k in US if US[k]["epic"] == letter]
-    us_links = " · ".join(wl(u) for u in us_ids)
-    rows = "\n".join(f"| {wl(u)} | {US[u]['titre']} |" for u in us_ids)
-    mm = ['```mermaid', 'flowchart TB', f'  EP["Épic {letter} · {etitle}"]']
+def feature_fiche(fc):
+    fv = FEATURES[fc]; letter = fv["epic"]
+    enote, etitle = EPICS[letter]["note"], EPICS[letter]["titre"]
+    intent = fv.get("intention", "")
+    us_ids = [k for k in US if US[k]["feature"] == fc]
+    us_links = " · ".join(wl(u) for u in us_ids) or "—"
+    rows = "\n".join(f"| {wl(u)} | {US[u]['titre']} |" for u in us_ids) or "| — | *(feature vide — DoD M3 non atteinte)* |"
+    mm = ['```mermaid', 'flowchart TB',
+          f'  EP["Épic {letter} · {etitle}"] --> FT["{fc} · {fv["titre"]}"]']
     for u in us_ids:
-        mm.append(f'  EP --> {u}["{u} · {US[u]["titre"]}"]')
+        mm.append(f'  FT --> {u}["{u} · {US[u]["titre"]}"]')
+    mm.append(f'  click EP "{enote}.md"')
     for u in us_ids:
         mm.append(f'  click {u} "../M2-user-stories/{FN[u]}.md"')
     mm.append('```')
     mm = "\n".join(mm)
-    return f"""# Épic {letter} · {etitle}
+    return f"""---
+aliases: ["{fc}"]
+tags: [feature, "epic/{letter}"]
+---
+# Feature {fc} · {fv['titre']}
 
-> {intent}. Regroupement métier (maillon **M3**). Les US détaillées vivent dans **M2** ; ici on relie.
-> Phase & brique par US : voir la [matrice de couverture](../M6-plan-technique/README.md).
+> {intent or fv['titre']}. Capacité démontrable (maillon **M3**, hiérarchie Épic → Feature → US).
+> Les US détaillées vivent dans **M2** ; phase & brique par US : voir la
+> [matrice de couverture](../M6-plan-technique/README.md).
 
-## User Stories de cet épic
+## User Stories de cette feature
 {us_links}
 
 | US | Nom |
 |---|---|
+{rows}
+
+## Relations (mermaid)
+{mm}
+
+## Liens
+Épic [[{enote}]] · Maillon [[README|M3 index]] · Phasage [../M5-phasage/README.md](../M5-phasage/README.md)
+"""
+
+def epic_fiche(letter):
+    ep = EPICS[letter]; enote, etitle, intent = ep["note"], ep["titre"], ep["intention"]
+    feat_ids = [f for f in FEATURES if FEATURES[f]["epic"] == letter]
+    feat_links = " · ".join(f"[[{FFN[f]}]]" for f in feat_ids) or "—"
+    rows = "\n".join(
+        f"| [[{FFN[f]}]] | {FEATURES[f].get('intention', FEATURES[f]['titre'])} | "
+        f"{' '.join(wl(u) for u in US if US[u]['feature'] == f) or '—'} |"
+        for f in feat_ids)
+    mm = ['```mermaid', 'flowchart TB', f'  EP["Épic {letter} · {etitle}"]']
+    for f in feat_ids:
+        mm.append(f'  EP --> {f}["{f} · {FEATURES[f]["titre"]}"]')
+        for u in US:
+            if US[u]["feature"] == f:
+                mm.append(f'  {f} --> {u}["{u} · {US[u]["titre"]}"]')
+    for f in feat_ids:
+        mm.append(f'  click {f} "{FFN[f]}.md"')
+    for u in US:
+        if EPIC_OF[u] == letter:
+            mm.append(f'  click {u} "../M2-user-stories/{FN[u]}.md"')
+    mm.append('```')
+    mm = "\n".join(mm)
+    return f"""# Épic {letter} · {etitle}
+
+> {intent}. Regroupement métier (maillon **M3**) : l'épic regroupe ses **features**, chaque feature
+> ses US (détaillées dans **M2**). Phase & brique par US : voir la
+> [matrice de couverture](../M6-plan-technique/README.md).
+
+## Features de cet épic
+{feat_links}
+
+| Feature | Intention | US |
+|---|---|---|
 {rows}
 
 ## Relations (mermaid)
@@ -186,15 +269,18 @@ for uid, v in US.items():
     with open(os.path.join(M2, FN[uid] + ".md"), "w", encoding="utf-8") as f:
         f.write(us_fiche(uid, v))
 
-# --- écriture épics (M3) ---
+# --- écriture features + épics (M3) ---
+for fc in FEATURES:
+    with open(os.path.join(M3, FFN[fc] + ".md"), "w", encoding="utf-8") as f:
+        f.write(feature_fiche(fc))
 for letter in EPICS:
     with open(os.path.join(M3, f"{EPICS[letter]['note']}.md"), "w", encoding="utf-8") as f:
         f.write(epic_fiche(letter))
 
 # --- index M2 ---
 by_epic = {}
-for uid, v in US.items():
-    by_epic.setdefault(v["epic"], []).append(uid)
+for uid in US:
+    by_epic.setdefault(EPIC_OF[uid], []).append(uid)
 idx = [f"# M2 · User Stories — {CHANTIER}",
  "",
  f"> **{len(US)} fiches US explicites**, une par fichier, reliées en graphe (**liens Obsidian `[[…]]`** + mermaid).",
@@ -205,20 +291,25 @@ idx = [f"# M2 · User Stories — {CHANTIER}",
  ""]
 for letter in EPICS:
     enote, etitle = EPICS[letter]["note"], EPICS[letter]["titre"]
-    links = " · ".join(wl(u) for u in by_epic.get(letter, []))
-    idx.append(f"- **[[{enote}|Épic {letter} — {etitle}]]** : {links}")
+    parts = []
+    for fc in FEATURES:
+        if FEATURES[fc]["epic"] != letter:
+            continue
+        us_l = " ".join(wl(u) for u in by_epic.get(letter, []) if US[u]["feature"] == fc)
+        parts.append(f"[[{FFN[fc]}|{fc}]] → {us_l or '—'}")
+    idx.append(f"- **[[{enote}|Épic {letter} — {etitle}]]** : {' · '.join(parts)}")
 idx += ["",
  "## Vue d'ensemble (mermaid)",
  "```mermaid",
  "flowchart LR",
  f'  M1["M1 Spec"] --> M2["M2 · {len(US)} fiches US"]',
- '  M2 --> M3["M3 Épics (regroupement)"]',
+ '  M2 --> M3["M3 Features & Épics (regroupement)"]',
  '  M6["M6 Matrice de couverture"] -. "mapping US→phase→brique" .-> M2',
  "```",
  "",
  "## Definition of Done",
  f"- [x] {len(US)} US découpées en fiches explicites (template `TEMPLATE-US.md` du kit)",
- "- [x] Chaque fiche reliée : épic (M3), dépendances (`[[…]]`) — axe métier seul",
+ "- [x] Chaque fiche reliée : feature + épic (M3), dépendances (`[[…]]`) — axe métier seul",
  "- [x] Pas de solution technique dans l'énoncé ; critères d'acceptation présents",
  ""]
 with open(os.path.join(M2, "README.md"), "w", encoding="utf-8") as f:
@@ -233,11 +324,11 @@ if mapped:
      "> **Brouillon généré** depuis le YAML (`phase`/`brique` par US) — à fusionner dans le README M6.",
      "> Colonnes Gate et Statut à compléter à la main dans le README M6 (source de vérité).",
      "",
-     "| US | Épic | Phase | Brique technique | Gate | Statut / révisé le |",
-     "|----|------|-------|------------------|------|--------------------|"]
+     "| US | Feature | Épic | Phase | Brique technique | Gate | Statut / révisé le |",
+     "|----|---------|------|-------|------------------|------|--------------------|"]
     for u in sorted(mapped):
-        v = mapped[u]
-        mat.append(f"| {u} | {v['epic']} — {EPICS[v['epic']]['titre']} | {v.get('phase','?')} "
+        v = mapped[u]; e = EPIC_OF[u]
+        mat.append(f"| {u} | {v['feature']} | {e} — {EPICS[e]['titre']} | {v.get('phase','?')} "
                    f"| {v.get('brique','?')} | *(à compléter)* | à faire |")
     mat.append("")
     with open(os.path.join(M6, "matrice-couverture.generated.md"), "w", encoding="utf-8") as f:
@@ -332,7 +423,7 @@ for old in glob.glob(os.path.join(TSQ, "**", "*.feature"), recursive=True):
 HEAD = ("# language: fr\n# SQUELETTE GÉNÉRÉ (pilier conception) — à déplacer dans le repo de code\n"
         "# et à implémenter. Zéro mock : tant que non implémenté, il reste `en_attente`.\n")
 for u, v in US.items():
-    lines = [HEAD + f"@US-{u} @epic-{v['epic']}",
+    lines = [HEAD + f"@US-{u} @feat-{v['feature']} @epic-{EPIC_OF[u]}",
              f"Fonctionnalité: {u} · {v['titre']}",
              f"  # En tant que {v['acteur']}, je veux {v['veux']}, afin de {v['afin']}."]
     for i, ca in enumerate(v["ca"], 1):
@@ -365,10 +456,12 @@ for p in glob.glob(os.path.join(ROOT, "**", "*.md"), recursive=True):
     txt = open(p, encoding="utf-8").read(); orig = txt
     for c in US:
         txt = re.sub(r"\[\[" + re.escape(c) + r"\]\]", f"[[{FN[c]}]]", txt)
+    for c in FEATURES:
+        txt = re.sub(r"\[\[" + re.escape(c) + r"\]\]", f"[[{FFN[c]}]]", txt)
     if txt != orig:
         open(p, "w", encoding="utf-8").write(txt); patched += 1
 
-print(f"OK : {len(US)} fiches US + {len(EPICS)} fiches épic + index M2"
+print(f"OK : {len(US)} fiches US + {len(FEATURES)} fiches feature + {len(EPICS)} fiches épic + index M2"
       + (f" + matrice M6 ({len(mapped)} lignes)" if mapped else "")
       + (f" + {len(RG)} fiches RG" if RG else "")
       + (" + matrice habilitations" if (ROLES or RG) else "")

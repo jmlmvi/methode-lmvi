@@ -1,3 +1,4 @@
+<!-- KIT-VERSION: 1.7.1 -->
 # Corpus d'inputs techniques TheSocle (générique)
 
 > Les **inputs techniques standards** dont la méthode a besoin pour construire **n'importe quelle** app

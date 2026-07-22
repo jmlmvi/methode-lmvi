@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.4.2 -->
+<!-- KIT-VERSION: 1.8.0 -->
 # USAGE — démarrer un nouveau chantier
 
 > Le mode d'emploi : **quoi faire, dans quel ordre, quel prompt lancer**. La théorie est dans
@@ -35,15 +35,8 @@ maillon de branchement de chaque artefact ; le prompt pilote les applique automa
 ## 0. Est-ce la bonne méthode, et à quel niveau ? (30 secondes)
 
 D'abord le **seuil** : si l'intention tient dans un message et se prouve par un test → **aucune
-méthode** (cf. [`conception/PROFILS.md`](conception/PROFILS.md)). Sinon :
-
-| # | Question | Oui → | Non → |
-|---|---|---|---|
-| 1 | Le domaine est-il déjà cadré (le commanditaire sait décrire ce qu'il veut) ? | Besoin2Plan | FromSpec2Plan |
-| 2 | Vend-on une **spec contractuelle** (la spec est le livrable) ? | FromSpec2Plan | Besoin2Plan |
-| 3 | Le périmètre dépasse-t-il ~1 app ? | FromSpec2Plan | Besoin2Plan |
-
-Deux réponses sur trois orientent la même méthode → on la prend. Puis on choisit dans
+méthode** (cf. [`conception/PROFILS.md`](conception/PROFILS.md)). Au-delà, `methode-AgileIA` est **la**
+méthode forward — on choisit directement dans
 [`conception/PROFILS.md`](conception/PROFILS.md) : le **mode d'entrée** (besoin exprimé / **CdC
 fourni** — un cahier des charges existant, même de 36 pages, s'INGÈRE : M0/M1 s'extraient avec
 traçabilité §CdC→US/RG, ses trous deviennent les `[À ARBITRER]`) et le **profil**
@@ -56,29 +49,35 @@ des documents).
 
 ```bash
 # 1. Récupérer le kit (dernier tag)
-git clone git@github.com:jmlmvi/methode-lmvi.git /tmp/methode-lmvi
+git clone https://github.com/jmlmvi/methode-lmvi.git /tmp/methode-AgileIA
 
 # 2. Créer le dossier d'instance du chantier dans l'app
 APP=/opt/.../APP-XX-MONAPP ; CHANTIER=$APP/docs/mon-chantier
 mkdir -p $CHANTIER/{M0-vision,M1-spec-besoins,M4-arbitrages,M5-phasage,M6-plan-technique,M7-execution,inputs,tracking}
 
-# 3. Vendorer le kit de conception + noter la version copiée
-cp -r /tmp/methode-lmvi/conception $CHANTIER/_kit
+# 3. Vendorer le kit de conception + le contrat d'architecture, noter la version copiée
+cp -r /tmp/methode-AgileIA/conception $CHANTIER/_kit
+cp /tmp/methode-AgileIA/CONTRAT-ARCHITECTURE.md $CHANTIER/_kit/
 grep -m1 KIT-VERSION $CHANTIER/_kit/METHODE-Besoin2Plan.md   # → noter dans le README du chantier
+
+# 4. Profil client (piliers conformité/run actifs, cf. §0) : les vendorer aussi
+cp -r /tmp/methode-AgileIA/conformite $CHANTIER/_kit/conformite
+cp -r /tmp/methode-AgileIA/run $CHANTIER/_kit/run
 ```
 
 Arborescence cible de l'instance (modèle : Régie `APP-16-REGIES/docs/atelier-decomposition/`) :
 
 ```
 <app>/docs/<chantier>/
-├── _kit/                         ← copie de conception/ (KIT-VERSION notée)
+├── _kit/                         ← copie de conception/ + CONTRAT-ARCHITECTURE.md (KIT-VERSION notée)
+│   └── conformite/ · run/          ← en profil client uniquement
 ├── us-data.yml                   ← SOURCE DE VÉRITÉ des US/RG/rôles (modèle : _kit/us-data.example.yml)
 ├── M0-vision/README.md
 ├── M1-spec-besoins/SPEC-<X>.md
 │   ├── RG/                       ← GÉNÉRÉ : 1 fiche par règle de gestion + index
 │   └── matrice-habilitations.generated.md   ← GÉNÉRÉ : à qualifier puis reporter dans la SPEC
 ├── M2-user-stories/              ← GÉNÉRÉ : 1 fiche par US + index
-├── M3-epics/                     ← GÉNÉRÉ : 1 fiche par épic
+├── M3-epics/                     ← GÉNÉRÉ : 1 fiche par épic + 1 fiche par feature
 ├── M4-arbitrages/README.md
 ├── M5-phasage/README.md
 ├── M6-plan-technique/README.md   ← matrice de couverture = source de vérité du mapping
@@ -165,13 +164,15 @@ SANS regarder le code du projet.
 Rends une liste de défauts priorisée, rien d'autre.
 ```
 
-### M2 + M3 · User Stories & Épics (générés)
+### M2 + M3 · User Stories, Features & Épics (générés)
 
 ```text
 Lis _kit/PROMPT-generer-fiches-US.md (voie 1) et _kit/us-data.example.yml (modèle).
 À partir de la SPEC M1 (récapitulatif des US), complète us-data.yml : chantier, root, spec (lien
-relatif + ancres), epics (lettre → note/titre/intention), us (code → epic, titre, acteur, veux,
-afin, deps, rg, ctx, ca). NE REMPLIS PAS phase/brique (on ne les connaît qu'après M5/M6).
+relatif + ancres), epics (lettre → note/titre/intention), features (code → epic, titre, intention —
+hiérarchie Épic → Feature → US OBLIGATOIRE : chaque épic a au moins une feature, au pire une
+feature-enveloppe reprenant son périmètre), us (code → feature, titre, acteur, veux, afin, deps,
+rg, ctx, ca). NE REMPLIS PAS phase/brique (on ne les connaît qu'après M5/M6).
 Zéro invention : chaque US vient de la spec.
 ```
 
@@ -206,8 +207,8 @@ phase = un lot d'épics/US à valeur démontrable SEULE ; chaque gate formulée 
 ### M6 · Plan technique + matrice + plan de test
 
 ```text
-Lis _kit/TEMPLATE-M6-plan-technique.md, _kit/TEMPLATE-TESTS.md, le CONTRAT-ARCHITECTURE.md du
-repo méthode, et les inputs/ du chantier. Pour chaque phase de M5, écris
+Lis _kit/TEMPLATE-M6-plan-technique.md, _kit/TEMPLATE-TESTS.md, _kit/CONTRAT-ARCHITECTURE.md,
+et les inputs/ du chantier. Pour chaque phase de M5, écris
 M6-plan-technique/README.md :
 1) réutilisation plateforme (ce qu'on NE code PAS — contrat d'architecture §10) ;
 2) briques nouvelles choisies PAR NATURE (arbre V005), jamais par épic ;
@@ -268,5 +269,5 @@ tasks/). Puis on code la P-0 par incréments atomiques — zéro mock, preuve r�
 
 **Zéro mock / simulation / régression** (sans dépendance réelle → état honnête `en_attente`) ·
 **gate = démo**, pas une coche · **décisions avant plan** (M4 bloquant) · **un artefact = un axe**
-(le mapping vit dans la matrice M6) · **réutilisation plateforme** (le contrat d'architecture ne se
+(hiérarchie métier **Épic → Feature → US** ; le mapping inter-axes vit dans la matrice M6) · **réutilisation plateforme** (le contrat d'architecture ne se
 redécide pas, il s'hérite) · **relecture requise M1/M4/M6**.

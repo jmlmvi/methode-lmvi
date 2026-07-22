@@ -1,5 +1,5 @@
-<!-- KIT-VERSION: 1.1.0 -->
-<!-- PROUVE-SUR: Régie/atelier-décomposition (kit v1.0) -->
+<!-- KIT-VERSION: 1.8.0 -->
+<!-- PROUVE-SUR: — (niveau Feature v1.8 non prouvé ; chaîne de base prouvée sur Régie kit v1.0) -->
 # M2 · User Stories — {{nom du chantier}}
 
 > Template. Une US = une intention **testable**, sans solution technique.
@@ -18,7 +18,7 @@ Liste d'US numérotées + **critères d'acceptation** sur les pivots (1 fiche pa
 ```mermaid
 flowchart LR
   M1["M1 Spec"] --> M2["M2 US"]
-  M2 --> M3["M3 Épics (regroupement)"]
+  M2 --> M3["M3 Features & Épics (regroupement)"]
   M2 -. "mapping phase/brique" .-> M6["M6 Matrice de couverture"]
 ```
 

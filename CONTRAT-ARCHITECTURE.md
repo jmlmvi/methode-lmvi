@@ -1,3 +1,4 @@
+<!-- KIT-VERSION: 1.7.1 -->
 # Contrat d'architecture plateforme TheSocle
 
 > **Le document transversal** : les **règles/décisions plateforme que TOUTE app TheSocle hérite** — le
@@ -64,7 +65,7 @@
 `apim` · `agentia / pack-ia (LLM)` · `proxy` · `dns` · `acme (TLS)` · `signature` · `tsa` · `nats` ·
 `cache` · `cosmo (cal/contacts)` · `onlyoffice` · `status/techdb`.
 
-## 11. Qualité → **clause LMVI**
+## 11. Qualité → **clause AgileIA**
 - **Zéro mock / simulation / régression.** Sans dépendance réelle → état **honnête** (`en_attente`),
   jamais un faux résultat. **Preuve réelle à chaque gate** (démo, pas coche de tâche).
 - Versionner (pom + build.properties + tag Docker) en même temps que les correctifs.

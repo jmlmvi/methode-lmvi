@@ -1,3 +1,4 @@
+<!-- KIT-VERSION: 1.7.1 -->
 # Slot · TheSocle 5.8 (5.8.0) (noyau framework)
 
 - **Source canonique** : `docs/docs-socleV005/01-docsV2/` + JAR `socle-v005-5.8.0`

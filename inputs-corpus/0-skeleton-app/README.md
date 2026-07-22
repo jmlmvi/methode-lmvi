@@ -1,3 +1,4 @@
+<!-- KIT-VERSION: 1.7.1 -->
 # Slot 0 · Skeleton d'app (APP-ZZ-TEMPLATE)
 
 - **Source canonique** : `/opt/2026-TheHub4TheSocle/APP-ZZ-TEMPLATE/` (`bootstrap.sh` + docs)

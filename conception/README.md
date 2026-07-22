@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.4.1 -->
+<!-- KIT-VERSION: 1.8.0 -->
 # Pilier CONCEPTION — la méthode M0→M7 · RG · Habilitations · Tests
 
 > **LE kit de conception** : la chaîne complète Besoin→Plan (M0→M7) + les artefacts que le client
@@ -13,7 +13,7 @@
   fourni** avec ingestion tracée), profils express / solo / client.
 - 📊 **[`TEMPLATE-RETEX.md`](TEMPLATE-RETEX.md)** — le post-mortem méthode d'un chantier : ce qui
   fait évoluer le kit (1 version = 1 RETEX ; fait vivre les marqueurs `PROUVE-SUR`).
-- 🛠️ **[`gen-fiches-us.py`](gen-fiches-us.py)** — générateur **générique** : fiches US/Épic/RG,
+- 🛠️ **[`gen-fiches-us.py`](gen-fiches-us.py)** — générateur **générique** : fiches US/Feature/Épic/RG,
   matrice d'habilitations, squelettes de tests Gherkin. Données dans un **YAML externe** :
   `python3 gen-fiches-us.py <us-data.yml>` — modèle : [`us-data.example.yml`](us-data.example.yml).
 - 🎛️ **[`PROMPT-PILOTE.md`](PROMPT-PILOTE.md)** — **LE prompt unique** qui déroule tout le chantier
@@ -28,7 +28,7 @@
 | [`TEMPLATE-M0-vision.md`](TEMPLATE-M0-vision.md) | M0 · Vision + **casting** + piliers activés |
 | [`TEMPLATE-M1-spec-besoins.md`](TEMPLATE-M1-spec-besoins.md) | M1 · Spec de besoins (+ NFR, révisions) |
 | [`TEMPLATE-M2-user-stories.md`](TEMPLATE-M2-user-stories.md) · [`TEMPLATE-US.md`](TEMPLATE-US.md) | M2 · index + **fiche US** (axe métier seul) |
-| [`TEMPLATE-M3-epics.md`](TEMPLATE-M3-epics.md) · [`TEMPLATE-EPIC.md`](TEMPLATE-EPIC.md) | M3 · index + **fiche épic** |
+| [`TEMPLATE-M3-epics.md`](TEMPLATE-M3-epics.md) · [`TEMPLATE-EPIC.md`](TEMPLATE-EPIC.md) · [`TEMPLATE-FEATURE.md`](TEMPLATE-FEATURE.md) | M3 · index + **fiche épic** + **fiche feature** (hiérarchie **Épic → Feature → US**, obligatoire) |
 | [`TEMPLATE-M4-arbitrages.md`](TEMPLATE-M4-arbitrages.md) | M4 · Arbitrages |
 | [`TEMPLATE-M5-phasage.md`](TEMPLATE-M5-phasage.md) | M5 · Phasage gaté (+ convention de préfixe) |
 | [`TEMPLATE-M6-plan-technique.md`](TEMPLATE-M6-plan-technique.md) | M6 · Plan + matrice (colonne Tests) + mapping IAM |
@@ -47,7 +47,7 @@ et vérifie sa **DoD** avant le maillon suivant. Relecture **requise** M1/M4/M6.
 
 Pas de mapping naïf « US→unitaires, épic→intégration » (même piège que « 1 épic = 1 worker ») :
 **US → ≥ 1 test d'acceptation** (ses CA, `@US-<code>`) · **RG → ≥ 2 tests** (conforme + rejet,
-`@RG-<code>`) · **épic → rollup** par tag · **brique → unitaires/intégration technique** ·
+`@RG-<code>`) · **feature / épic → rollup** par tags `@feat-x` / `@epic-x` · **brique → unitaires/intégration technique** ·
 **phase P-x → gate scriptée** (acceptation + non-régression des phases précédentes + démo du
 non-automatisable) · **app → E2E/smoke**. Calibrage : acceptation **API par défaut**, UI/E2E réservé
 aux `@pivot` ; unitaires où il y a de la vraie logique ; pas de dogme de % de couverture.
