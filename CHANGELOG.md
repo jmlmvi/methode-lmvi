@@ -1,8 +1,41 @@
 # CHANGELOG — méthode AgileIA (kit Besoin2Plan)
 
-> Semver (convention LMVI). Chaque instance note la `KIT-VERSION` copiée et resynce via ce fichier
+> Semver (convention AgileIA). Chaque instance note la `KIT-VERSION` copiée et resynce via ce fichier
 > (procédure : README racine, « Resync d'une instance »). Ce fichier est auto-versionné par ses
 > entrées (pas de marqueur `KIT-VERSION`, cf. charte U-DOCS §3).
+
+## 1.8.1 — 2026-09-03
+
+**Correctifs de cohérence** (aucune évolution de méthode — la cadence « 1 version = 1 RETEX »
+n'est pas entamée : ce patch ne distille rien, il répare). Issus d'une relecture du kit.
+
+- **`us-data.example.yml`** : `root` passé de l'absolu (`/opt/…/APP-16-REGIES/…`) à `.` — copié tel
+  quel, l'exemple faisait écrire le générateur **dans le chantier Régie** (ou échouait en
+  `PermissionError`) ; commentaire d'avertissement ajouté, chemin réel de l'instance conservé en
+  note. Marqueur `KIT-VERSION` posé (le fichier n'en portait pas, comme `gen-fiches-us.py` en
+  porte un — charte §3).
+- **Sections `roles:` / `rg:` rendues trouvables** : le bloc commenté en fin de
+  `us-data.example.yml` est **le schéma de référence** de ces sections ; il était correct mais
+  invisible — un agent devait deviner les clés (`enonce`, `exemples`, `contre_exemples`…) ou lire
+  le code. Il est désormais annoncé en tête du YAML, dans `USAGE` (prompts M1·RG et
+  M1·Habilitations) et dans `conception/README`, avec ce que le générateur produit en plus quand
+  elles sont renseignées. Il **reste commenté** : les énoncés réels des RG Régie vivent dans sa
+  SPEC (zéro invention) — conséquence assumée et désormais écrite.
+- **`ExempleCdc.md` raccroché** : le CdC BilanSocle (~800 lignes) illustre le mode d'entrée
+  « CdC fourni » vendu par README/PROFILS/USAGE/METHODE, mais **aucun fichier vivant ne le
+  citait**. Lié depuis l'arbre du README, `USAGE` §0 et la ligne « CdC fourni » de `PROFILS`.
+- **Nommage LMVI / AgileIA** : règle actée au chapeau (charte U-DOCS §6) — LMVI = la société
+  (jamais renommée : `eu.lmvi`, remote `methode-lmvi.git`, exploitant, signatures) ; AgileIA = la
+  méthode. Appliquée à `run/TEMPLATE-CI-REVUE.md` (« convention LMVI » → « convention AgileIA »)
+  **avec** bump de son marqueur — il avait été modifié sans bump, le défaut même que 1.7.1
+  corrigeait — et à l'en-tête de ce CHANGELOG. Le renommage qui avait été appliqué aux archives
+  `AnalyseFable/` (dont une **capture de terminal**) est **annulé** : on ne réécrit pas une trace.
+
+**Non traité ici** (décisions, pas correctifs) : le kit n'est ni poussé ni tagué au-delà de
+`v1.7.0` alors que `USAGE` §1 dit « dernier tag » → un chantier monté aujourd'hui récupère un kit
+**1.7.0**, sans le niveau Feature ; la tension **profil express** (ni M2 ni M3 requis) contre
+`features:` **obligatoire** dans le générateur ; le statut de `PRESENTATION.md` (orpheline, non
+citée, hors chaîne de lecture).
 
 ## 1.8.0 — 2026-07-22
 

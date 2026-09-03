@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.6.0 -->
+<!-- KIT-VERSION: 1.8.1 -->
 <!-- PROUVE-SUR: — -->
 # CI & revue de code — {{nom du chantier}}
 
@@ -27,7 +27,7 @@ La revue vérifie AUSSI : pas de mock/simulation, pas de brique plateforme recod
 suites des phases déjà livrées ; 6. rapport archivé (artefact) — c'est lui qu'on joint au PV.
 Rouge = on ne merge pas ; « flaky » = un BLOCKER, pas une excuse.
 
-## 4. Versionnage & livraison (convention LMVI)
+## 4. Versionnage & livraison (convention AgileIA)
 Version bumpée **avec** les correctifs, en une fois : `pom.xml` + `build.properties` + tag image
 Docker identiques. Une version livrée = un tag git = une image au registre. Changelog d'app :
 {{fichier/lieu}} — alimenté à chaque gate, sert de release notes client.

@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.8.0 -->
+<!-- KIT-VERSION: 1.8.1 -->
 # USAGE — démarrer un nouveau chantier
 
 > Le mode d'emploi : **quoi faire, dans quel ordre, quel prompt lancer**. La théorie est dans
@@ -42,6 +42,10 @@ fourni** — un cahier des charges existant, même de 36 pages, s'INGÈRE : M0/M
 traçabilité §CdC→US/RG, ses trous deviennent les `[À ARBITRER]`) et le **profil**
 (express / solo / client — le profil contraint les artefacts et les arrêts, **jamais** la taille
 des documents).
+
+À quoi ressemble un CdC ingérable : [`ExempleCdc.md`](ExempleCdc.md) — BilanSocle v5.0, ~800
+lignes (multi-tenant, moteur de parcours, planning, 14 formulaires). C'est le volume normal du
+mode « CdC fourni », pas un cas extrême.
 
 ---
 
@@ -140,13 +144,18 @@ Lis _kit/TEMPLATE-RG.md. Pour chaque règle de gestion de la SPEC, remplis la se
 us-data.yml : titre, énoncé (une phrase impérative et testable), type
 (invariant/calcul/contrainte/droit_acces/workflow), source, exceptions, et surtout ≥ 1 exemple
 conforme + ≥ 1 contre-exemple rejeté (ils deviendront les tests @RG-x). Zéro invention.
+Le schéma exact des clés (`enonce`, `type`, `source`, `exceptions`, `exemples`,
+`contre_exemples`, `statut`) est le bloc commenté en FIN de _kit/us-data.example.yml :
+décommente-le et adapte-le, ne le devine pas.
 ```
 
 ### M1 · Habilitations
 
 ```text
 Lis _kit/TEMPLATE-HABILITATIONS.md. À partir des acteurs M0 : propose les rôles métier
-(acteur ≠ rôle ; toujours un rôle admin du tenant), remplis la section roles: de us-data.yml,
+(acteur ≠ rôle ; toujours un rôle admin du tenant), remplis la section roles: de us-data.yml
+(schéma : même bloc commenté en fin de _kit/us-data.example.yml ; sans cette section les rôles
+sont dérivés des acteurs des US),
 lance le générateur, puis QUALIFIE M1-spec-besoins/matrice-habilitations.generated.md : plus
 aucune cellule en « ? » — chaque ⛔ devient un test négatif (403), chaque ⚠️ pointe une RG
 droit_acces. Reporte la matrice qualifiée dans la SPEC M1 : c'est un artefact que le métier signe.

@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.8.0 -->
+<!-- KIT-VERSION: 1.8.1 -->
 # Pilier CONCEPTION — la méthode M0→M7 · RG · Habilitations · Tests
 
 > **LE kit de conception** : la chaîne complète Besoin→Plan (M0→M7) + les artefacts que le client
@@ -60,7 +60,10 @@ contrat d'architecture §5). Les **conditions fines** (ownership, états…) son
 
 ## Génération automatique
 
-Le générateur consomme les sections optionnelles `rg:` et `roles:` du YAML et produit :
+Le générateur consomme les sections optionnelles `rg:` et `roles:` du YAML — **leur schéma de
+référence est le bloc commenté en fin de [`us-data.example.yml`](us-data.example.yml)**, à
+décommenter et adapter (il y reste commenté par honnêteté : les énoncés réels des RG Régie vivent
+dans sa SPEC). Sans ces sections, seules les fiches US/feature/épic sont produites. Avec, il ajoute :
 `M1-spec-besoins/RG/` (1 fiche/RG + index + RG orphelines signalées) ·
 `M1-spec-besoins/matrice-habilitations.generated.md` (✅ dérivés des acteurs, `?` à qualifier) ·
 `tests-squelettes/` (Gherkin `@US-x` / `@RG-x`, **à déplacer dans le repo de code**).

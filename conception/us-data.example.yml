@@ -1,11 +1,22 @@
+# KIT-VERSION: 1.8.1
 # Exemple de données pour gen-fiches-us.py — chantier Régie (APP-16), schéma kit v1.8.
 # Kit >= 1.8 : hiérarchie Épic → Feature → US OBLIGATOIRE — section `features:` requise ;
 # chaque US porte `feature:` (son épic est dérivé). Régie est antérieure au niveau Feature :
 # on illustre avec des features-enveloppes 1:1 (même périmètre que l'épic).
 # Copier ce fichier pour un nouveau chantier ; phase/brique sont OPTIONNELS (Option A :
 # s'ils sont présents, ils alimentent la matrice M6 générée, JAMAIS la fiche US).
+#
+# ⚠️ `root` = où le générateur ÉCRIT. Un chemin relatif se résout depuis CE fichier ; un chemin
+# absolu écrit là où il pointe. Il vaut donc `.` ici (le YAML vit à la racine du chantier) —
+# à ne remplacer par un absolu qu'en connaissance de cause. Instance réelle de cet exemple :
+# /opt/2026-TheHub4TheSocle/APP-16-REGIES/docs/atelier-decomposition
+#
+# 👉 Sections OPTIONNELLES `roles:` et `rg:` (pilier conception — fiches RG, matrice
+# d'habilitations, squelettes @RG-x) : leur SCHÉMA COMPLET est en commentaire À LA FIN de ce
+# fichier. Elles y restent commentées volontairement (zéro invention : les énoncés réels des RG
+# Régie vivent dans sa SPEC) — décommenter le bloc et l'adapter pour ton chantier.
 chantier: Atelier de décomposition — Régie (APP-16)
-root: /opt/2026-TheHub4TheSocle/APP-16-REGIES/docs/atelier-decomposition
+root: .
 spec: ../M1-spec-besoins/SPEC-ATELIER-DECOMPOSITION.md
 spec_us_anchor: '#11-récapitulatif-des-user-stories'
 spec_rg_anchor: '#12-règles-de-gestion-rg'
@@ -750,11 +761,30 @@ us:
     phase: PA-1
     brique: API APIM (fallback)
 
-# ---- Sections OPTIONNELLES (pilier conception, kit >= 1.4.0) — schéma d'exemple ----
-# (commentées ici : les énoncés réels des RG Régie vivent dans sa SPEC ; zéro invention.)
+# ============================================================================
+# Sections OPTIONNELLES `roles:` et `rg:` (pilier conception, kit >= 1.4.0)
+# ============================================================================
+# CE BLOC EST LE SCHÉMA DE RÉFÉRENCE de ces deux sections : décommenter et adapter.
+#
+# Il reste commenté dans cet exemple par honnêteté (zéro invention) : les énoncés réels des RG
+# Régie vivent dans sa SPEC M1, pas ici. Conséquence assumée — lancé tel quel, le générateur
+# produit les fiches US/feature/épic, l'index, la matrice et les squelettes @US-x, mais NI les
+# fiches RG NI la matrice d'habilitations. C'est normal, pas un bug.
+#
+# Ce que le générateur produit dès que `rg:` (et/ou `roles:`) est renseigné :
+#   - M1-spec-besoins/RG/<RG-x>-<slug>.md   1 fiche par RG + index (+ RG orphelines signalées :
+#                                           celles que les US citent sans fiche — ici RG-A1…A12)
+#   - M1-spec-besoins/matrice-habilitations.generated.md   brouillon rôle × US, cellules `?` à
+#                                           qualifier à la main (DoD M1 : plus aucune `?`)
+#   - tests-squelettes/rg/<RG-x>.feature    1 scénario par exemple / contre-exemple
+#
+# `roles:` est facultatif même quand `rg:` est là : sans lui, les rôles sont dérivés des
+# `acteur:` des US. Le déclarer sert à nommer un rôle qui n'est pas un acteur (ex. admin tenant).
+#
 # roles:
 #   metteur_en_scene: {label: "metteur en scène", description: "pilote la décomposition"}
 #   producteur:       {label: "producteur", description: "administre projets et bibliothèque"}
+#   admin_tenant:     {label: "admin tenant", description: "administre le tenant (toujours en définir un)"}
 # rg:
 #   RG-A2:
 #     titre: Citation source
@@ -764,4 +794,7 @@ us:
 #     exceptions: ["entité marquée « sans ancrage » et signalée"]
 #     exemples: ["une entité candidate référence un span valide"]
 #     contre_exemples: ["une entité sans span est committée sans signalement"]
-#     statut: active
+#     statut: active             # active | modifiée le <date> (cf. M4 Q-n) | abrogée le <date>
+#
+# Rappel (TEMPLATE-RG) : `exemples` et `contre_exemples` ne sont pas décoratifs — chaque ligne
+# devient un scénario de test. Une RG sans contre-exemple échoue la DoD de M1.

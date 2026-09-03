@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.7.0 -->
+<!-- KIT-VERSION: 1.8.1 -->
 <!-- PROUVE-SUR: — -->
 # Profils d'activation & modes d'entrée
 
@@ -12,7 +12,7 @@
 | Mode | Quand | Ce que ça change |
 |---|---|---|
 | **besoin exprimé** | le besoin est oral / en vrac / quelques pages de notes | M0/M1 s'**écrivent** (reformulation, confirmation) |
-| **CdC fourni** | un document structuré existe déjà (cahier des charges, spec v-n, même volumineux) | M0/M1 s'**extraient** : SPEC produite depuis le CdC avec **traçabilité §CdC → US/RG** ; les trous, contradictions et non-dits du CdC deviennent les `[À ARBITRER]` ; le CdC reste la référence contractuelle, la SPEC l'artefact opératoire. La valeur de M1 n'est plus la rédaction : c'est la **transformation en artefacts prouvables** + la détection des trous |
+| **CdC fourni** | un document structuré existe déjà (cahier des charges, spec v-n, même volumineux) — exemple réel : [`../ExempleCdc.md`](../ExempleCdc.md), BilanSocle v5.0, ~800 lignes | M0/M1 s'**extraient** : SPEC produite depuis le CdC avec **traçabilité §CdC → US/RG** ; les trous, contradictions et non-dits du CdC deviennent les `[À ARBITRER]` ; le CdC reste la référence contractuelle, la SPEC l'artefact opératoire. La valeur de M1 n'est plus la rédaction : c'est la **transformation en artefacts prouvables** + la détection des trous |
 
 ## Dimension 2 — le profil (contexte)
 

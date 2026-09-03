@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.8.0 -->
+<!-- KIT-VERSION: 1.8.1 -->
 # Méthode AgileIA — construire une app TheSocle
 
 > La **méthode générique** pour bâtir n'importe quelle app TheSocle (solo ou équipe cliente), avec
@@ -15,6 +15,7 @@ methode-AgileIA/
 ├── USAGE.md                  ← puis le mode d'emploi (pas-à-pas + prompts + PILOTE)
 ├── CONTRAT-ARCHITECTURE.md   ← les règles plateforme héritées par toute app (jamais redécidées)
 ├── CHANGELOG.md              ← versions du kit (cadence : 1 version = 1 RETEX de chantier réel)
+├── ExempleCdc.md             ← à quoi ressemble un CdC ingéré en mode d'entrée « CdC fourni »
 │
 ├── conception/               ← PILIER 1 : concevoir et prouver
 │     la chaîne M0→M7 (METHODE + templates + générateur + PROMPT-PILOTE)
