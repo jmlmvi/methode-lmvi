@@ -4,7 +4,7 @@
 > **Le document transversal** : les **règles/décisions plateforme que TOUTE app TheSocle hérite** — le
 > *« où / comment »* commun (stockage, APIs, base, secrets, identité, déploiement, front, qualité).
 > C'est un **input de premier plan** de la méthode (slot 8 du corpus). Une app ne redécide pas ces
-> points : elle **s'y conforme**. Version plateforme : **TheSocle 5.8 (5.8.0)**.
+> points : elle **s'y conforme**. Version plateforme : **TheSocle 5.8 (socle 5.8.6)**. Revu le 2026-09-22.
 
 ---
 
@@ -24,8 +24,14 @@
 ## 3. Base de données → **PostgreSQL standard THESOCLE**
 - **1 schéma par app** (`schema_<app>`), rôle `app_<app>`.
 - **Standard THESOCLE** : préfixes `z_` (paramétrage) / `db_` (référentiel) / `tr_` (transactionnel) ;
-  colonnes système `x_*` (`x_id`, `x_partition`, `x_dateCreated`, `x_dateChanged`, `x_active`, `x_datas`…) ;
-  **triggers** standard ; **owner = admin**.
+  **13 colonnes `x_*`** dans l'ordre strict ; **4 triggers** — 3 d'audit `AFTER` créés puis désactivés,
+  et `update_changed_fields` en **`BEFORE UPDATE`** (en `AFTER` il ne fait rien et `x_dateChanged`
+  reste vide) ; colonne `datas` jsonb finale.
+- **Propriétaire : `app_<app>`, PAS `admin`.** Un `ALTER … OWNER TO admin` échoue (« must be able to
+  SET ROLE admin ») quand l'app exécute son propre `init.sql` et emporte tout le script.
+  *Dérogation actée le 2026-05-07 au point « owner = admin » du contrat d'origine.*
+- Référence exécutable : `APP-ZZ-TEMPLATE/docs/09-PGSQL_Fields.md` et
+  `APP-ZZ-TEMPLATE/skeleton/monapp/sql/init.sql.tmpl`.
 - **Multi-tenant** : `x_partition` = tenant (une entreprise), jamais croisé entre tenants.
 - Exception : hypertables TimescaleDB exemptées du standard (PK/x_*/triggers).
 
@@ -45,7 +51,11 @@
   jamais exposée**).
 - ⚠️ **Update d'une app déjà RUNNING** : l'install distribué la traite en **REFERENCE** (no-op) →
   l'update réel = **SSH recreate** sur la box, en réutilisant l'env exact + label `managed=true`.
-- Après update : `update_route(target_host=…)` ; `set_env_var` seul ne propage pas.
+- ⚠️ **Jamais d'adresse IP dans `target_host`** : toujours le **nom du conteneur**, que le réseau
+  Docker résout. L'ancienne consigne « `update_route(target_host=<nouvelle IP>)` après chaque update »
+  est **abandonnée** — c'est elle qui a provoqué l'incident du 2026-09-06 (`sdrv2.thesocle.net`
+  servait `things`). Avec un nom de conteneur, il n'y a rien à resynchroniser après un update.
+- `set_env_var` seul ne propage pas : il faut un `update_app`.
 
 ## 7. Frontend → **shell React V005 (design system)**
 - **React + shell V005** (IDELayout, Cmd+K, ThemePalette, pattern `appdemo`).
@@ -57,8 +67,11 @@
   câblés). Jamais de `new Thread`/`while(true)`/`@Scheduled` dans un Worker.
 
 ## 9. Observabilité → **TechDB + Status Dashboard**
-- Métriques / logs / actions / résultats d'API dans la **TechDB** (port dashboard 9374) ; lecture via
-  `techdb_reader_worker`.
+- Métriques / logs / actions / résultats d'API dans la **TechDB** ; lecture via `techdb_reader_worker`.
+- Status Dashboard servi sur **`/dashboard`**, port applicatif (socle 5.8.6). Le port dédié 9374 n'est
+  plus ouvert. La santé de l'app est sur **`/health`** — `/admin/health` est une route du **Hub**.
+- Le Hub **ne sonde pas** l'app en HTTP : il regarde l'état du conteneur. La supervision métier reste
+  à la charge de l'app.
 
 ## 10. Services Hub disponibles (à réutiliser, ne pas recoder)
 `iam` · `vault` · `storage (S3/MinIO)` · `mail (James)` · `clamav (scan uploads)` · `backup (→S3)` ·

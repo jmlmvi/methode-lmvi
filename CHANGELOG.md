@@ -4,6 +4,33 @@
 > (procédure : README racine, « Resync d'une instance »). Ce fichier est auto-versionné par ses
 > entrées (pas de marqueur `KIT-VERSION`, cf. charte U-DOCS §3).
 
+## 1.9.0 — 2026-09-22
+
+**Contrôle avant go.** L'arrêt ⑥ cessait d'être un contrôle pour devenir une formalité : on
+validait le go sans repasser sur ce que la plateforme impose. Un chantier pouvait arriver au code
+avec une nomenclature de tables hors standard, une autorisation fondée sur un rôle que le SSO
+n'injecte pas, ou une API exposée hors APIM — et personne ne le voyait avant le déploiement.
+
+- **`conception/TEMPLATE-CONTROLE-AVANT-GO.md`** : grille en 9 sections (données, identité,
+  exposition, secrets, ce qu'on ne réécrit pas, architecture, exploitation, traçabilité, qualité),
+  un verdict par ligne. Règle : **tout écart non levé bloque le go** ; une levée est une correction
+  ou une décision M4 datée, jamais un « on verra ».
+- **`conception/controle-avant-go.sh`** : les ~25 points mécaniques, jugés et non cochés de
+  confiance. Éprouvé sur APP-23-Carousel avant livraison — il y a trouvé un vrai écart
+  (`spring-boot-starter-thymeleaf` et `-test` sans exclusion de Logback) et m'a obligé à corriger
+  deux faux positifs de ma propre écriture.
+- **`PROMPT-PILOTE.md`** : l'arrêt ⑥ ne se présente plus nu — la grille remplie l'accompagne.
+
+**`CONTRAT-ARCHITECTURE.md` corrigé sur quatre règles périmées**, sans quoi la grille aurait fait
+appliquer des consignes fausses :
+- propriétaire des tables : `app_<app>`, **pas** `admin` — un `ALTER OWNER TO admin` échoue quand
+  l'app exécute son `init.sql` (dérogation actée le 2026-05-07) ;
+- le trigger `update_changed_fields` est en **`BEFORE UPDATE`** — en `AFTER`, il ne fait rien et
+  `x_dateChanged` reste vide, sans la moindre erreur ;
+- plus jamais d'IP dans `target_host` : la consigne de repointage a causé l'incident du 2026-09-06 ;
+- Status Dashboard sur `/dashboard`, port applicatif ; le port 9374 n'existe plus ; la santé d'une
+  app est sur `/health`, `/admin/health` étant une route du Hub.
+
 ## 1.8.1 — 2026-09-03
 
 **Correctifs de cohérence** (aucune évolution de méthode — la cadence « 1 version = 1 RETEX »

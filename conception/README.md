@@ -67,3 +67,13 @@ dans sa SPEC). Sans ces sections, seules les fiches US/feature/épic sont produi
 `M1-spec-besoins/RG/` (1 fiche/RG + index + RG orphelines signalées) ·
 `M1-spec-besoins/matrice-habilitations.generated.md` (✅ dérivés des acteurs, `?` à qualifier) ·
 `tests-squelettes/` (Gherkin `@US-x` / `@RG-x`, **à déplacer dans le repo de code**).
+
+## Contrôle avant go (arrêt ⑥)
+
+| Fichier | Rôle |
+|---|---|
+| `TEMPLATE-CONTROLE-AVANT-GO.md` | La grille : 9 sections, un verdict par ligne. Tout écart non levé bloque le go. |
+| `controle-avant-go.sh` | Les points mécaniques (marqués 🤖 dans la grille) : nomenclature SQL, moment du trigger, propriétaire, secrets, package, `@Scheduled`, manifeste, traçabilité. Sortie 1 s'il reste un écart. |
+
+La référence de ce qui est imposé est `CONTRAT-ARCHITECTURE.md` : la grille l'interroge, elle ne
+le réénonce pas. Quand le contrat change, c'est lui qu'on modifie — pas la grille.

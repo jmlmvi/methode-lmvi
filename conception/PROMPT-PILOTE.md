@@ -33,6 +33,10 @@ RÈGLES DE PILOTAGE :
    ① M0 vision+casting confirmés · ② M1 signé (SPEC + fiches RG + matrice d'habilitations
    qualifiée, zéro « ? ») · ③ M4 arbitrages UN PAR UN (options + ta recommandation) ·
    ④ M5 phasage · ⑤ M6 plan+matrice (colonne Tests remplie) + mapping IAM · ⑥ go du code.
+   ⚠️ **L'arrêt ⑥ ne se présente jamais nu** : tu déroules d'abord le CONTRÔLE AVANT GO
+   (`_kit/TEMPLATE-CONTROLE-AVANT-GO.md`), tu lances `_kit/controle-avant-go.sh <dossier-app>`
+   pour les points mécaniques, et tu me présentes la grille remplie avec son verdict.
+   Tout écart non levé bloque le go — on corrige, ou on l'arbitre en décision M4 datée.
    Profil client : PV de recette proposé à chaque gate, piliers conformité/run appliqués.
    À chaque arrêt : un RÉSUMÉ COURT + la décision attendue, pas un déballage de fichiers.
 
