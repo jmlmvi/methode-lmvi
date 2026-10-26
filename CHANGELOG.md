@@ -4,6 +4,28 @@
 > (procédure : README racine, « Resync d'une instance »). Ce fichier est auto-versionné par ses
 > entrées (pas de marqueur `KIT-VERSION`, cf. charte U-DOCS §3).
 
+## 1.10.0 — 2026-10-26
+
+**La preuve d'un écran.** La méthode prouvait une US par son test d'acceptation et une phase par
+sa gate « démo réelle » — sans dire comment on prouve un écran. RETEX Your360 (APP-28), gate P-8
+jouée par le commanditaire lui-même, en une soirée : **cinq défauts d'écran**, tous invisibles à
+202 tests de services verts — un bouton « Créer » muet (état vide, `<select>` trompeur), une page
+d'accord dont le texte figé promettait l'anonymat sur une campagne signée, un bouton absent dans un
+état de campagne, un questionnaire soumis sans issue, un panneau de lecture **sans ascenseur**
+alors que vingt captures « pleine page » le montraient entier. Tous trouvés par le commanditaire ou
+par la suite Playwright en jouant la chaîne ; aucun par la suite de tests.
+
+- **`METHODE-Besoin2Plan.md`** : §0.1, une ligne de preuve externe de plus — **Écran → sa
+  traversée en bout de chaîne, dans le rôle, dans une fenêtre réelle, scriptée** ; M5, la gate se
+  formule *vue par le rôle* ; M6.5, **une US d'écran a deux preuves** (services + E2E navigateur) ;
+  M7, **la liste fixe de la gate d'écran** (rôle · fenêtre et ascenseur · un bouton ou une raison
+  par état · une sortie par étape · le texte dit l'état réel) ; §4 et §7 alignés.
+- **`TEMPLATE-TESTS.md`** : l'axe **Écran** et son scénario E2E, à côté des quatre axes existants.
+- **`TEMPLATE-M5-phasage.md`** : la gate d'une phase qui livre un écran cite la liste fixe.
+
+La règle qui fait mal : **une capture pleine page n'est pas une preuve**. Elle rend ce que
+personne ne peut atteindre.
+
 ## 1.9.0 — 2026-09-22
 
 **Contrôle avant go.** L'arrêt ⑥ cessait d'être un contrôle pour devenir une formalité : on

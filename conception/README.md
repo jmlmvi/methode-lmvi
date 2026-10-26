@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.8.1 -->
+<!-- KIT-VERSION: 1.10.0 -->
 # Pilier CONCEPTION — la méthode M0→M7 · RG · Habilitations · Tests
 
 > **LE kit de conception** : la chaîne complète Besoin→Plan (M0→M7) + les artefacts que le client

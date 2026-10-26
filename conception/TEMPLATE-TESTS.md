@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.4.0 -->
+<!-- KIT-VERSION: 1.10.0 -->
 <!-- PROUVE-SUR: — -->
 # Plan de test — {{nom du chantier}} · phase {{P-x}}
 
@@ -12,7 +12,13 @@
   `@pivot` (US pivot) — la couverture US/RG↔tests devient **calculable** (CI).
 - **Emplacement** : tests d'acceptation `{{repo}}/src/test/…/acceptance/` · unitaires avec le code ·
   E2E `{{repo}}/e2e/`. Squelettes générés : `tests-squelettes/` (à déplacer puis implémenter).
-- **Niveau par défaut** : acceptation **API** ; UI/E2E réservé aux `@pivot`.
+- **Niveau par défaut** : acceptation **API** ; UI/E2E pour les `@pivot` **et pour toute US dont
+  l'acteur est une personne devant un écran** — une US d'écran a **deux preuves** (services + E2E
+  au navigateur, dans le rôle). Le test de services ne voit ni un bouton muet, ni un texte figé,
+  ni un état sans sortie, ni un panneau sans ascenseur (kit 1.10.0, RETEX Your360 2026-10-26).
+- **Preuves d'écran** : captures **à la taille d'une fenêtre réelle** (1280 × 900), jamais « pleine
+  page » — une capture pleine page rend ce que personne ne peut atteindre ; l'E2E descend à la
+  molette jusqu'au dernier élément de chaque écran long et exige qu'il soit **dans la fenêtre**.
 
 ## 2. Couverture de la phase {{P-x}}
 | US / RG | Tests (IDs ou fichiers) | Niveau | Auto ? | État |
@@ -39,3 +45,6 @@ Puis démo humaine du non-automatisable, validée par {{recetteur du casting M0}
 - [ ] Chaque ⛔ d'habilitation de la phase a son test négatif + étanchéité cross-tenant
 - [ ] La colonne **Tests** de la matrice de couverture (M6) est remplie pour la phase
 - [ ] La commande de gate tourne et son rapport est archivé dans `tracking/{{P-x}}/`
+- [ ] Chaque US d'écran de la phase a son scénario E2E **dans le rôle**, au vert, et la **liste fixe
+      de la gate d'écran** est passée : rôle · fenêtre et ascenseur · un bouton ou une raison par
+      état · une sortie par étape · le texte dit l'état réel (METHODE §1·M7)

@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.8.0 -->
+<!-- KIT-VERSION: 1.10.0 -->
 <!-- PROUVE-SUR: — (niveau Feature v1.8 non prouvé ; chaîne de base prouvée sur Régie kit v1.0) -->
 # M5 · Phasage gaté — {{nom du chantier}}
 
@@ -34,5 +34,8 @@ flowchart LR
 ## 6. Definition of Done
 - [ ] Chaque phase apporte de la valeur **démontrable** seule
 - [ ] `P-0` = socle qui débloque le reste *(⚗️ règle candidate)*
-- [ ] Chaque gate formulée comme une **démo**, pas une tâche
+- [ ] Chaque gate formulée comme une **démo**, pas une tâche — et **vue par le rôle** quand la
+      phase livre un écran (« le bénéficiaire, connecté, lit… »), avec la liste fixe de la gate
+      d'écran (METHODE §1·M7 : rôle · fenêtre et ascenseur · un bouton ou une raison par état ·
+      une sortie par étape · le texte dit l'état réel)
 - [ ] Préfixe de phase déclaré (une seule convention pour le chantier)

@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.8.0 -->
+<!-- KIT-VERSION: 1.10.0 -->
 # Méthode AgileIA — Besoin → Plan (Spec de besoins → US → Features → Épics → Phasage → Plan technique)
 
 > **But** : passer proprement d'un **besoin métier exprimé** à un **plan technique exécutable**, sans
@@ -26,6 +26,7 @@
 | RG | son contre-exemple rejeté (`@RG-x`) |
 | Matrice de couverture | ses deux lectures (verticale : couverture ; horizontale : chemin) |
 | Phase | sa gate = démo réelle + non-régression |
+| **Écran** (US dont l'acteur est une personne) | sa **traversée en bout de chaîne**, dans le rôle, dans une fenêtre réelle, scriptée — le test de services ne prouve pas un écran |
 | Backup | sa restauration exécutée |
 | Doc utilisateur | sa rejouabilité (elle permet de refaire la démo) |
 | Spec | un relecteur **qui ne l'a pas écrite** (différent en nature, cf. §1) |
@@ -150,7 +151,8 @@ glm47 via APIM…) : une autre session du même modèle est une relecture de con
 - **Estimation (paramétrable selon le casting)** : la règle × 2 est le plancher ; en solo + agents IA
   elle suffit (assumé) ; en équipe cliente, un sizing peut s'y ajouter (t-shirt ou autre), **déclaré**
   dans le livrable M5 — jamais imposé par le kit.
-- **DoD** : chaque phase a une gate formulée comme une démo, pas comme une tâche.
+- **DoD** : chaque phase a une gate formulée comme une démo, pas comme une tâche — et une démo
+  **vue par le rôle** (« le bénéficiaire, connecté, lit… »), pas par le pilote qui sait où cliquer.
 
 ### M6 — Plan technique + matrice de couverture
 - **Entrée** : phasage + spec.
@@ -163,7 +165,9 @@ glm47 via APIM…) : une autre session du même modèle est une relecture de con
      vérité du mapping**, cf. §0 et §3 — colonne Tests : tags `@US-x`/`@RG-x`/`@neg`).
   5. **Plan de test** (pilier conception `TEMPLATE-TESTS.md`) — tests alignés sur les 3 axes (US→
      acceptation, RG→conforme+rejet, brique→unitaires, phase→gate scriptée + non-régression, app→E2E),
-     squelettes Gherkin générables depuis le YAML.
+     squelettes Gherkin générables depuis le YAML. **Une US d'écran a deux preuves** : son test de
+     services **et** son scénario E2E au navigateur, dans le rôle — l'un sans l'autre laisse passer
+     un bouton muet, un texte figé, un état sans sortie ou un panneau sans ascenseur (§1·M7).
   6. **Mapping habilitations → IAM** — rôles métier → rôles/scopes `manifest.json`, mode SSO par
      route, compte de service (pilier conception, doctrine : RBAC gros grain = IAM Hub, conditions
      fines = RG `droit_acces` en code).
@@ -179,6 +183,21 @@ glm47 via APIM…) : une autre session du même modèle est une relecture de con
 - **Règles** : code par **incréments atomiques** ; **preuve réelle à chaque gate** — démo de la phase
   **+ re-vérification des gates précédentes** (re-démo rapide ou suite de tests, cf. M6.5) ; **zéro
   mock** ; **double-track** — chaque phase produit code + trace de suivi + raffinement du kit méthode.
+- **La gate d'un écran, liste fixe** (RETEX Your360 2026-10-26 : cinq défauts d'écran en une
+  soirée, invisibles à 202 tests de services verts, tous trouvés par le commanditaire ou par la
+  suite E2E en jouant la chaîne) :
+  1. **dans le rôle** — connecté comme la personne (bénéficiaire par le SSO, contact par son
+     lien), jamais par un raccourci de pilote ;
+  2. **dans une fenêtre réelle** (1280 × 900) — une capture « pleine page » rend tout le DOM, y
+     compris ce que personne ne peut atteindre : les preuves se prennent **à la taille de la
+     fenêtre**, et l'E2E descend à la molette jusqu'au dernier élément et exige qu'il soit **dans
+     la fenêtre** ;
+  3. **chaque état de l'objet** montre un bouton, ou dit pourquoi il n'y en a pas — un état
+     « rien à faire, sans un mot » est un défaut ;
+  4. **chaque fin d'étape a une sortie** — « et maintenant, où est-ce que je clique ? » se pose
+     à chaque pas, et une page sans issue est un défaut ;
+  5. **le texte dit l'état réel** — un texte figé qui contredit le régime, le seuil ou l'étape
+     est un défaut, même si la règle derrière est juste.
 - **DoD** : on sait *où / avec quoi / sur quoi* on exécute ; le suivi de la 1ʳᵉ phase est en place.
 
 ---
@@ -242,7 +261,9 @@ voit le chemin besoin→code→démo. C'est **ici** — et seulement ici — que
   (Vrai pour un prompt… et pour chaque maillon de cette méthode.)
 - **Décisions avant plan** : M4 est un vrai maillon, pas une note de bas de page.
 - **Gate = démo** : une phase se valide en **montrant**, pas en cochant des tâches — et les gates
-  précédentes sont re-vérifiées (§1·M7).
+  précédentes sont re-vérifiées (§1·M7). Un écran se montre **dans le rôle et dans la fenêtre**
+  (liste fixe, §1·M7) : les tests de services ne voient aucun des défauts qu'une personne voit en
+  dix secondes.
 - **Chaque livrable est relisible** : pas de big-bang ; relecture **requise** M1/M4/M6.
 - **Un artefact = un axe** : le mapping inter-axes vit dans la matrice (M6), nulle part ailleurs.
 
@@ -302,3 +323,6 @@ Dans les deux cas, mêmes invariants : **phasage gaté**, **anti-extrapolation**
 - [ ] M7 Câblage : **inputs rassemblés** (`inputs/`), outils Hub, cible d'exécution, build/deploy
 - [ ] M7 Suivi : un dossier `tracking/<P-x>/` par phase (`STATE/JOURNAL/tasks`), **preuve à chaque
       gate + gates précédentes re-vérifiées**, zéro mock
+- [ ] M7 Écrans : **E2E au navigateur dans le rôle** au vert, captures **à la fenêtre** (jamais
+      pleine page), la liste fixe de la gate d'écran passée (rôle · fenêtre et ascenseur · un bouton
+      ou une raison par état · une sortie par étape · le texte dit l'état réel)
