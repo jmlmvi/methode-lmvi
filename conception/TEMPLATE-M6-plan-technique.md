@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.11.1 -->
+<!-- KIT-VERSION: 1.11.2 -->
 <!-- PROUVE-SUR: — (niveau Feature v1.8 non prouvé ; chaîne de base prouvée sur Régie kit v1.0) -->
 # M6 · Plan technique + matrice de couverture — {{nom du chantier}}
 
@@ -23,7 +23,7 @@ des gates précédentes) · 6. **Mapping habilitations → IAM** (rôles métier
 Avant d'écrire une brique, on cherche où elle est déjà décrite :
 1. **un service de la plateforme ?** → `APP-ZZ-TEMPLATE/docs/services-disponibles/` (index
    `00-index.md`) : on le **consomme** et on cite le guide — la table « besoin → guide » des 44
-   guides est dans `inputs-corpus/2-thesoclehub-services/README.md` ;
+   guides est dans `CATALOGUE-SERVICES.md` (même dossier) ;
 2. **sinon, un mécanisme du socle ?** → `APP-ZZ-TEMPLATE/docs/use-cases/` (index `INDEX.md`) : on
    cite la fiche et on **suit le mécanisme qu'elle prescrit** ;
 3. **sinon** → `NON COUVERT`, écrit ici avant de coder ; le catalogue s'enrichit en M7.

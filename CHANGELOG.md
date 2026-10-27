@@ -4,6 +4,14 @@
 > (procédure : README racine, « Resync d'une instance »). Ce fichier est auto-versionné par ses
 > entrées (pas de marqueur `KIT-VERSION`, cf. charte U-DOCS §3).
 
+## 1.11.2 — 2026-10-27
+
+**La table voyage avec le kit.** En 1.11.1, la table « besoin → guide » vivait dans
+`inputs-corpus/`, que ni le `_kit/` d'un chantier ni la skill ne recopient (ils prennent
+`conception/`, `ESSENTIEL.md` et le CONTRAT) : le gabarit M6 pointait vers un fichier absent du
+chantier. Elle passe dans **`conception/CATALOGUE-SERVICES.md`** ; le slot 2 du corpus n'en garde
+qu'un renvoi.
+
 ## 1.11.1 — 2026-10-27
 
 **Les 44 guides, nommés dans le kit.** La 1.11.0 envoyait chaque brique vers le catalogue des

@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.11.1 -->
+<!-- KIT-VERSION: 1.11.2 -->
 # Corpus d'inputs techniques TheSocle (générique)
 
 > Les **inputs techniques standards** dont la méthode a besoin pour construire **n'importe quelle** app
@@ -11,7 +11,7 @@
 |---|---|---|---|
 | 0 | **Skeleton d'app (APP-ZZ-TEMPLATE)** | `/opt/2026-TheHub4TheSocle/APP-ZZ-TEMPLATE/` | **le squelette de départ** : plomberie DB/auth/SSO/scopes/tenant, Dockerfile, manifest, Application, SPA — `./bootstrap.sh` ; **les 148 fiches de mécanismes** `docs/use-cases/` |
 | 1 | **TheSocle 5.8 (5.8.0)** (noyau) | `docs/docs-socleV005/01-docsV2/` + JAR `socle-v005-5.8.0` | Workers, invariants (1 worker=1 fichier, injection ctor…), templates, actions/MCP, config |
-| 2 | **TheSocleHub — catalogue de services** | `APP-ZZ-TEMPLATE/docs/services-disponibles/` (44 guides, [table besoin → guide](2-thesoclehub-services/README.md)) + MCP du Hub | **APIs & agents & services** : `iam`, `vault`, `storage (S3)`, `mail (James)`, `clamav`, `backup`, `apim`, `agentia`, `proxy`, `dns`, `acme`, `signature`, `tsa`, `nats`, `cache`, `cosmo`, `onlyoffice`, `status/techdb` |
+| 2 | **TheSocleHub — catalogue de services** | `APP-ZZ-TEMPLATE/docs/services-disponibles/` (44 guides, [table besoin → guide](../conception/CATALOGUE-SERVICES.md)) + MCP du Hub | **APIs & agents & services** : `iam`, `vault`, `storage (S3)`, `mail (James)`, `clamav`, `backup`, `apim`, `agentia`, `proxy`, `dns`, `acme`, `signature`, `tsa`, `nats`, `cache`, `cosmo`, `onlyoffice`, `status/techdb` |
 | 3 | **FrontEnd (React V005)** | shell React V005 + design system (`appdemo`, charte violet) | règles UI, IDELayout, Cmd+K, ThemePalette, composants, SSO front |
 | 4 | **socle-pack-ia** | repo/pack `socle-pack-ai` | agents IA / LLM (via APIM), providers, quotas |
 | 5 | **socle-pack-pipeline** | `/opt/2026-TheHub4TheSocle/socle-pack-pipeline/` | moteur DAG (stages S/T/E/G/K/H/C), reprise, lineage, `graph_view` |

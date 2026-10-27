@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.11.1 -->
+<!-- KIT-VERSION: 1.11.2 -->
 # Méthode AgileIA — Besoin → Plan (Spec de besoins → US → Features → Épics → Phasage → Plan technique)
 
 > **But** : passer proprement d'un **besoin métier exprimé** à un **plan technique exécutable**, sans
@@ -165,7 +165,7 @@ glm47 via APIM…) : une autre session du même modèle est une relecture de con
      où elle est déjà décrite :
      1. **le besoin est-il un service rendu par la plateforme ?** → le catalogue des services
         (`APP-ZZ-TEMPLATE/docs/services-disponibles/`, 44 guides, table « besoin → guide »
-        dans `inputs-corpus/2-thesoclehub-services/`) ; si oui, la brique
+        dans `CATALOGUE-SERVICES.md`) ; si oui, la brique
         **consomme** ce service et cite son guide (`howto-NN`), elle ne le réimplémente pas ;
      2. **ce qui reste à écrire dans l'app** → le catalogue des mécanismes
         (`APP-ZZ-TEMPLATE/docs/use-cases/`, 148 fiches) ; la brique cite sa fiche (`UC-XXX-NN`)
