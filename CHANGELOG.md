@@ -4,6 +4,19 @@
 > (procédure : README racine, « Resync d'une instance »). Ce fichier est auto-versionné par ses
 > entrées (pas de marqueur `KIT-VERSION`, cf. charte U-DOCS §3).
 
+## 1.12.2 — 2026-10-27
+
+**Les catalogues annoncés dès le départ.** Jusqu'ici, l'agent ne découvrait les deux catalogues
+qu'en M6, en lisant la méthode et le gabarit du plan technique : ni le prompt pilote ni
+`ESSENTIEL.md` ne les citaient.
+
+- **`ESSENTIEL.md` §5** : « on ne recode pas ce que la plateforme fournit » dit désormais où le
+  vérifier — `CATALOGUE-SERVICES.md` puis `CATALOGUE-MECANISMES.md`, sinon `NON COUVERT`.
+- **`PROMPT-PILOTE.md`** : les deux catalogues entrent dans les lectures de M6, et l'invariant 5
+  demande de vérifier un besoin d'allure « service » dès M1, puis de router chaque brique en M6.
+
+Les chantiers déjà montés gardent leur `_kit/` gelé : seuls les chantiers neufs en profitent.
+
 ## 1.12.1 — 2026-10-27
 
 Trois lignes d'exemple de `services-disponibles/` arrêtaient le contrôle anti-secret de la

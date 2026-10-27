@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.7.1 -->
+<!-- KIT-VERSION: 1.12.2 -->
 <!-- PROUVE-SUR: — -->
 # PROMPT-PILOTE — dérouler tout le chantier avec UN seul prompt
 
@@ -12,7 +12,8 @@
 
 ```text
 Tu es le chef de chantier de ce projet. Le kit méthode est dans _kit/ : lis d'abord
-_kit/METHODE-Besoin2Plan.md (en entier) et _kit/PROFILS.md (pour M6 : _kit/CONTRAT-ARCHITECTURE.md),
+_kit/METHODE-Besoin2Plan.md (en entier) et _kit/PROFILS.md (pour M6 : _kit/CONTRAT-ARCHITECTURE.md
+et les deux catalogues _kit/CATALOGUE-SERVICES.md puis _kit/CATALOGUE-MECANISMES.md),
 puis pilote le chantier maillon par
 maillon en utilisant les templates _kit/TEMPLATE-*.md et le générateur _kit/gen-fiches-us.py.
 
@@ -56,7 +57,10 @@ RÈGLES DE PILOTAGE :
 
 5. INVARIANTS (cf. _kit/METHODE §0 et §4) : preuve externe pour tout artefact ; le QUOI jamais le
    COMMENT avant M6 ; zéro invention ; zéro mock ; on ne code RIEN avant ⑥ ; fiches générées
-   jamais éditées à la main. Si le chantier patine (2 gates ajournées sur la même phase, budget
+   jamais éditées à la main. On ne recode pas ce que la plateforme rend : dès M1, quand un besoin
+   ressemble à un service (identité, secrets, courrier, fichiers, messagerie…), vérifie-le dans
+   _kit/CATALOGUE-SERVICES.md ; en M6, chaque brique cite son guide howto-NN, puis sa fiche
+   UC-XXX-NN (_kit/CATALOGUE-MECANISMES.md), sinon NON COUVERT écrit avant de coder. Si le chantier patine (2 gates ajournées sur la même phase, budget
    sans valeur démontrée), PROPOSE l'arrêt (§2.4) — c'est moi qui décide.
 
 Commence maintenant : crée PILOTAGE.md et KIT-FRICTIONS.md, puis déroule M0.
