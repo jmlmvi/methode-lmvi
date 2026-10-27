@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.11.2 -->
+<!-- KIT-VERSION: 1.11.3 -->
 # Méthode AgileIA — Besoin → Plan (Spec de besoins → US → Features → Épics → Phasage → Plan technique)
 
 > **But** : passer proprement d'un **besoin métier exprimé** à un **plan technique exécutable**, sans
@@ -168,7 +168,8 @@ glm47 via APIM…) : une autre session du même modèle est une relecture de con
         dans `CATALOGUE-SERVICES.md`) ; si oui, la brique
         **consomme** ce service et cite son guide (`howto-NN`), elle ne le réimplémente pas ;
      2. **ce qui reste à écrire dans l'app** → le catalogue des mécanismes
-        (`APP-ZZ-TEMPLATE/docs/use-cases/`, 148 fiches) ; la brique cite sa fiche (`UC-XXX-NN`)
+        (`APP-ZZ-TEMPLATE/docs/use-cases/`, 148 fiches, table « besoin → fiche »
+        dans `CATALOGUE-MECANISMES.md`) ; la brique cite sa fiche (`UC-XXX-NN`)
         et **suit le mécanisme qu'elle prescrit**, pas le code d'un voisin ;
      3. **aucun des deux ne couvre le cas** → la brique porte `NON COUVERT`, c'est dit avant de
         coder, et le catalogue concerné s'enrichit une fois la solution trouvée (M7).

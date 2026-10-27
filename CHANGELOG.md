@@ -4,6 +4,15 @@
 > (procédure : README racine, « Resync d'une instance »). Ce fichier est auto-versionné par ses
 > entrées (pas de marqueur `KIT-VERSION`, cf. charte U-DOCS §3).
 
+## 1.11.3 — 2026-10-27
+
+**Les 148 fiches de mécanismes, nommées dans le kit.** Même manque que pour les guides : le kit ne
+citait que deux fiches en exemple (`UC-RES-01`, `UC-DOM-02`). Nouveau
+**`conception/CATALOGUE-MECANISMES.md`** : la table « besoin → fiche » des 148 fiches, 17 thèmes,
+avec la disponibilité en Java, générée depuis `APP-ZZ-TEMPLATE/docs/use-cases/INDEX.md` ; chaque
+référence vérifiée présente dans le catalogue. M6, METHODE, CONTRAT §10 et le corpus y renvoient.
+Avec `CATALOGUE-SERVICES.md`, les deux étapes du routage de M6 se font sans quitter le kit.
+
 ## 1.11.2 — 2026-10-27
 
 **La table voyage avec le kit.** En 1.11.1, la table « besoin → guide » vivait dans

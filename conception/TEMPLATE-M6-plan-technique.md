@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.11.2 -->
+<!-- KIT-VERSION: 1.11.3 -->
 <!-- PROUVE-SUR: — (niveau Feature v1.8 non prouvé ; chaîne de base prouvée sur Régie kit v1.0) -->
 # M6 · Plan technique + matrice de couverture — {{nom du chantier}}
 
@@ -24,7 +24,8 @@ Avant d'écrire une brique, on cherche où elle est déjà décrite :
 1. **un service de la plateforme ?** → `APP-ZZ-TEMPLATE/docs/services-disponibles/` (index
    `00-index.md`) : on le **consomme** et on cite le guide — la table « besoin → guide » des 44
    guides est dans `CATALOGUE-SERVICES.md` (même dossier) ;
-2. **sinon, un mécanisme du socle ?** → `APP-ZZ-TEMPLATE/docs/use-cases/` (index `INDEX.md`) : on
+2. **sinon, un mécanisme du socle ?** → `APP-ZZ-TEMPLATE/docs/use-cases/` (index `INDEX.md` ; table
+   « besoin → fiche » des 148 fiches dans `CATALOGUE-MECANISMES.md`, même dossier) : on
    cite la fiche et on **suit le mécanisme qu'elle prescrit** ;
 3. **sinon** → `NON COUVERT`, écrit ici avant de coder ; le catalogue s'enrichit en M7.
 
