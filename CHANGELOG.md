@@ -4,6 +4,23 @@
 > (procédure : README racine, « Resync d'une instance »). Ce fichier est auto-versionné par ses
 > entrées (pas de marqueur `KIT-VERSION`, cf. charte U-DOCS §3).
 
+## 1.11.1 — 2026-10-27
+
+**Les 44 guides, nommés dans le kit.** La 1.11.0 envoyait chaque brique vers le catalogue des
+services, mais le kit ne citait qu'un seul guide (`howto-37`, en exemple) : pour router une brique,
+il fallait sortir du kit et parcourir l'index.
+
+- **`inputs-corpus/2-thesoclehub-services/README.md`** : la **table « besoin → guide »** des 44
+  guides, rangée par besoin (identité, API, messagerie, courrier, fichiers, mise en ligne,
+  construction, livraison), avec une colonne *Côté* : `app` (une brique le consomme) ou
+  `plateforme` (geste d'administration ou de livraison, utile en M7). Source canonique précisée :
+  `docs/02-DocHub/use-cases/`.
+- **`TEMPLATE-M6`**, **`METHODE`**, **`CONTRAT`** §10 et le corpus pointent vers cette table ;
+  « 43 guides » devient 44.
+- **Catalogue** : la copie `APP-ZZ-TEMPLATE/docs/services-disponibles/` est resynchronisée sur sa
+  source (il lui manquait `howto-44`, et `howto-17` et l'index avaient vieilli). Sans cela, le
+  contrôle avant go aurait compté `howto-44` comme une référence inventée.
+
 ## 1.11.0 — 2026-10-27
 
 **Le routage avant la brique.** M6 disait « réutiliser la plateforme » sans dire où regarder. Deux
