@@ -1,0 +1,1632 @@
+{
+  "version": "1.0",
+  "contrat": "5.9",
+  "moteurs": [
+    {
+      "code": "java",
+      "nom": "Socle V005 Java",
+      "role": "référence"
+    },
+    {
+      "code": "socle-py",
+      "nom": "socle-py",
+      "role": "Python / FastAPI"
+    },
+    {
+      "code": "socle-py-django",
+      "nom": "socle-py-django",
+      "role": "Python / Django ORM + Ninja"
+    }
+  ],
+  "statuts": {
+    "ok": "disponible",
+    "P-3": "prévu phase P-3",
+    "P-4": "prévu phase P-4",
+    "P-5": "prévu phase P-5",
+    "hors": "hors périmètre déclaré",
+    "na": "sans objet"
+  },
+  "themes": [
+    {
+      "code": "UC-WRK",
+      "titre": "Workers et cycle de vie",
+      "intention": "écrire une unité de traitement et la faire tourner au bon rythme"
+    },
+    {
+      "code": "UC-BUS",
+      "titre": "KvBus",
+      "intention": "faire communiquer les workers d'une même instance"
+    },
+    {
+      "code": "UC-ACT",
+      "titre": "Actions REST et MCP",
+      "intention": "exposer les capacités des workers aux humains, aux frontends et aux agents IA"
+    },
+    {
+      "code": "UC-DB",
+      "titre": "TechDB",
+      "intention": "persister et exploiter l'état technique de l'instance"
+    },
+    {
+      "code": "UC-DOM",
+      "titre": "Domaine applicatif et couches",
+      "intention": "placer les règles de gestion et les données métier au bon endroit"
+    },
+    {
+      "code": "UC-SEC",
+      "titre": "Sécurité et identité",
+      "intention": "savoir qui appelle, avec quels droits, pour quel tenant"
+    },
+    {
+      "code": "UC-CFG",
+      "titre": "Configuration",
+      "intention": "configurer une application sans toucher au code"
+    },
+    {
+      "code": "UC-SUP",
+      "titre": "Supervision et exploitation",
+      "intention": "surveiller, redémarrer, drainer et arrêter une instance"
+    },
+    {
+      "code": "UC-OPS",
+      "titre": "Workers intégrés du framework",
+      "intention": "utiliser les workers d'exploitation livrés avec le socle"
+    },
+    {
+      "code": "UC-RES",
+      "titre": "Résilience des appels sortants",
+      "intention": "appeler un système tiers sans se laisser entraîner par ses pannes"
+    },
+    {
+      "code": "UC-RUL",
+      "titre": "Moteurs de décision et code dynamique",
+      "intention": "décider et calculer sans redéployer"
+    },
+    {
+      "code": "UC-PIP",
+      "titre": "Pipelines",
+      "intention": "chaîner des étapes de traitement"
+    },
+    {
+      "code": "UC-INT",
+      "titre": "Intégrations et transports",
+      "intention": "s'insérer dans la plateforme et parler aux autres systèmes"
+    },
+    {
+      "code": "UC-UI",
+      "titre": "Pages et frontend",
+      "intention": "servir des interfaces d'exploitation et d'application"
+    },
+    {
+      "code": "UC-FIL",
+      "titre": "Repository et fichiers",
+      "intention": "exposer des fichiers éditables et leurs validateurs"
+    },
+    {
+      "code": "UC-CTR",
+      "titre": "Contrats et conformité",
+      "intention": "garder les moteurs indiscernables dans la durée"
+    },
+    {
+      "code": "UC-DEV",
+      "titre": "Outillage du développeur",
+      "intention": "démarrer, contrôler et livrer une application"
+    }
+  ],
+  "cas": {
+    "UC-WRK": [
+      {
+        "num": 1,
+        "titre": "Exécuter une tâche toutes les N millisecondes",
+        "slug": "planifier-par-intervalle",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 2,
+        "titre": "Exécuter une tâche à heure fixe (cron)",
+        "slug": "planifier-par-cron",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 3,
+        "titre": "Worker passif : jamais planifié, piloté par ses actions",
+        "slug": "worker-passif",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 4,
+        "titre": "Faire découvrir ses workers automatiquement",
+        "slug": "decouverte-automatique",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 5,
+        "titre": "Ordonner démarrage et arrêt par priorités",
+        "slug": "priorites-demarrage-arret",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 6,
+        "titre": "Désactiver un worker sans le supprimer",
+        "slug": "desactiver-un-worker",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 7,
+        "titre": "Injecter ses dépendances par le constructeur",
+        "slug": "injecter-ses-dependances",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 8,
+        "titre": "Publier santé et statistiques d'un worker",
+        "slug": "sante-et-statistiques",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 9,
+        "titre": "Worker événementiel : consommer un flux en continu",
+        "slug": "worker-evenementiel",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      },
+      {
+        "num": 10,
+        "titre": "Worker d'appel externe protégé",
+        "slug": "worker-appel-externe-protege",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      },
+      {
+        "num": 11,
+        "titre": "Travail bloquant ou non bloquant (sync / async)",
+        "slug": "bloquant-ou-asynchrone",
+        "moteurs": {
+          "java": "na",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 12,
+        "titre": "Partager un état entre workers sans base",
+        "slug": "registre-partage",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      }
+    ],
+    "UC-BUS": [
+      {
+        "num": 1,
+        "titre": "Stocker une valeur clé/valeur avec expiration",
+        "slug": "cle-valeur-avec-expiration",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 2,
+        "titre": "Opérations atomiques (incrément, compare-and-set)",
+        "slug": "operations-atomiques",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 3,
+        "titre": "Publier un événement à tous les abonnés",
+        "slug": "publication-simple",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 4,
+        "titre": "S'abonner à un sujet, et seulement à l'initialisation",
+        "slug": "s-abonner-a-un-sujet",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 5,
+        "titre": "Publication fiable : groupe de consommateurs, au moins une fois",
+        "slug": "publication-fiable",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 6,
+        "titre": "File des messages en échec : inspecter, rejouer, purger",
+        "slug": "file-des-echecs",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 7,
+        "titre": "Rendre un consommateur idempotent",
+        "slug": "consommateur-idempotent",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 8,
+        "titre": "Changer d'implémentation de bus (mémoire vers Redis)",
+        "slug": "bus-interchangeable",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      }
+    ],
+    "UC-ACT": [
+      {
+        "num": 1,
+        "titre": "Déclarer une action avec ses paramètres typés",
+        "slug": "declarer-une-action",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 2,
+        "titre": "Valider les paramètres d'une action",
+        "slug": "valider-les-parametres",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 3,
+        "titre": "Imposer un délai maximal d'exécution",
+        "slug": "delai-maximal",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 4,
+        "titre": "Exiger un scope pour une action",
+        "slug": "exiger-un-scope",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 5,
+        "titre": "Action en lecture seule ou à confirmation requise",
+        "slug": "lecture-seule-et-confirmation",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 6,
+        "titre": "Auditer les invocations sans secret en clair",
+        "slug": "auditer-les-invocations",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 7,
+        "titre": "Invoquer une action en REST (synchrone)",
+        "slug": "invoquer-en-rest",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 8,
+        "titre": "Invoquer une action en asynchrone et suivre le job",
+        "slug": "invoquer-en-asynchrone",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 9,
+        "titre": "Exposer les actions comme outils MCP",
+        "slug": "exposer-en-outils-mcp",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 10,
+        "titre": "Publier la spécification des actions",
+        "slug": "publier-la-specification",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 11,
+        "titre": "Publier un OpenAPI exact, sécurité comprise",
+        "slug": "publier-un-openapi",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 12,
+        "titre": "Distinguer un refus métier d'une panne",
+        "slug": "refus-metier-ou-panne",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 13,
+        "titre": "Consommer les actions depuis un agent IA",
+        "slug": "consommer-depuis-un-agent",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 14,
+        "titre": "Agréger plusieurs instances dans un catalogue (MCPagger)",
+        "slug": "agreger-avec-mcpagger",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      }
+    ],
+    "UC-DB": [
+      {
+        "num": 1,
+        "titre": "Persister l'état technique d'une instance",
+        "slug": "persister-l-etat-technique",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 2,
+        "titre": "Choisir le moteur : H2, PostgreSQL, SQLite",
+        "slug": "choisir-le-moteur",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 3,
+        "titre": "Faire évoluer le schéma par migrations tracées",
+        "slug": "migrations-tracees",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 4,
+        "titre": "Interroger la TechDB en SQL en lecture seule",
+        "slug": "interroger-en-sql",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-3",
+          "socle-py-django": "P-3"
+        }
+      },
+      {
+        "num": 5,
+        "titre": "Lire les événements récents par action",
+        "slug": "lire-les-evenements",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-3",
+          "socle-py-django": "P-3"
+        }
+      },
+      {
+        "num": 6,
+        "titre": "Purger selon une rétention",
+        "slug": "purger-selon-la-retention",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-3",
+          "socle-py-django": "P-3"
+        }
+      },
+      {
+        "num": 7,
+        "titre": "Sauvegarder et restaurer",
+        "slug": "sauvegarder-et-restaurer",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-3",
+          "socle-py-django": "P-3"
+        }
+      },
+      {
+        "num": 8,
+        "titre": "Console TechDB d'exploitation",
+        "slug": "console-techdb",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-3",
+          "socle-py-django": "P-3"
+        }
+      },
+      {
+        "num": 9,
+        "titre": "Isoler les données métier par tenant",
+        "slug": "isoler-par-tenant",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 10,
+        "titre": "Refuser un accès sans tenant à une table partitionnée",
+        "slug": "refuser-sans-tenant",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 11,
+        "titre": "Écrire les tables métier en SQL brut",
+        "slug": "tables-metier-en-sql",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 12,
+        "titre": "Travailler avec des bases applicatives tierces",
+        "slug": "bases-applicatives-tierces",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      }
+    ],
+    "UC-DOM": [
+      {
+        "num": 1,
+        "titre": "Modéliser une entité métier avec l'ORM Django",
+        "slug": "modeliser-avec-l-orm",
+        "moteurs": {
+          "java": "na",
+          "socle-py": "na",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 2,
+        "titre": "Séparer les couches de l'application",
+        "slug": "separer-les-couches",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 3,
+        "titre": "Faire franchir la frontière par des échanges immuables",
+        "slug": "echanges-immuables",
+        "moteurs": {
+          "java": "na",
+          "socle-py": "na",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 4,
+        "titre": "Porter les règles de gestion dans un service",
+        "slug": "regles-de-gestion-en-service",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 5,
+        "titre": "Fournir l'heure et la configuration au domaine",
+        "slug": "fournir-heure-et-configuration",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 6,
+        "titre": "Porter l'intégrité par des contraintes en base",
+        "slug": "integrite-par-contraintes",
+        "moteurs": {
+          "java": "na",
+          "socle-py": "na",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 7,
+        "titre": "Écritures de masse dans un QuerySet dédié",
+        "slug": "ecritures-de-masse",
+        "moteurs": {
+          "java": "na",
+          "socle-py": "na",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 8,
+        "titre": "Générer et appliquer les migrations d'une application métier",
+        "slug": "migrations-applicatives",
+        "moteurs": {
+          "java": "na",
+          "socle-py": "na",
+          "socle-py-django": "ok"
+        }
+      }
+    ],
+    "UC-SEC": [
+      {
+        "num": 1,
+        "titre": "Protéger l'API d'administration par clé",
+        "slug": "cle-d-administration",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 2,
+        "titre": "Protéger /mcp par clé",
+        "slug": "cle-mcp",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 3,
+        "titre": "Accepter les JWT délégués du Hub",
+        "slug": "jwt-delegues-du-hub",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 4,
+        "titre": "Accepter un JWT délégué sur les actions REST",
+        "slug": "jwt-sur-les-actions-rest",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 5,
+        "titre": "Transmettre scopes et tenant jusqu'à l'action",
+        "slug": "transmettre-scopes-et-tenant",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 6,
+        "titre": "Ne croire l'en-tête de tenant que derrière un proxy de confiance",
+        "slug": "proxy-de-confiance",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 7,
+        "titre": "Fermer par défaut toute surface non publique",
+        "slug": "fermer-par-defaut",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 8,
+        "titre": "Déclarer les routes publiques d'une application",
+        "slug": "routes-publiques",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 9,
+        "titre": "Protéger des routes par session OIDC",
+        "slug": "session-oidc",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 10,
+        "titre": "S'enregistrer auprès du registre de workers",
+        "slug": "registre-de-workers",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      },
+      {
+        "num": 11,
+        "titre": "Garde de licence TheSocle",
+        "slug": "garde-de-licence",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      },
+      {
+        "num": 12,
+        "titre": "Lire ses secrets au démarrage (Vault)",
+        "slug": "secrets-au-demarrage",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      }
+    ],
+    "UC-CFG": [
+      {
+        "num": 1,
+        "titre": "Configurer par fichier avec substitution d'environnement",
+        "slug": "configurer-par-fichier",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 2,
+        "titre": "Partager les mêmes clés entre les moteurs",
+        "slug": "memes-cles-partout",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 3,
+        "titre": "Refuser au démarrage une configuration invalide",
+        "slug": "refuser-une-configuration-invalide",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 4,
+        "titre": "Lire une clé applicative typée",
+        "slug": "lire-une-cle-typee",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 5,
+        "titre": "Basculer par profils d'environnement",
+        "slug": "profils-d-environnement",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 6,
+        "titre": "Documenter les clés d'une application",
+        "slug": "documenter-ses-cles",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      }
+    ],
+    "UC-SUP": [
+      {
+        "num": 1,
+        "titre": "Répondre aux sondes de vivacité et de disponibilité",
+        "slug": "sondes-de-sante",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 2,
+        "titre": "Lister les workers, leur état et leurs statistiques",
+        "slug": "lister-les-workers",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 3,
+        "titre": "Redémarrer automatiquement un worker malade",
+        "slug": "redemarrage-automatique",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      },
+      {
+        "num": 4,
+        "titre": "Redémarrer un worker à la main",
+        "slug": "redemarrage-manuel",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      },
+      {
+        "num": 5,
+        "titre": "Déclencher hors cycle un worker planifié",
+        "slug": "declencher-hors-cycle",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      },
+      {
+        "num": 6,
+        "titre": "Drainer puis arrêter proprement",
+        "slug": "drain-et-arret-ordonne",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      },
+      {
+        "num": 7,
+        "titre": "Drain HTTP seul, annulable",
+        "slug": "drain-http",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      },
+      {
+        "num": 8,
+        "titre": "Exposer des métriques Prometheus",
+        "slug": "metriques-prometheus",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      },
+      {
+        "num": 9,
+        "titre": "Escalade quand le redémarrage ne suffit pas",
+        "slug": "escalade-du-superviseur",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      },
+      {
+        "num": 10,
+        "titre": "Journaliser avec un contexte de corrélation",
+        "slug": "journaliser-avec-contexte",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 11,
+        "titre": "Agréger et expédier un rapport d'erreurs",
+        "slug": "rapport-d-erreurs",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      },
+      {
+        "num": 12,
+        "titre": "Tableau de bord d'exploitation des workers",
+        "slug": "tableau-de-bord",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      }
+    ],
+    "UC-OPS": [
+      {
+        "num": 1,
+        "titre": "Piloter le système par commandes",
+        "slug": "piloter-par-commandes",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      },
+      {
+        "num": 2,
+        "titre": "Hygiène périodique automatique",
+        "slug": "hygiene-periodique",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      },
+      {
+        "num": 3,
+        "titre": "Gérer les files d'échec",
+        "slug": "gerer-les-files-d-echec",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      },
+      {
+        "num": 4,
+        "titre": "Limiter une ressource par sémaphores nommés",
+        "slug": "semaphores-nommes",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 5,
+        "titre": "Servir des routes HTTP applicatives",
+        "slug": "routes-http-applicatives",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 6,
+        "titre": "Recevoir un webhook externe",
+        "slug": "recevoir-un-webhook",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 7,
+        "titre": "Servir une page HTML depuis un worker",
+        "slug": "page-html-depuis-un-worker",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 8,
+        "titre": "Charger des plugins à chaud",
+        "slug": "plugins-a-chaud",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 9,
+        "titre": "Déboguer en cours d'exécution",
+        "slug": "deboguer-en-execution",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 10,
+        "titre": "Catalogue des actions pour l'exploitant",
+        "slug": "catalogue-des-actions",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      }
+    ],
+    "UC-RES": [
+      {
+        "num": 1,
+        "titre": "Couper les appels après une série d'échecs",
+        "slug": "disjoncteur",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      },
+      {
+        "num": 2,
+        "titre": "Réessayer avec attente croissante",
+        "slug": "reessais-avec-attente",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      },
+      {
+        "num": 3,
+        "titre": "Refuser au-delà d'un débit autorisé",
+        "slug": "limiter-le-debit",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      },
+      {
+        "num": 4,
+        "titre": "Combiner disjoncteur, reprises et débit",
+        "slug": "combiner-les-protections",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      },
+      {
+        "num": 5,
+        "titre": "Imposer un délai à tout appel HTTP sortant",
+        "slug": "timeout-obligatoire",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      }
+    ],
+    "UC-RUL": [
+      {
+        "num": 1,
+        "titre": "Modéliser une décision en graphe (JDM)",
+        "slug": "decision-en-graphe",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 2,
+        "titre": "Choisir le type de nœud adapté (JDM)",
+        "slug": "types-de-noeuds",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 3,
+        "titre": "Écrire un évaluateur d'expression (JDM)",
+        "slug": "evaluateur-d-expression",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 4,
+        "titre": "Auditer et mettre en cache les décisions",
+        "slug": "auditer-les-decisions",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 5,
+        "titre": "Exécuter un moteur de règles métier",
+        "slug": "moteur-de-regles",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 6,
+        "titre": "Tracer les règles déclenchées",
+        "slug": "tracer-les-regles",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 7,
+        "titre": "Compiler du code à la volée (Janino)",
+        "slug": "compiler-a-la-volee",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 8,
+        "titre": "Exposer des interfaces de calcul dynamique",
+        "slug": "interfaces-de-calcul",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 9,
+        "titre": "Exécuter un script dynamique",
+        "slug": "script-dynamique",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      }
+    ],
+    "UC-PIP": [
+      {
+        "num": 1,
+        "titre": "Chaîner des étapes en pipeline (V1)",
+        "slug": "pipeline-v1",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 2,
+        "titre": "Déclarer une étape typée (V2)",
+        "slug": "etape-typee-v2",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 3,
+        "titre": "Orchestrer un pipeline V2",
+        "slug": "orchestrer-un-pipeline",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 4,
+        "titre": "Appliquer les motifs de pipeline courants",
+        "slug": "motifs-de-pipeline",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 5,
+        "titre": "Agréger des résultats de plusieurs sources",
+        "slug": "agreger-des-resultats",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      }
+    ],
+    "UC-INT": [
+      {
+        "num": 1,
+        "titre": "Consommer un sujet Kafka",
+        "slug": "consommer-kafka",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 2,
+        "titre": "Exposer un service gRPC",
+        "slug": "exposer-grpc",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 3,
+        "titre": "Tenir des sessions gRPC",
+        "slug": "sessions-grpc",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 4,
+        "titre": "Relier deux instances en pair-à-pair",
+        "slug": "pair-a-pair-grpc",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 5,
+        "titre": "Servir gRPC-Web à un frontend",
+        "slug": "grpc-web",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 6,
+        "titre": "S'insérer derrière la Gateway TheSocle",
+        "slug": "derriere-la-gateway",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 7,
+        "titre": "Appeler un autre Socle en client authentifié",
+        "slug": "appeler-un-autre-socle",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      },
+      {
+        "num": 8,
+        "titre": "Déployer via le manifeste du Hub",
+        "slug": "manifeste-de-deploiement",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      }
+    ],
+    "UC-UI": [
+      {
+        "num": 1,
+        "titre": "Servir le tableau de bord des workers",
+        "slug": "servir-le-tableau-de-bord",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      },
+      {
+        "num": 2,
+        "titre": "Servir la console TechDB",
+        "slug": "servir-la-console-techdb",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-3",
+          "socle-py-django": "P-3"
+        }
+      },
+      {
+        "num": 3,
+        "titre": "Servir le catalogue des actions",
+        "slug": "servir-le-catalogue",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      },
+      {
+        "num": 4,
+        "titre": "Héberger un frontend FrontendShell",
+        "slug": "heberger-un-frontend",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-5",
+          "socle-py-django": "P-5"
+        }
+      },
+      {
+        "num": 5,
+        "titre": "Servir un formulaire piloté par un schéma",
+        "slug": "formulaire-par-schema",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 6,
+        "titre": "Rendre une page avec un moteur de gabarits",
+        "slug": "moteur-de-gabarits",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 7,
+        "titre": "Exposer l'interface MCPagger",
+        "slug": "interface-mcpagger",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "P-4",
+          "socle-py-django": "P-4"
+        }
+      }
+    ],
+    "UC-FIL": [
+      {
+        "num": 1,
+        "titre": "Exposer un dépôt de fichiers éditables",
+        "slug": "depot-de-fichiers",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 2,
+        "titre": "Déclarer un type de fichier et son validateur",
+        "slug": "type-de-fichier-et-validateur",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 3,
+        "titre": "Éditer ces fichiers depuis FrontendEditorZen",
+        "slug": "editer-depuis-editorzen",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 4,
+        "titre": "Versionner et auditer les modifications",
+        "slug": "versionner-et-auditer",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      },
+      {
+        "num": 5,
+        "titre": "Charger au démarrage des définitions du dépôt",
+        "slug": "charger-des-definitions",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "hors",
+          "socle-py-django": "hors"
+        }
+      }
+    ],
+    "UC-CTR": [
+      {
+        "num": 1,
+        "titre": "Écrire un contrat hors du code",
+        "slug": "ecrire-un-contrat",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 2,
+        "titre": "Jouer la suite de conformité croisée",
+        "slug": "suite-de-conformite",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 3,
+        "titre": "Annoncer sa version de contrat",
+        "slug": "version-de-contrat",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 4,
+        "titre": "Faire échouer la CI sur une régression de contrat",
+        "slug": "conformite-en-ci",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 5,
+        "titre": "Faire évoluer un contrat dans les trois moteurs",
+        "slug": "faire-evoluer-un-contrat",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 6,
+        "titre": "Vérifier qu'un backend est indiscernable d'un autre",
+        "slug": "backends-indiscernables",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      }
+    ],
+    "UC-DEV": [
+      {
+        "num": 1,
+        "titre": "Créer un projet neuf",
+        "slug": "creer-un-projet",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 2,
+        "titre": "Obtenir un squelette complet en couches",
+        "slug": "squelette-en-couches",
+        "moteurs": {
+          "java": "hors",
+          "socle-py": "hors",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 3,
+        "titre": "Partir du bon modèle de worker",
+        "slug": "choisir-un-modele-de-worker",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 4,
+        "titre": "Contrôler son code contre les conventions",
+        "slug": "revue-des-conventions",
+        "moteurs": {
+          "java": "hors",
+          "socle-py": "hors",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 5,
+        "titre": "Bloquer un commit non conforme",
+        "slug": "hook-de-pre-commit",
+        "moteurs": {
+          "java": "hors",
+          "socle-py": "hors",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 6,
+        "titre": "Construire et lancer la pile Docker",
+        "slug": "pile-docker",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 7,
+        "titre": "Mettre en place la CI",
+        "slug": "mettre-en-place-la-ci",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 8,
+        "titre": "Emporter le framework et sa doc hors du dépôt",
+        "slug": "archive-du-starter-pack",
+        "moteurs": {
+          "java": "hors",
+          "socle-py": "hors",
+          "socle-py-django": "ok"
+        }
+      },
+      {
+        "num": 9,
+        "titre": "Faire tourner une application de démonstration",
+        "slug": "application-de-demonstration",
+        "moteurs": {
+          "java": "ok",
+          "socle-py": "ok",
+          "socle-py-django": "ok"
+        }
+      }
+    ]
+  }
+}

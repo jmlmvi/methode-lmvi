@@ -4,6 +4,24 @@
 > (procédure : README racine, « Resync d'une instance »). Ce fichier est auto-versionné par ses
 > entrées (pas de marqueur `KIT-VERSION`, cf. charte U-DOCS §3).
 
+## 1.12.0 — 2026-10-27
+
+**Les fiches elles-mêmes sont dans le kit.** Les deux tables nommaient les 44 guides et les 148
+fiches, mais renvoyaient hors du kit. Elles sont désormais livrées avec lui :
+
+- **`conception/services-disponibles/`** : les 44 guides de services, leur index et les deux
+  catalogues annexes (copie de `APP-ZZ-TEMPLATE/docs/services-disponibles/`) ;
+- **`conception/use-cases/`** : les 148 fiches de mécanismes et leur `INDEX.md` (copie de
+  `APP-ZZ-TEMPLATE/docs/use-cases/`) ;
+- **`CATALOGUE-SERVICES.md`** et **`CATALOGUE-MECANISMES.md`** : chaque référence est un lien —
+  un clic ouvre le guide ou la fiche ;
+- **`controle-avant-go.sh`** : sans `APP-ZZ-TEMPLATE` voisin, il vérifie les références dans ces
+  copies au lieu de rendre « catalogue introuvable ».
+
+Dans `conception/`, les fiches voyagent avec le `_kit/` de chaque chantier et avec la skill.
+Avant publication, `howto-10` : un `client_secret` d'exemple d'apparence réelle remplacé par un
+gabarit, dans la source comme dans les copies. Resynchroniser ces dossiers quand la source grandit.
+
 ## 1.11.3 — 2026-10-27
 
 **Les 148 fiches de mécanismes, nommées dans le kit.** Même manque que pour les guides : le kit ne

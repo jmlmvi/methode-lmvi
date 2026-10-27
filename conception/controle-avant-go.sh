@@ -149,7 +149,9 @@ titre "5. Ce qui ne doit pas être réécrit"
 # La table de routage de M6 (§3 bis du gabarit) : chaque brique cite un guide de
 # service (howto-NN), une fiche de mécanisme (UC-XXX-NN), ou porte NON COUVERT.
 # Les catalogues sont ceux d'APP-ZZ-TEMPLATE, voisin des apps ; surchargeables.
+# À défaut, les copies livrées avec le kit, à côté de ce script.
 CAT_RACINE="$(dirname "$APP_DIR")/APP-ZZ-TEMPLATE/docs"
+[ -d "$CAT_RACINE/use-cases" ] || CAT_RACINE="$(cd "$(dirname "$0")" && pwd)"
 CAT_SERVICES="${CATALOGUE_SERVICES:-$CAT_RACINE/services-disponibles}"
 CAT_UC="${CATALOGUE_UC:-$CAT_RACINE/use-cases}"
 M6_PLAN="$CHANTIER/M6-plan-technique/README.md"
