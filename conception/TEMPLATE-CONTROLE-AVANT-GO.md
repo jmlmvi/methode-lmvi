@@ -97,11 +97,15 @@
 
 | # | Ce qu'on impose | Verdict | Preuve / écart |
 |---|---|---|---|
-| 5.1 | Aucune brique de M6 ne refait un **service du Hub** (`10-TOOLS2USE.md`) : mail, fichiers, antivirus, signature, horodatage, LLM, messagerie, sauvegarde, DNS, TLS, cache | | |
-| 5.2 | Aucune brique de M6 ne refait un **mécanisme du socle** (`11-SOCLE-EN-EXECUTION.md`) : ordonnanceur, disjoncteur, réessai, sémaphore, file d'échec, registre d'état, supervision, métriques, corrélation, arrêt | | |
+| 5.1 | Aucune brique de M6 ne refait un **service du Hub** (`services-disponibles/`, `10-TOOLS2USE.md`) : mail, fichiers, antivirus, signature, horodatage, LLM, messagerie, sauvegarde, DNS, TLS, cache | | |
+| 5.2 | Aucune brique de M6 ne refait un **mécanisme du socle** (`use-cases/`, `11-SOCLE-EN-EXECUTION.md`) : ordonnanceur, disjoncteur, réessai, sémaphore, file d'échec, registre d'état, supervision, métriques, corrélation, arrêt | | |
 | 5.3 | Les fichiers vont sur S3 via `storage_worker`, jamais sur le disque du conteneur | | |
 | 5.4 | Chaque worker de M6 porte une logique **que seule cette app connaît** | | |
 | 5.5 | L'interface vient de `@lmvi/ui` par étiquette npm — aucune copie de composant dans l'app | | |
+| 5.6 | 🤖 Chaque brique de la table de routage de M6 cite un guide de service (`howto-NN`, `services-disponibles/`), une fiche de mécanisme (`UC-XXX-NN`, `use-cases/`), ou porte `NON COUVERT` | | |
+| 5.7 | 🤖 Chaque référence citée existe dans le catalogue — un guide ou une fiche inventés comptent comme un écart | | |
+| 5.8 | L'ordre a été suivi : pour chaque brique à fiche `UC-*` seule, aucun service du Hub ne rend déjà ce besoin | | |
+| 5.9 | Chaque `NON COUVERT` dit pourquoi, et quel catalogue sera enrichi en M7 | | |
 
 > C'est la ligne la plus rentable de cette grille. Un service réécrit ne se voit pas à la revue de
 > code : il se voit trois mois plus tard, quand les deux versions ont divergé.

@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.7.1 -->
+<!-- KIT-VERSION: 1.11.0 -->
 # Contrat d'architecture plateforme TheSocle
 
 > **Le document transversal** : les **règles/décisions plateforme que TOUTE app TheSocle hérite** — le
@@ -77,6 +77,16 @@
 `iam` · `vault` · `storage (S3/MinIO)` · `mail (James)` · `clamav (scan uploads)` · `backup (→S3)` ·
 `apim` · `agentia / pack-ia (LLM)` · `proxy` · `dns` · `acme (TLS)` · `signature` · `tsa` · `nats` ·
 `cache` · `cosmo (cal/contacts)` · `onlyoffice` · `status/techdb`.
+
+**Où chercher, dans cet ordre** (kit 1.11.0) :
+1. le besoin est-il un service rendu par le Hub ? → `APP-ZZ-TEMPLATE/docs/services-disponibles/`
+   (43 guides, index `00-index.md`) — on le **consomme** ;
+2. ce qui reste à écrire dans l'app → `APP-ZZ-TEMPLATE/docs/use-cases/` (148 fiches, index
+   `INDEX.md`) — on **suit la fiche**, pas le code d'un voisin ;
+3. aucun des deux → `NON COUVERT`, dit avant de coder, et le catalogue s'enrichit ensuite.
+
+Chaque brique du plan technique (M6) cite sa référence dans la table de routage ; le contrôle
+avant go (5.6, 5.7) vérifie qu'elle existe.
 
 ## 11. Qualité → **clause AgileIA**
 - **Zéro mock / simulation / régression.** Sans dépendance réelle → état **honnête** (`en_attente`),

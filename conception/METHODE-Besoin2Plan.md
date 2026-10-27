@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.10.0 -->
+<!-- KIT-VERSION: 1.11.0 -->
 # Méthode AgileIA — Besoin → Plan (Spec de besoins → US → Features → Épics → Phasage → Plan technique)
 
 > **But** : passer proprement d'un **besoin métier exprimé** à un **plan technique exécutable**, sans
@@ -160,6 +160,20 @@ glm47 via APIM…) : une autre session du même modèle est une relecture de con
   1. **Réutilisation plateforme** — ce qu'on **ne code pas** (iam/vault/storage/agentia/db/pipeline…).
   2. **Briques nouvelles** — workers / services / stages / packages, **choisis par nature** (cf. arbre
      V005), pas par épic.
+
+     **Le routage de chaque brique, dans cet ordre** — avant d'écrire une brique, on cherche
+     où elle est déjà décrite :
+     1. **le besoin est-il un service rendu par la plateforme ?** → le catalogue des services
+        (`APP-ZZ-TEMPLATE/docs/services-disponibles/`, 43 guides) ; si oui, la brique
+        **consomme** ce service et cite son guide (`howto-NN`), elle ne le réimplémente pas ;
+     2. **ce qui reste à écrire dans l'app** → le catalogue des mécanismes
+        (`APP-ZZ-TEMPLATE/docs/use-cases/`, 148 fiches) ; la brique cite sa fiche (`UC-XXX-NN`)
+        et **suit le mécanisme qu'elle prescrit**, pas le code d'un voisin ;
+     3. **aucun des deux ne couvre le cas** → la brique porte `NON COUVERT`, c'est dit avant de
+        coder, et le catalogue concerné s'enrichit une fois la solution trouvée (M7).
+
+     L'ordre compte : interrogé à l'envers, l'agent réécrit un service que la plateforme rend déjà.
+     Une brique **sans référence** n'est pas prête : le contrôle avant go la bloque.
   3. **Modèle de données** (tables, standard THESOCLE).
   4. **Matrice de couverture** `US → épic → phase → brique → tests` (le garde-fou, **source de
      vérité du mapping**, cf. §0 et §3 — colonne Tests : tags `@US-x`/`@RG-x`/`@neg`).
@@ -171,7 +185,8 @@ glm47 via APIM…) : une autre session du même modèle est une relecture de con
   6. **Mapping habilitations → IAM** — rôles métier → rôles/scopes `manifest.json`, mode SSO par
      route, compte de service (pilier conception, doctrine : RBAC gros grain = IAM Hub, conditions
      fines = RG `droit_acces` en code).
-- **DoD** : chaque US est tracée jusqu'à une brique ; aucune brique orpheline ; aucune US oubliée.
+- **DoD** : chaque US est tracée jusqu'à une brique ; aucune brique orpheline ; aucune US oubliée ;
+  **chaque brique cite son guide de service, sa fiche de mécanisme, ou porte `NON COUVERT`**.
   **Relecture requise.**
 
 ### M7 — Exécution & câblage
@@ -183,6 +198,8 @@ glm47 via APIM…) : une autre session du même modèle est une relecture de con
 - **Règles** : code par **incréments atomiques** ; **preuve réelle à chaque gate** — démo de la phase
   **+ re-vérification des gates précédentes** (re-démo rapide ou suite de tests, cf. M6.5) ; **zéro
   mock** ; **double-track** — chaque phase produit code + trace de suivi + raffinement du kit méthode.
+  **Le code suit la fiche citée en M6** ; chaque brique `NON COUVERT` livrée laisse une fiche
+  nouvelle dans le catalogue concerné, ou un ticket daté pour l'écrire.
 - **La gate d'un écran, liste fixe** (RETEX Your360 2026-10-26 : cinq défauts d'écran en une
   soirée, invisibles à 202 tests de services verts, tous trouvés par le commanditaire ou par la
   suite E2E en jouant la chaîne) :
@@ -254,7 +271,9 @@ voit le chemin besoin→code→démo. C'est **ici** — et seulement ici — que
 ## 4. Principes transverses (non négociables)
 
 - **Réutilisation plateforme** : on n'écrit aucune brique déjà fournie (auth, secrets, storage, LLM,
-  pipeline…). Anti-extrapolation.
+  pipeline…). Anti-extrapolation. **Elle se prouve par une référence** : chaque brique de M6 cite
+  le guide du service qu'elle consomme ou la fiche du mécanisme qu'elle suit — d'abord les
+  services, ensuite les mécanismes, sinon `NON COUVERT` dit avant de coder.
 - **Aucun mock, aucune simulation, aucune régression** (clause AgileIA). Sans dépendance réelle → état
   **honnête** (`en_attente`), jamais un faux résultat.
 - **Contrat de sortie explicite** : à chaque étape, on sait **ce qu'elle produit** avant de la lancer.
@@ -320,6 +339,8 @@ Dans les deux cas, mêmes invariants : **phasage gaté**, **anti-extrapolation**
 - [ ] M5 Phases avec **gate = démo** ; préfixe de phase déclaré ; P-0 = socle *(⚗️ candidate)*
 - [ ] M6 Plan technique + **matrice de couverture** (US→épic→phase→brique→**tests**, colonne statut) +
       **plan de test** + **mapping habilitations→IAM** — **relu**
+- [ ] M6 Routage : chaque brique cite son **guide de service** (`howto-NN`) ou sa **fiche de
+      mécanisme** (`UC-XXX-NN`), dans cet ordre, sinon `NON COUVERT` — aucune brique sans référence
 - [ ] M7 Câblage : **inputs rassemblés** (`inputs/`), outils Hub, cible d'exécution, build/deploy
 - [ ] M7 Suivi : un dossier `tracking/<P-x>/` par phase (`STATE/JOURNAL/tasks`), **preuve à chaque
       gate + gates précédentes re-vérifiées**, zéro mock

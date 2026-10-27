@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.8.0 -->
+<!-- KIT-VERSION: 1.11.0 -->
 <!-- PROUVE-SUR: — (niveau Feature v1.8 non prouvé ; chaîne de base prouvée sur Régie kit v1.0) -->
 # M6 · Plan technique + matrice de couverture — {{nom du chantier}}
 
@@ -19,6 +19,23 @@ Traduire chaque phase en briques techniques + prouver la couverture.
 des gates précédentes) · 6. **Mapping habilitations → IAM** (rôles métier → rôles/scopes
 `manifest.json` + mode SSO par route, §3 de `TEMPLATE-HABILITATIONS.md`).
 
+### 3 bis. Routage des briques (dans cet ordre : services, puis mécanismes)
+Avant d'écrire une brique, on cherche où elle est déjà décrite :
+1. **un service de la plateforme ?** → `APP-ZZ-TEMPLATE/docs/services-disponibles/` (index
+   `00-index.md`) : on le **consomme** et on cite le guide ;
+2. **sinon, un mécanisme du socle ?** → `APP-ZZ-TEMPLATE/docs/use-cases/` (index `INDEX.md`) : on
+   cite la fiche et on **suit le mécanisme qu'elle prescrit** ;
+3. **sinon** → `NON COUVERT`, écrit ici avant de coder ; le catalogue s'enrichit en M7.
+
+| Brique | Ce qu'elle fait | Service consommé (`howto-NN`) | Mécanisme suivi (`UC-XXX-NN`) | Non couvert |
+|--------|-----------------|-------------------------------|-------------------------------|-------------|
+| `{{NomWorker}}` | `{{publie l'événement « idée reçue » sur NATS}}` | `{{howto-37}}` | `{{UC-RES-01}}` | |
+| `{{NomService}}` | `{{calcule le score}}` | — | `{{UC-DOM-02}}` | |
+| `{{NomStage}}` | `{{…}}` | — | — | `{{NON COUVERT — pourquoi, et quel catalogue enrichir}}` |
+
+> Une brique peut citer un guide **et** une fiche : elle consomme un service par un mécanisme du
+> socle. Une ligne sans aucune des trois colonnes remplies bloque le contrôle avant go.
+
 ## 4. Relations (mermaid)
 ```mermaid
 flowchart LR
@@ -36,6 +53,7 @@ flowchart LR
 - [ ] Chaque US tracée jusqu'à une brique (aucune orpheline)
 - [ ] Aucune brique sans US
 - [ ] Réutilisation plateforme explicitée · **zéro mock**
+- [ ] Table de routage remplie : chaque brique cite son guide, sa fiche, ou porte `NON COUVERT`
 - [ ] Colonne **Tests** remplie (aucune US sans test ni démo listée) · plan de test posé
 - [ ] Mapping habilitations → IAM complet (si pilier conception actif)
 - [ ] **Relecture faite** (relecteur défini en M0)

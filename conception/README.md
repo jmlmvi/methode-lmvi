@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.10.0 -->
+<!-- KIT-VERSION: 1.11.0 -->
 # Pilier CONCEPTION — la méthode M0→M7 · RG · Habilitations · Tests
 
 > **LE kit de conception** : la chaîne complète Besoin→Plan (M0→M7) + les artefacts que le client
@@ -31,7 +31,7 @@
 | [`TEMPLATE-M3-epics.md`](TEMPLATE-M3-epics.md) · [`TEMPLATE-EPIC.md`](TEMPLATE-EPIC.md) · [`TEMPLATE-FEATURE.md`](TEMPLATE-FEATURE.md) | M3 · index + **fiche épic** + **fiche feature** (hiérarchie **Épic → Feature → US**, obligatoire) |
 | [`TEMPLATE-M4-arbitrages.md`](TEMPLATE-M4-arbitrages.md) | M4 · Arbitrages |
 | [`TEMPLATE-M5-phasage.md`](TEMPLATE-M5-phasage.md) | M5 · Phasage gaté (+ convention de préfixe) |
-| [`TEMPLATE-M6-plan-technique.md`](TEMPLATE-M6-plan-technique.md) | M6 · Plan + matrice (colonne Tests) + mapping IAM |
+| [`TEMPLATE-M6-plan-technique.md`](TEMPLATE-M6-plan-technique.md) | M6 · Plan + **routage des briques** (guide de service / fiche de mécanisme) + matrice (colonne Tests) + mapping IAM |
 | [`TEMPLATE-M7-execution.md`](TEMPLATE-M7-execution.md) | M7 · Exécution & câblage (+ suivi par phase) |
 | [`TEMPLATE-RG.md`](TEMPLATE-RG.md) | **fiche règle de gestion** (M1 — typée, tracée, testable) |
 | [`TEMPLATE-HABILITATIONS.md`](TEMPLATE-HABILITATIONS.md) | **matrice rôle × US** (M1, signée métier) + mapping IAM (M6) |

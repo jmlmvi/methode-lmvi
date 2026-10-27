@@ -103,7 +103,7 @@ fi
 # =============================================================== 2. Identité ===
 titre "2. Identité"
 
-USERS=$(grep -hoiE 'CREATE TABLE (IF NOT EXISTS )?[a-z_]*\.?(z_|db_|tr_)?(users?|utilisateurs?|accounts?|sessions?|passwords?)\b' $SQL_FILES 2>/dev/null | sort -u)
+USERS=$(grep -hoiE 'CREATE TABLE (IF NOT EXISTS )?[a-z_]*\.?(z_|db_|tr_)?(users?|utilisateurs?|accounts?|sessions?|passwords?)\b' ${SQL_FILES:-/dev/null} 2>/dev/null < /dev/null | sort -u)
 [ -z "$USERS" ] && ok "2.1" "aucune table d'utilisateurs / sessions / mots de passe" \
                || ecart "2.1" "table d'identité dans l'app : $(echo $USERS | tr '\n' ' ')"
 
@@ -142,6 +142,61 @@ FUITES=$(grep -rlEi '(password|secret|api[_-]?key|token)[[:space:]]*[:=][[:space
          | grep -vE '(\$\{|example|sample|CHANGEME|xxx|<.*>)' | head -5)
 [ -z "$FUITES" ] && ok "4.1/4.4" "aucun secret apparent dans le dépôt" \
                  || { ecart "4.1/4.4" "secret possible dans :"; echo "$FUITES" | sed "s|$APP_DIR/|             |"; }
+
+# ====================================================== 5. Ce qu'on ne réécrit pas
+titre "5. Ce qui ne doit pas être réécrit"
+
+# La table de routage de M6 (§3 bis du gabarit) : chaque brique cite un guide de
+# service (howto-NN), une fiche de mécanisme (UC-XXX-NN), ou porte NON COUVERT.
+# Les catalogues sont ceux d'APP-ZZ-TEMPLATE, voisin des apps ; surchargeables.
+CAT_RACINE="$(dirname "$APP_DIR")/APP-ZZ-TEMPLATE/docs"
+CAT_SERVICES="${CATALOGUE_SERVICES:-$CAT_RACINE/services-disponibles}"
+CAT_UC="${CATALOGUE_UC:-$CAT_RACINE/use-cases}"
+M6_PLAN="$CHANTIER/M6-plan-technique/README.md"
+
+if [ ! -f "$M6_PLAN" ]; then
+  ecart "5.6" "pas de M6-plan-technique/README.md — aucune brique n'est routée"
+else
+  ROUTAGE=$(awk '
+    /^\|/ && !t && /[Bb]rique/ && /UC-/ && /howto/ { t=1; next }
+    t && /^\|/ && !/[A-Za-z0-9]/                    { next }
+    t && /^\|/ {
+      b=$0; sub(/^\|[ \t]*/,"",b); sub(/[ \t]*\|.*/,"",b); gsub(/`/,"",b)
+      r=$0; sub(/^\|[^|]*\|[^|]*\|/,"",r)
+      print b "\t" r; next
+    }
+    t && !/^\|/ { exit }' "$M6_PLAN")
+
+  if [ -z "$ROUTAGE" ]; then
+    ecart "5.6" "aucune table de routage dans M6 (colonnes Brique, howto-NN, UC-XXX-NN)"
+  else
+    NB=0; NC=0; SANS=""; INVENTES=""; CAT_ABSENT=""
+    while IFS=$'\t' read -r b r; do
+      NB=$((NB+1))
+      if echo "$r" | grep -q '{{'; then SANS="$SANS $b"; continue; fi
+      REFS=$(echo "$r" | grep -oiE 'howto-[0-9]{2}|UC-[A-Z]{2,3}-[0-9]{2}' | sed -E 's/^[Hh][Oo][Ww][Tt][Oo]/howto/')
+      if [ -z "$REFS" ]; then
+        if echo "$r" | grep -qi 'NON COUVERT'; then NC=$((NC+1)); else SANS="$SANS $b"; fi
+        continue
+      fi
+      for x in $REFS; do
+        case "$x" in howto-*) d="$CAT_SERVICES" ;; *) d="$CAT_UC" ;; esac
+        if [ ! -d "$d" ]; then CAT_ABSENT="$d"
+        elif ! ls "$d/$x"-*.md >/dev/null 2>&1; then INVENTES="$INVENTES $x"; fi
+      done
+    done <<< "$ROUTAGE"
+
+    [ -z "$SANS" ] && ok "5.6" "$NB brique(s) routée(s), dont $NC NON COUVERT" \
+                   || ecart "5.6" "brique(s) sans référence :$SANS"
+    if [ -n "$CAT_ABSENT" ]; then
+      inconnu "5.7" "catalogue introuvable : $CAT_ABSENT (CATALOGUE_SERVICES / CATALOGUE_UC)"
+    elif [ -z "$INVENTES" ]; then
+      ok "5.7" "toutes les références citées existent dans les catalogues"
+    else
+      ecart "5.7" "référence(s) absente(s) des catalogues :$INVENTES"
+    fi
+  fi
+fi
 
 # =========================================================== 6. Architecture ===
 titre "6. Architecture"

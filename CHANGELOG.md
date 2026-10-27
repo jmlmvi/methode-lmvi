@@ -4,6 +4,32 @@
 > (procédure : README racine, « Resync d'une instance »). Ce fichier est auto-versionné par ses
 > entrées (pas de marqueur `KIT-VERSION`, cf. charte U-DOCS §3).
 
+## 1.11.0 — 2026-10-27
+
+**Le routage avant la brique.** M6 disait « réutiliser la plateforme » sans dire où regarder. Deux
+catalogues existent pourtant dans le squelette d'app, et ne répondent pas à la même question :
+`APP-ZZ-TEMPLATE/docs/services-disponibles/` (43 guides : *quel service du Hub je consomme au lieu
+de le recoder ?*) et `APP-ZZ-TEMPLATE/docs/use-cases/` (148 fiches : *par quel mécanisme du socle
+je l'écris dans mon code ?*). Aucun fichier du kit ne les citait. C'est au plan technique qu'un
+agent réécrit un service que la plateforme rend déjà, et c'est là que la règle manquait.
+
+- **`METHODE-Besoin2Plan.md`** : M6.2, **le routage de chaque brique, dans cet ordre** — service
+  de la plateforme d'abord, mécanisme du socle ensuite, sinon `NON COUVERT` dit avant de coder ;
+  DoD de M6, M7 (le code suit la fiche, un `NON COUVERT` livré laisse une fiche), §4 et §7 alignés.
+- **`TEMPLATE-M6-plan-technique.md`** : §3 bis, la **table de routage** (brique · guide
+  `howto-NN` · fiche `UC-XXX-NN` · non couvert) et sa ligne de DoD.
+- **`TEMPLATE-CONTROLE-AVANT-GO.md`** : lignes 5.6 à 5.9 — chaque brique routée, chaque
+  référence existante, l'ordre suivi, chaque `NON COUVERT` justifié.
+- **`controle-avant-go.sh`** : 5.6 et 5.7 mécaniques. Le script lit la table de routage de M6 et
+  vérifie que chaque `howto-NN` et `UC-XXX-NN` cité existe dans les catalogues (voisins
+  `../APP-ZZ-TEMPLATE/docs/`, surchargeables par `CATALOGUE_SERVICES` et `CATALOGUE_UC`). Corrige
+  au passage un blocage : sans fichier SQL, le point 2.1 lisait l'entrée standard et attendait.
+- **`CONTRAT-ARCHITECTURE.md`** §10, **`inputs-corpus/`** slots 0 et 2 : les deux catalogues
+  nommés comme sources canoniques.
+
+La règle qui fait mal : **une brique sans référence n'est pas prête**. Si personne n'a cherché, le
+plan ne sait pas si elle double un service.
+
 ## 1.10.0 — 2026-10-26
 
 **La preuve d'un écran.** La méthode prouvait une US par son test d'acceptation et une phase par
