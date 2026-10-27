@@ -231,7 +231,7 @@ réutilisable.
 ```http
 GET /api/some-endpoint HTTP/1.1
 Host: admin.thesocle.net
-Authorization: Bearer eyJhbGciOiJSUzI1NiIs...
+Authorization: Bearer <jeton JWT>
 ```
 
 Pas de cookie automatique ni de header custom. C'est le standard OAuth 2.0

@@ -4,6 +4,12 @@
 > (procédure : README racine, « Resync d'une instance »). Ce fichier est auto-versionné par ses
 > entrées (pas de marqueur `KIT-VERSION`, cf. charte U-DOCS §3).
 
+## 1.12.1 — 2026-10-27
+
+Trois lignes d'exemple de `services-disponibles/` arrêtaient le contrôle anti-secret de la
+publication des skills ; toutes trois étaient fictives (en-tête PEM écrit par du code, clé tronquée
+`MIIE...`, en-tête JWT seul). Reformulées en gabarits, dans la source et dans les copies.
+
 ## 1.12.0 — 2026-10-27
 
 **Les fiches elles-mêmes sont dans le kit.** Les deux tables nommaient les 44 guides et les 148

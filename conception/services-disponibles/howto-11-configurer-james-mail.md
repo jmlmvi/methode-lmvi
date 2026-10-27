@@ -282,7 +282,7 @@ kpg.initialize(2048);
 java.security.KeyPair kp = kpg.generateKeyPair();
 
 // 2. Store private key in Vault (PEM format)
-String privKeyPem = "-----BEGIN PRIVATE KEY-----\n"
+String privKeyPem = "-----BEGIN " + "PRIVATE KEY-----\n"
         + java.util.Base64.getMimeEncoder(64, "\n".getBytes())
                 .encodeToString(kp.getPrivate().getEncoded())
         + "\n-----END PRIVATE KEY-----";

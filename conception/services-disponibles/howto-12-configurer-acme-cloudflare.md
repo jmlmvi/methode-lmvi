@@ -343,7 +343,7 @@ docker exec soclehub-vault vault kv get -format=json soclehub/certs/app2.thesocl
 # {
 #   "data": {
 #     "data": {
-#       "private_key": "-----BEGIN PRIVATE KEY-----\nMIIE...\n-----END PRIVATE KEY-----",
+#       "private_key": "<clé privée au format PEM>",
 #       "chain":       "-----BEGIN CERTIFICATE-----\nMIIF...",
 #       "issued_at":   "2026-04-28T14:30:01Z",
 #       "issuer":      "Let's Encrypt"
