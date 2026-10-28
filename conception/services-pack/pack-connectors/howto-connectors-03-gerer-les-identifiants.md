@@ -2,7 +2,7 @@
 
 **Niveau :** Intermédiaire
 **Cible :** exploitant ou développeur qui pose les clés Notion / Google / Stripe / HubSpot d'une app
-**Versions vérifiées au code (2026-10-28) :** `socle-pack-connectors:2.0.0` — `VaultCredentialResolver`,
+**Versions vérifiées au code (2026-10-28) :** `socle-pack-connectors:3.0.0` (Boot 4.0.6 ; code de ce périmètre identique à 2.0.0, dernière version Boot 3) — `VaultCredentialResolver`,
 `ConnectorsProperties`, `NotionClient`, `GoogleAuthService`, `StripeWorker`, `HubspotWorker`
 **Temps estimé :** 15 min
 

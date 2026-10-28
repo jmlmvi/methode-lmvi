@@ -10,11 +10,11 @@ gabarits vivent dans le schéma PostgreSQL de l'app. Le canal EMAIL **délègue 
 
 | | |
 |---|---|
-| Version documentée | **1.1.0** (`pom.xml`) |
-| Référence git | dépôt `/opt/2026-TheHub4TheSocle/socle-pack-com`, branche `main`, commit `6abb702` (2026-10-02), à jour avec `origin/main` |
-| Construit contre | `socle-v005` 5.7.4 (`provided`), parent Spring Boot 3.2.1, Java 21 |
+| Version documentée | **2.0.0** (`pom.xml`) — Spring Boot 4.0.6. **Dernière version Boot 3 = 1.1.0** (commit `6abb702`, branche `main`) pour les apps restées en Boot 3.2.1 / socle ≤ 5.7.x |
+| Référence git | dépôt `/opt/2026-TheHub4TheSocle/socle-pack-com`, branche `feat/boot4`, commit `ffbfd75` (2026-10-28), poussée sur `origin` ; pas encore fusionnée dans `main`, pas de tag |
+| Construit contre | `socle-v005` 5.9.0 (`provided`, propriété `socle.version`), parent Spring Boot **4.0.6**, Java 21. Compile aussi contre 5.8.6 et 5.8.8 : socle minimal **5.8.6** |
 | Distribution | installé dans `~/.m2` de la box de build (`mvn install`) ; ni vendorisé, ni vu sur un dépôt distant |
-| Contenu | 4 workers PASSIVE, 22 actions MCP, 4 tables, 6 scripts SQL, 34 tests |
+| Contenu | 4 workers PASSIVE, 22 actions MCP, 4 tables, 6 scripts SQL, 35 tests (dont un démarrage de contexte Spring Boot 4), tous verts, aucun sauté |
 | Vérifié au code le | 2026-10-28 |
 
 ## Besoin → HOWTO
@@ -48,12 +48,14 @@ gabarits vivent dans le schéma PostgreSQL de l'app. Le canal EMAIL **délègue 
   **APP-25 UniqPersonnality** (1.1.0, SMTP James, contenu non conservé), **APP-12 RssArchiver**
   (encore en 1.0.0-SNAPSHOT, aux côtés de socle-pack-Editorial). APP-28 Your360 (socle 5.9.4) l'a écarté au profit
   d'un `GatewayWorker` maison en attendant une version Boot 4.
+- **Candidates à la 2.0.0** (Boot 4, socle ≥ 5.8.6) : BingFetch (5.8.6) et UniqPersonnality (5.8.9), qui
+  embarquent aujourd'hui la 1.1.0 Boot 3 dans une app Boot 4 ; Your360 (5.9.4) peut revenir au pack.
+  `socle-pack-Editorial` doit passer en Boot 4 pour suivre (il dépend de ce pack).
 
 ## Écarts README / code et fonctions incomplètes (le code fait foi)
 
-| Sujet | Documentation du pack | Code 1.1.0 |
+| Sujet | Documentation du pack | Code 2.0.0 (= 1.1.0) |
 |---|---|---|
-| Version | README, `socle-pack.json` : 1.0.0 | 1.1.0 |
 | Fournisseurs email | `smtp`, `brevo` | + `hub` (relais `mail_worker`) |
 | Invocation | `POST /api/actions/notify_worker__…` | une app s'invoque par `POST /mcp` (`notify_worker__…`) |
 | Vault | « credentials lus depuis Vault d'abord » | jamais consulté (`appId` toujours `null`) |
@@ -63,7 +65,10 @@ gabarits vivent dans le schéma PostgreSQL de l'app. Le canal EMAIL **délègue 
 | Digest `LOW` | spec | non implémenté |
 | Purge inbox / journal | « auto-purge » (commentaire DDL) | aucune |
 | Variables `SOCLE_COMM_EMAIL_HUB_*`, `LOG_CONTENT`, `RETRY_*` | absentes de `ENV-REFERENCE.md` et du manifeste | lues par `CommProperties` |
-| `contexte.md` | « socle 5.2.0, ne compile pas » | obsolète : 5.7.4, 34 tests verts |
+| `contexte.md` | « socle 5.2.0, ne compile pas » | obsolète : 5.9.0 / Boot 4, 35 tests verts |
+
+Corrigé en 2.0.0 : README et `socle-pack.json` annonçaient 1.0.0 — ils portent désormais la
+version, le socle minimal (5.8.6) et Boot 4.0.6 ; un `CHANGELOG.md` existe.
 
 Défauts constatés au code (détail dans les HOWTOs) : anti-doublon qui échoue en mono-tenant
 (`? IS NULL` sans type, COM-05) ; `update_config` qui duplique les lignes à partition NULL

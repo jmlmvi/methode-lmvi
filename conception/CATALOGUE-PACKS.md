@@ -24,12 +24,12 @@ touche cette fonctionnalité, le howto donne le contournement ; à corriger **da
 | Ma brique embarque… | Howto | État |
 |---|---|---|
 | `socle-pack-ai` (2.7.x Boot 4 ; 2.4.x pour une app Boot 3) | [`howto-ai-01`](services-pack/pack-ai/howto-ai-01-integrer-le-pack.md) · [`howto-ai-09`](services-pack/pack-ai/howto-ai-09-lignee-2-4-x-pour-les-apps-boot-3.md) | à construire (2.7.14 absente de `~/.m2`) |
-| `socle-pack-comm` (Boot 3) | [`howto-com-01`](services-pack/pack-com/howto-com-01-integrer-le-pack.md) | à construire |
-| `socle-pack-connectors` (Boot 3) | [`howto-connectors-01`](services-pack/pack-connectors/howto-connectors-01-integrer-le-pack.md) | à construire |
-| `socle-pack-editorial` (Boot 3, dépend de ai + comm) | [`howto-editorial-01`](services-pack/pack-editorial/howto-editorial-01-integrer-le-pack.md) | à construire (SNAPSHOT) |
-| `socle-pack-egress` | [`howto-egress-01`](services-pack/pack-egress/howto-egress-01-integrer-le-pack.md) | à construire |
+| `socle-pack-comm` 2.0.0 (Boot 4 ; 1.1.0 pour Boot 3) | [`howto-com-01`](services-pack/pack-com/howto-com-01-integrer-le-pack.md) | à construire (branche `feat/boot4`, jar dans `~/.m2`) |
+| `socle-pack-connectors` 3.0.0 (Boot 4 ; 2.0.0 pour Boot 3) | [`howto-connectors-01`](services-pack/pack-connectors/howto-connectors-01-integrer-le-pack.md) | à construire (branche `feat/boot4`) |
+| `socle-pack-editorial` 2.0.0 (Boot 4, dépend de ai 2.7.x + comm 2.0.0) | [`howto-editorial-01`](services-pack/pack-editorial/howto-editorial-01-integrer-le-pack.md) | à construire (branche `feat/boot4`) |
+| `socle-pack-egress` 2.0.0 (Boot 4 ; 1.0.0 pour Boot 3) | [`howto-egress-01`](services-pack/pack-egress/howto-egress-01-integrer-le-pack.md) | à construire (branche `feat/boot4` ; test contre le Hub à rejouer) |
 | `socle-pack-mail` (Boot 4, dépend de ai) | [`howto-mail-01`](services-pack/pack-mail/howto-mail-01-integrer-le-pack.md) | à construire (1.4.0 non commitée) |
-| `socle-pack-pipeline` (Boot 3) | [`howto-pipeline-01`](services-pack/pack-pipeline/howto-pipeline-01-integrer-le-pack.md) | à construire (SNAPSHOT, branche non fusionnée) |
+| `socle-pack-pipeline` 0.2.0 (Boot 4 ; 0.1.0-SNAPSHOT pour Boot 3) | [`howto-pipeline-01`](services-pack/pack-pipeline/howto-pipeline-01-integrer-le-pack.md) | à construire (branche `feat/boot4` ; collision `pipelineProperties` corrigée) |
 | `socle-pack-tenant` (Boot 4) | [`howto-tenant-01`](services-pack/pack-tenant/howto-tenant-01-integrer-le-pack.md) | prêt (0.5.0) |
 
 ### IA et texte

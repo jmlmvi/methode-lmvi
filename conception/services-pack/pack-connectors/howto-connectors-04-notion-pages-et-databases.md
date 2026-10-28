@@ -2,7 +2,7 @@
 
 **Niveau :** Intermédiaire
 **Cible :** app, agent MCP ou opérateur qui pilote un workspace Notion via `notion_worker`
-**Versions vérifiées au code (2026-10-28) :** `socle-pack-connectors:2.0.0` — `NotionWorker` (20 actions),
+**Versions vérifiées au code (2026-10-28) :** `socle-pack-connectors:3.0.0` (Boot 4.0.6, socle 5.9.0) — `NotionWorker` (20 actions),
 `NotionClient`, `PropertyConverter` ; API Notion `2022-06-28` (défaut `socle.conn.notion.version`)
 **Temps estimé :** 20 min
 
@@ -204,6 +204,7 @@ WHERE connector = 'notion' ORDER BY x_id DESC LIMIT 10;
 | Piège | Symptôme | Correction |
 |---|---|---|
 | **`search_pages`, `query_database`, `list_workspace_pages` sur la dernière page de résultats** | Échec avec erreur **vide** (`error: null`) dès que `has_more=false` | `Map.of(…, "next_cursor", null)` lève une `NullPointerException` (vérifié avec Jackson 2.15.4). Utiliser `get_database_full` (construit sa réponse en `LinkedHashMap`) ou `NotionDatabaseService` |
+| `get_page` → `blocks`, `get_database_full` → `properties_schema` en pack **2.0.0** sur une app socle ≥ 5.8 | Champ rempli de clés Java (`nodeType`, `array`, `containerNode`…) au lieu du JSON Notion | **Corrigé en 3.0.0** : ces champs sont des `List`/`Map` (le serveur MCP du socle 5.8+ écrit en Jackson 3, qui ne reconnaît pas un `JsonNode` Jackson 2). Monter en 3.0.0 |
 | Écrire un titre ou un `select` par action | `HTTP 400 … is expected to be title/select` | `NotionDatabaseService.upsertDatabaseRow` avec schéma |
 | Une chaîne contenant `@` et `.` (« RDV @ 14.30 ») | Envoyée comme `email`, refus 400 | Schéma explicite |
 | Page non partagée avec l'intégration | `HTTP 404` | *Connections* sur la page |

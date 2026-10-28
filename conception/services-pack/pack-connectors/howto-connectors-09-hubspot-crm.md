@@ -2,7 +2,7 @@
 
 **Niveau :** Intermédiaire
 **Cible :** app qui alimente ou consulte un CRM HubSpot
-**Versions vérifiées au code (2026-10-28) :** `socle-pack-connectors:2.0.0` — `HubspotWorker` (12 actions),
+**Versions vérifiées au code (2026-10-28) :** `socle-pack-connectors:3.0.0` (Boot 4.0.6 ; code de ce périmètre identique à 2.0.0, dernière version Boot 3) — `HubspotWorker` (12 actions),
 HubSpot CRM API v3, jeton Private App en `Authorization: Bearer`
 **Temps estimé :** 20 min
 

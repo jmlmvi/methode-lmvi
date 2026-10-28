@@ -1,7 +1,7 @@
 # HOWTO COM-07 — Envoyer des SMS (Twilio, OVH, Vonage, ou fournisseur maison)
 
 **Niveau :** Intermédiaire
-**Cible :** `eu.lmvi:socle-pack-comm` **1.1.0** (branche `main`, commit `6abb702`)
+**Cible :** `eu.lmvi:socle-pack-comm` **2.0.0** (branche `feat/boot4`, commit `ffbfd75` ; Spring Boot 4.0.6, socle 5.9.0) — comportement identique à 1.1.0, dernière version Boot 3
 **Vérifié au code le :** 2026-10-28
 **Prérequis :** [[howto-com-01-integrer-le-pack|COM-01]] ; un compte chez l'un des fournisseurs
 **Temps estimé :** 20 min

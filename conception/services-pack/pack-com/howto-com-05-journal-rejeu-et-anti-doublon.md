@@ -1,7 +1,7 @@
 # HOWTO COM-05 — Journal des envois, rejeu, anti-doublon et multi-tenant
 
 **Niveau :** Confirmé
-**Cible :** `eu.lmvi:socle-pack-comm` **1.1.0** (branche `main`, commit `6abb702`)
+**Cible :** `eu.lmvi:socle-pack-comm` **2.0.0** (branche `feat/boot4`, commit `ffbfd75` ; Spring Boot 4.0.6, socle 5.9.0) — comportement identique à 1.1.0, dernière version Boot 3
 **Vérifié au code le :** 2026-10-28 (requête d'anti-doublon rejouée en JDBC sur PostgreSQL 17 le même jour)
 **Prérequis :** [[howto-com-02-envoyer-une-notification-multicanal|COM-02]]
 **Temps estimé :** 30 min
@@ -133,7 +133,7 @@ Types seedés concernés (fenêtre effective > 0) : `SYSTEM_ALERT` (5 min, HIGH 
 (30), `HITL_REMINDER` (240). Non concernés : `USER_WELCOME`, `PASSWORD_RESET`, `NEWSLETTER`
 (0) et `HARD_CAP_BREACH` (CRITICAL).
 
-Conduite à tenir en 1.1.0, en mono-tenant :
+Conduite à tenir en 1.1.0 et 2.0.0, en mono-tenant :
 
 ```sql
 -- désactiver l'anti-doublon du pack ; le faire côté app si nécessaire
@@ -150,7 +150,7 @@ partition non nulle à `sendNotification`.
 
 Toutes les tables portent `x_partition VARCHAR(30)`. Ce que le pack fait réellement :
 
-| Mécanisme | Réalité en 1.1.0 |
+| Mécanisme | Réalité en 1.1.0 / 2.0.0 |
 |---|---|
 | Partition passée à `sendNotification(partition, …)` | utilisée pour config, gabarit, anti-doublon, journal, inbox |
 | Partition d'un appel MCP | lue par `TenantResolver` (`current_setting('app.current_tenant_id', true)`) sur une connexion du pool ; hors transaction de l'appelant elle vaut `null` |

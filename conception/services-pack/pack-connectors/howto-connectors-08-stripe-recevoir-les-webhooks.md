@@ -2,7 +2,7 @@
 
 **Niveau :** Confirmé
 **Cible :** app qui doit réagir à `checkout.session.completed`, `invoice.paid`, `customer.subscription.deleted`…
-**Versions vérifiées au code (2026-10-28) :** `socle-pack-connectors:2.0.0` — `StripeWebhookController`
+**Versions vérifiées au code (2026-10-28) :** `socle-pack-connectors:3.0.0` (Boot 4.0.6 ; contrôleur inchangé depuis 2.0.0) — `StripeWebhookController`
 (`POST /api/webhooks/stripe`), `StripeWorker.create_webhook_endpoint`, `StripeWorker.resolveWebhookSecret()`
 **Temps estimé :** 40 min
 
@@ -239,6 +239,7 @@ SELECT event_type, count(*) FROM schema_monapp.tr_stripe_event GROUP BY 1;
 | Écrire un contrôleur sur `/api/webhooks/stripe` | `Ambiguous mapping` au démarrage : le chemin appartient au contrôleur du pack | Choisir un autre chemin |
 | Rotation du secret Stripe | Le contrôleur du pack ne garde que le **dernier** `v1` du header | Le récepteur de l'app teste tous les `v1` |
 | Corps relu après désérialisation | Signature toujours fausse | Recevoir `@RequestBody String` brut |
+| `@RequestBody JsonNode` (Jackson 2) dans une app Boot 4 | `500 Cannot construct instance of JsonNode` avant même la signature | Le convertisseur HTTP de Boot 4 est Jackson 3 : `String` brut puis `new ObjectMapper().readTree(raw)`, comme ci-dessus. Le contrôleur du pack fait ainsi (couvert par `StripeWebhookBoot4Test` en 3.0.0) |
 | Traitement lent avant le `200` | Stripe réessaie : doublons | Dédoublonner sur `event.id` ; traitement lourd en asynchrone |
 | `whsec_` perdu | Impossible de le relire chez Stripe | Le poser dès `create_webhook_endpoint`, sinon recréer l'endpoint |
 | Chemin derrière le SSO du Hub | Stripe reçoit une redirection vers la connexion | Exclure le chemin du SSO |

@@ -8,11 +8,14 @@
 4. Résilience commune (rate limiter, retry ×3, circuit breaker par fournisseur) et journal `tr_connector_log` dans le schéma PostgreSQL de l'app.
 5. Services Notion réutilisables sans worker (`NotionDatabaseService`, `PropertyConverter`) et récepteur webhook Stripe signé (`POST /api/webhooks/stripe`, qui valide et journalise seulement).
 
-**Version documentée :** `2.0.0` (pom, `socle-pack.json`), compilée contre `socle-v005:5.7.4` et
-Spring Boot `3.2.1`, Java 21.
-**Référence git :** dépôt `socle-pack-Connectors`, branche `feat/connectors-enabled` @ `298f758`.
-Le mécanisme d'activation (`f3a3e08`) est **fusionné dans `main`** (`9e6d106`) ; la branche n'ajoute
-que `docs/preuves/README.md`. Aucun mécanisme n'est propre à la branche.
+**Version documentée :** `3.0.0` (pom, `socle-pack.json`) — **Spring Boot `4.0.6`**, construite et
+testée contre `socle-v005:5.9.0` (provided), compile aussi contre `5.8.8` ; socle minimal déclaré 5.8.4 ; Java 21.
+**Dernière version Boot 3 = `2.0.0`** (Boot 3.2.1, socle 5.7.4) : une app Boot 3 reste sur 2.0.0.
+**Référence git :** dépôt `socle-pack-Connectors`, branche `feat/boot4` @ `2be4a46` (partie de
+`feat/connectors-enabled` @ `298f758`) — **pas encore fusionnée dans `main`, pas de tag**.
+Ce que la 3.0.0 change pour une app : Boot 4 / socle ≥ 5.8.4 obligatoires ; `get_page.blocks` et
+`get_database_full.properties_schema` sortent enfin en JSON (voir CONNECTORS-04) ; `create_database`
+figure au manifeste.
 **Vérifié au code le :** 2026-10-28.
 
 ---
@@ -38,7 +41,7 @@ que `docs/preuves/README.md`. Aucun mécanisme n'est propre à la branche.
 
 | Connecteur | Actions | État |
 |---|---|---|
-| Notion | 20 (19 au manifeste + `create_database`) | Réel, sauf `import_zip_export` (**stub**, échoue toujours), `download_asset` (**stub**, renvoie l'URL), `register_webhook` (tentative best-effort) |
+| Notion | 20 (manifeste à jour depuis 3.0.0) | Réel, sauf `import_zip_export` (**stub**, échoue toujours), `download_asset` (**stub**, renvoie l'URL), `register_webhook` (tentative best-effort) |
 | Google Drive | 10 | Réel ; `list_files` échoue quand la réponse n'a pas de `nextPageToken` (CONNECTORS-06) |
 | Stripe | 12 + contrôleur webhook | Réel ; le contrôleur ne transmet pas les événements (CONNECTORS-08) |
 | HubSpot | 12 | Réel |
@@ -50,12 +53,13 @@ que `docs/preuves/README.md`. Aucun mécanisme n'est propre à la branche.
 import de `socle-pack-ai` ou `socle-pack-comm` (les classes de résilience sont recopiées localement).
 Dépendances techniques attendues de l'app hôte (scope `provided` dans le pack) : `socle-v005`,
 `spring-boot-starter-web`, `spring-boot-starter-jdbc`, `postgresql`, `jackson-databind` (Jackson 2),
-`log4j2`. Le pack apporte OkHttp 4.12.0.
+`log4j2`. Le pack apporte OkHttp 4.12.0. Le pack reste en Jackson 2 (`com.fasterxml`), comme le socle
+et les packs tenant/mail/ai ; Boot 4 apporte Jackson 2 et 3 côte à côte.
 
 ## Applications consommatrices
 
 Au 2026-10-28, **aucune APP-* du dépôt ne déclare la dépendance** (`grep -rl socle-pack-connectors
---include=pom.xml` : zéro résultat hors du pack). Les versions `1.0.0-SNAPSHOT` → `2.0.0` sont
+--include=pom.xml` : zéro résultat hors du pack). Les versions `1.0.0-SNAPSHOT` → `3.0.0` sont
 installées dans `~/.m2` de la box de build ; aucune n'est vendorisée dans un `mvn-repo/`. Les
 exemples de code des HOWTOs utilisent donc une app fictive `monapp` (`schema_monapp`).
 

@@ -2,7 +2,7 @@
 
 **Niveau :** Expert
 **Cible :** application qui embarque `socle-pack-pipeline`
-**Versions vérifiées au code :** `socle-pack-pipeline` 0.1.0-SNAPSHOT @ `5fa8f05` · `socle-v005` 5.8.0 (`VThreadStageExecutor` lu au bytecode) · date 2026-10-28
+**Versions vérifiées au code :** `socle-pack-pipeline` 0.2.0 @ `4cb5aa6` (branche `feat/boot4`, code fonctionnel identique à 0.1.0-SNAPSHOT @ `5fa8f05`) · `socle-v005` 5.9.0 / Spring Boot 4.0.6 (`VThreadStageExecutor` lu au bytecode) · date 2026-10-28
 **Temps estimé :** 45 min
 
 > Classes de référence : `engine/MessageIds`, `engine/DedupRegistry`, `engine/DagStageFunction`,

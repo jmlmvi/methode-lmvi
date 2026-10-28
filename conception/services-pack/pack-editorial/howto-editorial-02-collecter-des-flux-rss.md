@@ -1,8 +1,8 @@
 # HOWTO EDITORIAL-02 — Collecter des flux RSS/Atom avec `rss_collect_worker`
 
 **Niveau :** Intermédiaire
-**Cible :** application V005 embarquant le pack (lignée Boot 3.2.1)
-**Versions vérifiées au code (2026-10-28) :** `socle-pack-editorial:1.0.0-SNAPSHOT`, `main` @ `fffd6f9` —
+**Cible :** application V005 embarquant le pack — 2.0.0 sur Spring Boot 4.0.6 (1.0.0-SNAPSHOT sur Boot 3.2.1 : contenu identique)
+**Versions vérifiées au code (2026-10-28) :** `socle-pack-editorial:2.0.0`, `feat/boot4` @ `8879bf7` (fonctionnellement identique à `1.0.0-SNAPSHOT`, `main` @ `fffd6f9`) —
 classes `RssCollectWorker`, `RssCollectionService`, `RssFetcher`, `RssParser`, `Politesse`,
 `EnParallele`, `UrlNormalizer`, `LanguageDetector` ; migrations `V001`, `V010`, `V011`
 **Prérequis :** [[howto-editorial-01-integrer-le-pack|EDITORIAL-01]] fait

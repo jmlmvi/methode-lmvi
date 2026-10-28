@@ -14,15 +14,17 @@ remplace pas.
 
 | | |
 |---|---|
-| Artefact | `eu.lmvi:socle-pack-editorial:1.0.0-SNAPSHOT` (`socle-pack.json` annonce `1.0.0`) |
+| Artefact | `eu.lmvi:socle-pack-editorial:**2.0.0**` (`socle-pack.json` : `2.0.0`, 31 actions, socle min. 5.8.8) |
 | Dépôt | `/opt/2026-TheHub4TheSocle/socle-pack-Editorial` — `github.com/jmlmvi/socle-pack-Editorial` |
-| Référence git | branche **`main`** @ **`fffd6f9`** (2026-10-10, « chore: sauvegarde de session — paquet fetch ») |
-| Compilé contre | `socle-v005:5.7.4`, Spring Boot **3.2.1**, `socle-pack-ai:2.3.3`, `socle-pack-comm:1.0.0-SNAPSHOT` |
-| Tests | 17 classes, tous verts au dernier rapport Surefire ; `HitlWorker`, `RssCollectWorker`, `NewsletterRenderer` sans test |
+| Référence git | branche **`feat/boot4`** @ **`8879bf7`** (2026-10-28) — poussée, **ni fusionnée dans `main`, ni taguée** |
+| Compilé contre | Spring Boot **4.0.6**, `socle-v005:5.9.0` (`provided`, propriété `socle.version` ; compile aussi contre **5.8.8**), `socle-pack-ai:2.7.13`, `socle-pack-comm:2.0.0` (tous deux `provided`) |
+| Dernière version Boot 3 | **`1.0.0-SNAPSHOT`** — `main` @ `fffd6f9` (2026-10-10) : socle 5.7.4, Boot 3.2.1, ai 2.3.3, comm 1.0.0-SNAPSHOT. Les apps Boot 3 (RssArchiver) y restent |
+| Tests | 18 classes, **67 tests verts** (`mvn clean verify`, Testcontainers pgvector) dont `DemarrageContexteSpringTest` : vrai contexte Boot 4 avec ai + comm ; `HitlWorker`, `RssCollectWorker`, `NewsletterRenderer` sans test unitaire |
 | Vérifié au code | 2026-10-28 |
 
 **Comment une application l'obtient.** Aucune version n'est publiée (ni `maven.thesocle.net`, ni
-`mvn-repo/` vendorisé). L'application construit le pack depuis `main` (`mvn install`) puis vendorise
+`mvn-repo/` vendorisé). L'application construit le pack depuis `feat/boot4` (2.0.0, Boot 4) ou `main`
+(1.0.0-SNAPSHOT, Boot 3) (`mvn install`) puis vendorise
 le jar et le pom dans son propre `mvn-repo/` — [[howto-editorial-01-integrer-le-pack|EDITORIAL-01 §3]].
 Une branche `master` diverge de `main` (28 commits propres) : ne pas construire depuis elle.
 
@@ -59,8 +61,8 @@ Une branche `master` diverge de `main` (28 commits propres) : ne pas construire 
 
 | Pack | Ce qu'Editorial utilise | Présence |
 |---|---|---|
-| `socle-pack-ai` — [[howto-ai-01-integrer-le-pack\|AI-01]] | `GenerationWorker.generateOne` (score, résumé, intro), `FiveW1HService`, `TranslationService`, `WebWorker.fetch_smart`, `RagWorker.ingest_document` ; prompts `classify_generic`, `generate_summary` | jar **obligatoire** ; `GenerationWorker` requis si `curation_worker` actif ; le reste facultatif |
-| `socle-pack-comm` — [[howto-com-01-integrer-le-pack\|COM-01]] | `NotifyWorker.sendNotification` ; types `HITL_REMINDER`, `NEWSLETTER` | jar **obligatoire** ; bean facultatif (sans lui : ni relance, ni envoi) |
+| `socle-pack-ai` **2.7.x** (Boot 4 ; 2.4.x pour Boot 3) — [[howto-ai-01-integrer-le-pack\|AI-01]] | `GenerationWorker.generateOne` (score, résumé, intro), `FiveW1HService`, `TranslationService`, `WebWorker.fetch_smart`, `RagWorker.ingest_document` ; prompts `classify_generic`, `generate_summary` | jar **obligatoire** ; `GenerationWorker` requis si `curation_worker` actif ; le reste facultatif |
+| `socle-pack-comm` **2.0.0** (Boot 4 ; 1.x pour Boot 3) — [[howto-com-01-integrer-le-pack\|COM-01]] | `NotifyWorker.sendNotification` ; types `HITL_REMINDER`, `NEWSLETTER` | jar **obligatoire** ; bean facultatif (sans lui : ni relance, ni envoi) |
 | Service Hub **KEW** (APIM `api.thesocle.net`) | extraction mots-clés / Wikidata | facultatif, clé APIM — [[howto-39-provisionner-une-cle-apim-pour-une-app\|HOWTO 39]] |
 
 ---
@@ -69,7 +71,7 @@ Une branche `master` diverge de `main` (28 commits propres) : ne pas construire 
 
 | Application | Usage |
 |---|---|
-| **APP-12-RssArchiver** (`rssarchiver/pom.xml`, socle 5.7.4, pack-ai 2.7.7) | collecte RSS du pack ; `curation_worker` **désactivé** (`SOCLE_EDITORIAL_CURATION_WORKER_ENABLED=false`) ; réutilise `CurationConfigService`, `KewClient`, `BibliographicExtractor`, `ArticleBodyFetcher` dans son pipeline DAG (`eu.lmvi.pipeline.CurationSteps`) |
+| **APP-12-RssArchiver** (`rssarchiver/pom.xml`, Boot 3.2.1, socle 5.7.4, pack-ai 2.7.7 — reste sur editorial **1.0.0-SNAPSHOT**) | collecte RSS du pack ; `curation_worker` **désactivé** (`SOCLE_EDITORIAL_CURATION_WORKER_ENABLED=false`) ; réutilise `CurationConfigService`, `KewClient`, `BibliographicExtractor`, `ArticleBodyFetcher` dans son pipeline DAG (`eu.lmvi.pipeline.CurationSteps`) |
 | `APP-RAG-INDEPENDANT/02-sources/domain-pack-editorial` | **pas un consommateur** : une copie ancienne du pack (socle 5.2.0) sous les **mêmes coordonnées Maven** — à ne pas installer |
 
 ---
@@ -78,7 +80,8 @@ Une branche `master` diverge de `main` (28 commits propres) : ne pas construire 
 
 Le code fait foi ; chaque écart est repris dans les « Pièges courants » du HOWTO concerné.
 
-- README : 35 actions ; code : **31**. README : dépendances ai/comm en `1.0.0-SNAPSHOT` ; pom : ai **2.3.3**.
+- ~~README : 35 actions ; code : 31. README : dépendances ai/comm en `1.0.0-SNAPSHOT` ; pom : ai 2.3.3.~~
+  **Corrigé en 2.0.0** : README, manifeste et pom disent 31 actions, ai 2.7.x, comm 2.0.0.
 - README / exemples `curl …/api/actions/<worker>__<action>` sur l'app : cette porte est celle du Hub.
 - README / CLAUDE.md : `ClassificationWorker` fait le score ; code : `GenerationWorker` + prompt `scoring_prompt_id`.
 - CLAUDE.md : un article accepté en HITL est ingéré au RAG ; code : non, ni enrichi.
@@ -87,3 +90,21 @@ Le code fait foi ; chaque écart est repris dans les « Pièges courants » du H
   (newsletter) : déclarés, jamais lus.
 - `ENV-REFERENCE.md` ne couvre pas `kew.*`, `newsletter.base-url|unsubscribe-secret|scheduler-*`,
   `rss.min-content-chars-for-fetch|always-fetch-body`.
+
+---
+
+## Migration Boot 4 (2.0.0) — ce qu'elle a résolu, ce qu'elle impose
+
+- **API pack-ai inchangée** pour ce pack entre 2.3.3 et 2.7.13 (comparée par `javap`) : aucun changement
+  du code principal. Seuls les câblages manuels changent : `AgentIaLlmProvider(…, ResilienceFactory)`,
+  `StrategyDetector(…, SymbolJavaChunker)`.
+- **Journalisation** : sous Boot 4, `spring-boot-starter-jdbc` apporte `log4j-to-slf4j` ; il faut y
+  exclure `spring-boot-starter-logging` (le pack le fait ; l'app hôte aussi) —
+  [[howto-editorial-01-integrer-le-pack|EDITORIAL-01 §4]].
+- **`ObjectMapper` Jackson 2** : Boot 4 n'en fournit plus ; le web de pack-ai l'exige ; c'est
+  `SocleJacksonConfiguration` du socle qui le déclare → l'app doit balayer `eu.lmvi.socle` (§5 d'EDITORIAL-01).
+- **Jackson 3 côté HTTP** : le pack ne rend que des Map/List/scalaires (taxonomie KEW convertie en Map) ;
+  aucun `JsonNode` ne sort, pas de contrôleur.
+- **Inchangés** : actions MCP, propriétés `socle.editorial.*`, variables d'environnement, migrations SQL.
+  Les défauts fonctionnels listés plus haut (HITL `sendReminders` NPE, `update_curation_config`…) ne
+  sont **pas** corrigés par la 2.0.0.

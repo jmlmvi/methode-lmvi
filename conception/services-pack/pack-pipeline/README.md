@@ -14,22 +14,25 @@
 
 | Élément | Valeur |
 |---|---|
-| Artefact | `eu.lmvi:socle-pack-pipeline:0.1.0-SNAPSHOT` (jamais publié en release) |
+| Artefact | `eu.lmvi:socle-pack-pipeline:`**`0.2.0`** (première release, plus de SNAPSHOT) |
 | Dépôt | `/opt/2026-TheHub4TheSocle/socle-pack-pipeline` (git autonome, `github.com/jmlmvi/socle-pack-pipeline`) |
-| Réf. documentée | branche **`feat/p1-p4-dag-engine` @ `5fa8f05`** (2026-10-05) |
-| Compilé contre | `socle-v005` **5.8.0** (`provided`), parent Spring Boot **3.2.1**, `jnats` 2.19.1 (`provided`) |
-| Manifeste | `META-INF/socle-pack.json`, `minSocleVersion` 5.7.4 |
-| Où trouver le JAR | **uniquement `~/.m2` de la box de build** (installé par `mvn install` le 2026-10-05). Aucun `mvn-repo/` vendorisé, et le dépôt `maven.thesocle.net` ne le sert pas |
+| Réf. documentée | branche **`feat/boot4` @ `4cb5aa6`** (2026-10-28), issue de `feat/p1-p4-dag-engine` @ `5fa8f05` ; **non fusionnée dans `main`, pas de tag** |
+| Compilé contre | parent Spring Boot **4.0.6**, `socle-v005` **5.9.0** (`provided`, propriété `socle.version`) ; compile aussi contre 5.8.4 et 5.8.8. `jnats` 2.19.1 (`provided`) |
+| Manifeste | `META-INF/socle-pack.json`, `minSocleVersion` **5.8.4** (premier socle Boot 4), `springBootVersion` 4.0.6 |
+| Jackson | Jackson 2 (`com.fasterxml`, `provided`), comme le socle et les packs tenant/mail/ai. Le pack n'a aucun contrôleur HTTP : le Jackson 3 de Boot 4 ne voit jamais ses `JsonNode` |
+| Où trouver le JAR | **uniquement `~/.m2` de la box de build** (`mvn install` du 2026-10-28). Aucun `mvn-repo/` vendorisé, et le dépôt `maven.thesocle.net` ne le sert pas |
 
-**Ce que la branche a de plus que `main`** (`git diff main --stat`, `main` = `4c9bc17`) :
+**Dernière version Boot 3 = `0.1.0-SNAPSHOT`** (branche `feat/p1-p4-dag-engine` @ `5fa8f05`, Spring Boot 3.2.1,
+socle 5.8.0) — pour les apps restées en Boot 3.2.1 (RssArchiver, REGIES, BilanSocle). Elle n'est plus
+modifiée ; les apps Boot 4 passent en 0.2.0.
 
-| Fichier | Apport |
-|---|---|
-| `db/pipeline/V002__run_key_unique.sql` | ferme les doublons de `run_key` et pose un index unique partiel `NULLS NOT DISTINCT` (PostgreSQL ≥ 15) |
-| `runtime/PipelineRuntimeManager.java` | `instantiate` devient **idempotent sur `run_key`** : un run non terminé en base est repris au lieu d'être recréé |
-| `docs/preuves/README.md` | preuves du correctif |
+**0.2.0 corrige la collision `pipelineProperties`** avec le socle ≥ 5.8.6 : tous les beans du pack portent un
+nom explicite `pipelinePack*` (`pipelinePackProperties`, `pipelinePackWorker`, `pipelinePackRepository`,
+`pipelinePackDagBuilder`, `pipelinePackRuntimeManager`, …). Plus besoin de générateur de noms dans l'app.
+Prouvé par `PackContexteSocleTest` (contexte Spring socle 5.9.0 + pack, vrai PostgreSQL).
 
-Le JAR présent dans `~/.m2` contient déjà `V002` : les apps qui reconstruisent aujourd'hui embarquent donc la branche, pas `main`.
+Le contenu fonctionnel est celui de `feat/p1-p4-dag-engine` : `V002__run_key_unique.sql` (index unique partiel
+`NULLS NOT DISTINCT`, PostgreSQL ≥ 15) et `instantiate` **idempotent sur `run_key`** sont inclus.
 
 ## Quel HOWTO pour quel besoin
 
@@ -49,7 +52,7 @@ Le JAR présent dans `~/.m2` contient déjà `V002` : les apps qui reconstruisen
 
 | Dépendance | Nature |
 |---|---|
-| `socle-v005` ≥ 5.7.4 | **fournie par l'app** (`provided`) ; Pipeline V2, Worker, ActionProvider, TechDB |
+| `socle-v005` ≥ 5.8.4 (Boot 4) en 0.2.0 ; 5.7.4 → 5.8.0 en 0.1.0-SNAPSHOT (Boot 3) | **fournie par l'app** (`provided`) ; Pipeline V2, Worker, ActionProvider, TechDB |
 | PostgreSQL ≥ **15** | **obligatoire** : 6 tables `db_/tr_pipeline_*` + registre `z_pack_migrations`, dans `socle.pipeline.schema`. `V002` exige `NULLS NOT DISTINCT` |
 | `spring-boot-starter-jdbc` | tirée par le pack (`JdbcTemplate`, `DataSource` de l'app) |
 | TechDB H2 du framework | seulement si `queue-backend=techdb` (défaut) |
@@ -58,21 +61,19 @@ Le JAR présent dans `~/.m2` contient déjà `V002` : les apps qui reconstruisen
 
 ## Apps qui l'embarquent (2026-10-28)
 
-| App | Socle | Backend | Usage |
+| App | Socle (Boot) | Backend | Usage |
 |---|---|---|---|
-| **APP-12-RssArchiver** | 5.7.4 | `techdb` | moteur unique de curation éditoriale (DAG `rss-editorial`, 12 handlers, Pipeline Studio) |
-| **APP-17-BilanSocle** | 5.8.0 | `memory` | parcours de bilan de compétences : étapes humaines (`H`) résolues par `human_resolve` |
-| APP-06-NotionSocle | 5.8.9 | `memory` | moteur de workflows d'ingestion |
-| APP-16-REGIES | 5.8.0 | `memory` | atelier de décomposition (un prompt = une étape) |
-| APP-21-TheDiffuseur | 5.8.6 | `memory` | plans de diffusion |
+| **APP-12-RssArchiver** | 5.7.4 (Boot 3) → reste en 0.1.0-SNAPSHOT | `techdb` | moteur unique de curation éditoriale (DAG `rss-editorial`, 12 handlers, Pipeline Studio) |
+| **APP-17-BilanSocle** | 5.8.0 (Boot 3) → reste en 0.1.0-SNAPSHOT | `memory` | parcours de bilan de compétences : étapes humaines (`H`) résolues par `human_resolve` |
+| APP-06-NotionSocle | 5.8.9 (Boot 4) → **peut passer en 0.2.0** | `memory` | moteur de workflows d'ingestion |
+| APP-16-REGIES | 5.8.0 (Boot 3) → reste en 0.1.0-SNAPSHOT | `memory` | atelier de décomposition (un prompt = une étape) |
+| APP-21-TheDiffuseur | 5.8.6 (Boot 4) → **peut passer en 0.2.0** (et retirer `NomsDesPacks` s'il ne sert qu'au pack) | `memory` | plans de diffusion |
 
 ## Écarts entre la documentation du pack et le code
 
 Le code fait foi. Le détail figure dans chaque HOWTO.
 
 - **24 actions** dans `PipelineWorker`. Le README et `socle-pack.json` en listent 21 : `catalogue_set_category`, `get_graph` et `list_handlers` y manquent.
-- **15 tests** (10 + 3 NATS + 2 `CollectSinkHandler`). Le README en annonce 10.
-- Le README annonce un framework 5.7.4 ; le `pom.xml` compile contre **5.8.0**.
 - **Contrats E/S** : le README parle de contrats validés. Le code vérifie à l'exécution des **JSON Pointers obligatoires** (`params.requiredIn`) et compare à la validation des **noms** de contrat. La validation JSON Schema prévue par la SPEC n'existe pas.
 - La SPEC prévoit `triggers` et `phases` dans le DAG, et des boucles bornées. Aucun des trois n'est modélisé : les deux premiers champs sont **ignorés en silence** et un cycle est refusé (V1).
 - Les actions MCP s'appellent `pipeline_worker__<action>`, pas `pipeline_<action>` comme dans la SPEC.
@@ -94,4 +95,4 @@ Le code fait foi. Le détail figure dans chaque HOWTO.
 | `visibility` du catalogue stockée, jamais appliquée | `catalogue_list` rend tout | 08 |
 | Aucune purge des tables `tr_pipeline_*` ni des streams NATS | croissance sans borne | 07, [[howto-pipeline-09-backend-nats-jetstream\|09]] |
 | `context_params` stocké mais transmis à aucun handler | donnée inutilisable par les étapes | 04 |
-| Le nom de bean `pipelineProperties` entre en collision avec le socle ≥ 5.8.6 | l'app ne démarre pas sans générateur de noms | [[howto-pipeline-01-integrer-le-pack\|01]] §6 |
+| Le nom de bean `pipelineProperties` entre en collision avec le socle ≥ 5.8.6 — **corrigé en 0.2.0** (beans `pipelinePack*`) ; reste vrai pour 0.1.0-SNAPSHOT | une app Boot 3 n'est pas concernée (socle ≤ 5.8.0) | [[howto-pipeline-01-integrer-le-pack\|01]] §6 |

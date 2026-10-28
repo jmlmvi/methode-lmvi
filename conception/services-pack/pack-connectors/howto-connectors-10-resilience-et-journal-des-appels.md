@@ -2,7 +2,7 @@
 
 **Niveau :** Confirmé
 **Cible :** développeur ou exploitant qui diagnostique un connecteur lent, refusé ou « en panne »
-**Versions vérifiées au code (2026-10-28) :** `socle-pack-connectors:2.0.0` — `ResilienceFactory`,
+**Versions vérifiées au code (2026-10-28) :** `socle-pack-connectors:3.0.0` (Boot 4.0.6 ; code de ce périmètre identique à 2.0.0, dernière version Boot 3) — `ResilienceFactory`,
 `CircuitBreaker`, `RetryPolicy`, `RateLimiter`, `ConnectorLogger`, `V001__create_connector_log.sql`
 **Temps estimé :** 20 min
 

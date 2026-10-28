@@ -1,7 +1,10 @@
 # socle-pack-egress — sortir sur internet par un mmh du Hub
 
-> **Version documentée :** `eu.lmvi:socle-pack-egress:1.0.0` — dépôt `/opt/2026-TheHub4TheSocle/socle-pack-egress`,
-> branche `main`, commit `8c8544e` (« sortir par un mmh du Hub via le tunnel gRPC »), unique commit du dépôt.
+> **Version documentée :** `eu.lmvi:socle-pack-egress:2.0.0` — dépôt `/opt/2026-TheHub4TheSocle/socle-pack-egress`,
+> branche `feat/boot4` (non fusionnée dans `main` au 2026-10-28), commit `36be667` — **Spring Boot 4.0.6,
+> socle 5.9.0** (minimum 5.8.4), gRPC 1.81.0 / protobuf 3.25.9 alignés sur le socle.
+> **Dernière version Boot 3 = 1.0.0** (`main`, commit `8c8544e`, Spring Boot 3.2.1, gRPC 1.60, socle 5.7.x) :
+> c'est celle qu'utilisent encore les consommateurs en socle 5.7.4.
 > **Côté Hub, lu au code :** `soclehub` 3.73.0 (commit `35fdcd0`). **Vérifié le :** 2026-10-28.
 
 ## Le pack en 5 lignes
@@ -37,19 +40,31 @@ Le tunnel gRPC qu'emploie le pack accepte une clé API IAM ou un JWT Bearer — 
 
 | Dépendance | Portée | Fournie par |
 |---|---|---|
-| `io.grpc:grpc-api`, `grpc-stub`, `grpc-protobuf` (compilé en 1.60.0) | `provided` | le socle V005 de l'app |
-| `com.google.protobuf:protobuf-java` (3.25.1) | `provided` | le socle |
-| un transport gRPC à l'exécution (`grpc-netty-shaded`) | — | le socle (présent jusqu'en 5.9.5, gRPC 1.81.0) |
+| `io.grpc:grpc-api`, `grpc-stub`, `grpc-protobuf` (**1.81.0**, la version du socle) | `provided` | le socle V005 de l'app |
+| `com.google.protobuf:protobuf-java` (**3.25.9**, la version du socle) | `provided` | le socle |
+| un transport gRPC à l'exécution (`grpc-netty-shaded`) | — | le socle (5.8.0 → 5.9.5 : gRPC 1.81.0) |
 | `spring-boot-autoconfigure`, `slf4j-api` | `provided` | l'app |
 
-`socle-pack.json` : `minSocleVersion` **5.7.0**, aucun pack requis. Parent Maven du pack : Spring Boot **3.2.1**.
+Le pack **ne dépend pas** de `socle-v005` (il n'en utilise aucune classe) : `<socle.version>5.9.0</socle.version>`
+ne sert qu'au test `GrpcAlignementSocleTest`, qui lit le pom embarqué dans le jar du socle et échoue si le gRPC
+ou le protobuf du pack divergent de ceux du socle (passe en 5.9.0 et 5.8.8, échoue en 5.7.4).
+
+`socle-pack.json` (2.0.0) : `minSocleVersion` **5.8.4**, `springBootVersion` 4.0.6, `grpcVersion` 1.81.0,
+`protobufVersion` 3.25.9, aucun pack requis. Parent Maven du pack : Spring Boot **4.0.6**.
+
+| Pack | Boot | Socle | gRPC / protobuf |
+|---|---|---|---|
+| **2.0.0** | 4.0.6 | ≥ 5.8.4 (testé 5.9.0 et 5.8.8) | 1.81.0 / 3.25.9 |
+| 1.0.0 — dernière Boot 3 | 3.2.1 | 5.7.x | 1.60.0 / 3.25.1 |
 
 ## Apps consommatrices (2026-10-28)
 
 | App | Socle | Usage |
 |---|---|---|
-| `APP-09-KEW` 1.8.0 | 5.7.4 | `WikidataGatewayWorker` : OkHttp branché sur `EgressTunnelProxy.proxy()`, une sortie fixe par instance (`KEW_EGRESS_SELECTOR`) |
-| `APP-12-RssArchiver` | 5.7.4 | port local fixe `3129`, donné à pack-ai par `socle.ai.web.proxy-url` (pas de code Java) |
+| `APP-09-KEW` 1.8.0 | 5.7.4 → pack **1.0.0** | `WikidataGatewayWorker` : OkHttp branché sur `EgressTunnelProxy.proxy()`, une sortie fixe par instance (`KEW_EGRESS_SELECTOR`) |
+| `APP-12-RssArchiver` | 5.7.4 → pack **1.0.0** | port local fixe `3129`, donné à pack-ai par `socle.ai.web.proxy-url` (pas de code Java) |
+
+Aucune ne passe en 2.0.0 tant qu'elle reste en socle 5.7.x / Boot 3 : la montée du pack suit celle du socle de l'app.
 
 ## Écarts relevés entre README et code
 

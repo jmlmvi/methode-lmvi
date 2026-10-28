@@ -2,7 +2,7 @@
 
 **Niveau :** Intermédiaire
 **Cible :** app qui encaisse ses utilisateurs via Stripe (abonnement ou paiement unique)
-**Versions vérifiées au code (2026-10-28) :** `socle-pack-connectors:2.0.0` — `StripeWorker` (12 actions),
+**Versions vérifiées au code (2026-10-28) :** `socle-pack-connectors:3.0.0` (Boot 4.0.6 ; code de ce périmètre identique à 2.0.0, dernière version Boot 3) — `StripeWorker` (12 actions),
 API Stripe v1 en `application/x-www-form-urlencoded`
 **Temps estimé :** 30 min
 

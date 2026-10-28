@@ -1,9 +1,10 @@
 # HOWTO COM-01 — Intégrer socle-pack-comm dans une application V005
 
 **Niveau :** Confirmé
-**Cible :** `eu.lmvi:socle-pack-comm` **1.1.0** (dépôt `socle-pack-com`, branche `main`, commit `6abb702`) · compilé contre `socle-v005` **5.7.4** (`provided`) · parent Spring Boot **3.2.1**
+**Cible :** `eu.lmvi:socle-pack-comm` **2.0.0** (dépôt `socle-pack-com`, branche `feat/boot4`, commit `ffbfd75`) · compilé contre `socle-v005` **5.9.0** (`provided`), compile aussi contre 5.8.6 et 5.8.8 · parent Spring Boot **4.0.6**
+**Application restée en Boot 3.2.1 (socle ≤ 5.7.x) :** rester sur **1.1.0** (branche `main`, commit `6abb702`), dernière version Boot 3 — même comportement, mêmes propriétés
 **Vérifié au code le :** 2026-10-28
-**Prérequis :** application V005 sur PostgreSQL (le pack n'a pas de variante H2) ; Java 21 GraalVM CE ; accès à `~/.m2` de la box de build
+**Prérequis :** application V005 **Spring Boot 4, socle ≥ 5.8.6** sur PostgreSQL (le pack n'a pas de variante H2) ; Java 21 GraalVM CE ; accès à `~/.m2` de la box de build
 **Temps estimé :** 30 min
 
 > Suite du pack : [[howto-com-02-envoyer-une-notification-multicanal|COM-02 — Envoyer une notification]] ·
@@ -44,7 +45,7 @@ Apps de référence :
 │  code métier ──► NotifyWorker.sendNotification(...)   (appel Java direct)     │
 │  agent / Hub ──► POST /mcp  tools/call notify_worker__send_notification       │
 │                                                                               │
-│  socle-pack-comm 1.1.0  (package eu.lmvi.socle.pack.comm)                     │
+│  socle-pack-comm 2.0.0  (package eu.lmvi.socle.pack.comm)                     │
 │   ├─ CommProperties          @ConfigurationProperties("socle.comm")           │
 │   ├─ PackMigrationRunner     @PostConstruct → db/comm/V*.sql                  │
 │   ├─ NotifyWorker            PASSIVE, 8 actions, poller de rejeu              │
@@ -65,18 +66,18 @@ Apps de référence :
 
 ## 3. Étape 1 — Résoudre l'artefact
 
-La version 1.1.0 est **installée dans le `~/.m2` de la box de build** (`_remote.repositories` vide :
-elle ne vient d'aucun dépôt distant) ; aucune app consommatrice ne la vendorise dans un `mvn-repo/`.
-Un clone frais sur une autre machine doit d'abord la construire :
+Les versions 2.0.0 (Boot 4) et 1.1.0 (Boot 3) sont **installées dans le `~/.m2` de la box de build**
+(`_remote.repositories` vide : elles ne viennent d'aucun dépôt distant) ; aucune app consommatrice ne
+les vendorise dans un `mvn-repo/`. Un clone frais sur une autre machine doit d'abord construire :
 
 ```bash
 cd /opt/2026-TheHub4TheSocle/socle-pack-com
-git checkout main && git log -1 --oneline        # 6abb702
-mvn clean install -DskipTests                    # → ~/.m2/repository/eu/lmvi/socle-pack-comm/1.1.0/
+git checkout feat/boot4 && git log -1 --oneline  # ffbfd75 (2.0.0, Boot 4) — main = 1.1.0 (Boot 3)
+mvn clean install -DskipTests                    # → ~/.m2/repository/eu/lmvi/socle-pack-comm/2.0.0/
 ```
 
 Pour qu'une CI compile sans cette étape, déposer le `.jar` et le `.pom` dans le `mvn-repo/` vendorisé
-de l'app (`mvn-repo/eu/lmvi/socle-pack-comm/1.1.0/`), comme pour le framework.
+de l'app (`mvn-repo/eu/lmvi/socle-pack-comm/2.0.0/`), comme pour le framework.
 
 ---
 
@@ -89,7 +90,7 @@ L'artifactId est **`socle-pack-comm`** (deux *m*), même si le dépôt git s'app
 <dependency>
     <groupId>eu.lmvi</groupId>
     <artifactId>socle-pack-comm</artifactId>
-    <version>1.1.0</version>
+    <version>2.0.0</version>   <!-- Boot 4 / socle ≥ 5.8.6 ; 1.1.0 pour une app Boot 3.2.1 -->
 </dependency>
 
 <!-- Le pack déclare en provided : l'app doit les fournir -->
@@ -104,8 +105,19 @@ L'artifactId est **`socle-pack-comm`** (deux *m*), même si le dépôt git s'app
 </dependency>
 ```
 
-Le pack apporte en `compile` : `okhttp 4.12.0` et `com.sun.mail:jakarta.mail 2.0.1`. Le reste
+Le pack apporte en `compile` : `okhttp 4.12.0` (avec `kotlin-stdlib`, résolu en 2.2.x par la
+nomenclature Boot 4) et `com.sun.mail:jakarta.mail 2.0.1` (comme socle-pack-mail). Le reste
 (socle, Spring Web, Jackson, Log4j2, Disruptor) est `provided`.
+
+**Version de Boot.** Le pack doit tourner sur le Boot de son socle : 2.0.0 est construit sur Spring
+Boot 4.0.6, celui de `socle-v005` 5.8.4+. Une app Boot 4 qui garde la 1.1.0 (Boot 3.2.1) démarre
+aujourd'hui, mais sur un binaire compilé contre une autre ligne de Spring — à remplacer par 2.0.0.
+
+**Jackson.** Boot 4 sérialise le HTTP en Jackson 3 (`tools.jackson`). Le pack, comme le socle et les
+packs tenant/mail/ai, reste en Jackson 2 (`com.fasterxml`, version gérée par Boot 4 : 2.21.x) pour
+son code interne, et ne rend que des `Map`/`List`/scalaires dans ses `ActionResult` : rien à
+adapter côté app. Une app qui relaie une réponse du pack dans **son propre** contrôleur ne doit pas
+y glisser de `JsonNode` Jackson 2 (voir la règle Boot 4 : convertir en `Map` avant de rendre).
 
 Les classes sont trouvées par le balayage de composants **si** l'application balaie `eu.lmvi` —
 c'est le cas avec une classe principale `eu.lmvi.Application` annotée `@SpringBootApplication`.
@@ -285,8 +297,9 @@ s'affichent « stopped » sur un socle ≤ 5.9.4 : leur `getStats()` n'écrit pa
 | 4 | `notify_worker__get_stats` | `channels_available` cohérent avec la config |
 | 5 | Sans `SOCLE_COMM_SMS_PROVIDER` | `sms_worker` désactivé, aucun redémarrage en boucle au journal |
 
-Tests du pack correspondants : `RegistreScopeParSchemaTest`, `XPartitionDefaultTriggerTest`
-(Testcontainers PostgreSQL) — 34 tests verts au dernier `surefire-reports`.
+Tests du pack correspondants : `RegistreScopeParSchemaTest`, `XPartitionDefaultTriggerTest`,
+`DemarrageContexteSpringTest` (contexte Spring Boot 4 : balayage, liaison `socle.comm.*`, migrations
+dans un schéma neuf, 4 workers) — Testcontainers PostgreSQL ; 35 tests verts, aucun sauté (2.0.0).
 
 ---
 
@@ -301,8 +314,9 @@ Tests du pack correspondants : `RegistreScopeParSchemaTest`, `XPartitionDefaultT
 | Variable déclarée avec valeur vide (`SOCLE_COMM_SLACK_WEBHOOK_URL=`) | Slack/Telegram se croient configurés (« » ≠ `null`) puis échouent à chaque envoi | ne déclarer la variable que si elle porte une valeur |
 | `artifactId socle-pack-com` | dépendance introuvable | l'artifactId est `socle-pack-comm` |
 | Suivre HOWTO 28 à la lettre | `soclehub-pack.com.schema`, `${pack_schema}`, chemins Vault : rien n'est lu | propriétés `socle.comm.*`, placeholder `${comm_schema}` |
-| README / `socle-pack.json` | annoncent 1.0.0, deux fournisseurs email, `POST /api/actions/notify_worker__…` | le code est en 1.1.0, trois fournisseurs ; une app s'invoque par `POST /mcp` |
-| Socle ≥ 5.8 (Spring Boot 4) | pack compilé contre Boot 3.2.1 / socle 5.7.4 | employé tel quel par BingFetch (5.8.6) et UniqPersonnality (5.8.9) ; Your360 (5.9.4) a préféré un `GatewayWorker` maison en attendant une version Boot 4 — tester l'envoi réel après chaque montée de socle |
+| README du pack | annonce deux fournisseurs email, `POST /api/actions/notify_worker__…` | trois fournisseurs ; une app s'invoque par `POST /mcp` (la version, le socle minimal et Boot sont justes depuis 2.0.0) |
+| Mauvaise ligne de Boot | 1.1.0 (Boot 3.2.1) dans une app Boot 4, ou 2.0.0 dans une app Boot 3 | **corrigé en 2.0.0** pour Boot 4 : app Boot 4 / socle ≥ 5.8.6 → 2.0.0 ; app Boot 3.2.1 → 1.1.0. Tester l'envoi réel après chaque montée de socle |
+| Schéma absent | `schema "…" does not exist` à V000, l'app ne démarre pas | le pack ne crée pas le schéma : c'est le Hub (`db_worker/create_app_schema`) qui le pose |
 | Worker affiché « stopped » | tableau de bord ≤ 5.9.4 | lire `notify_worker__get_stats` ou `tr_notification_log` |
 
 ---

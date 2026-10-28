@@ -4,6 +4,17 @@
 > (procédure : README racine, « Resync d'une instance »). Ce fichier est auto-versionné par ses
 > entrées (pas de marqueur `KIT-VERSION`, cf. charte U-DOCS §3).
 
+## 1.14.0 — 2026-10-28
+
+**Les huit packs ont une version Spring Boot 4.0.6.** Montées faites ce jour, chacune sur une
+branche `feat/boot4` non fusionnée, jar installé dans `~/.m2` : com 2.0.0, connectors 3.0.0,
+editorial 2.0.0 (ai 2.7.13 + comm 2.0.0), egress 2.0.0 (gRPC aligné sur le socle), pipeline 0.2.0
+(collision de beans `pipelineProperties` corrigée dans le pack). Les howtos de ces cinq packs
+suivent : versions, « dernière version Boot 3 » pour les apps restées en 3.2.1, pièges corrigés ou
+créés par la migration (exclusion de `spring-boot-starter-logging`, `ObjectMapper` Jackson 2 fourni
+par le socle, deux actions Notion qui renvoyaient un `JsonNode`). `00-index.md` et
+`CATALOGUE-PACKS.md` mis à jour.
+
 ## 1.13.1 — 2026-10-28
 
 **Un exemple reformulé pour passer le contrôle anti-secret de la publication de la skill.**

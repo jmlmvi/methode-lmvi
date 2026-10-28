@@ -1,8 +1,8 @@
 # HOWTO PIPELINE-01 — Intégrer socle-pack-pipeline dans une application
 
 **Niveau :** Confirmé
-**Cible :** application V005 (socle 5.7.4 → 5.9.x) avec un PostgreSQL applicatif
-**Versions vérifiées au code :** `socle-pack-pipeline` 0.1.0-SNAPSHOT, branche `feat/p1-p4-dag-engine` @ `5fa8f05` · compilé contre `socle-v005` 5.8.0 / Spring Boot 3.2.1 · date 2026-10-28
+**Cible :** application V005 **Spring Boot 4** (socle 5.8.4 → 5.9.x) avec un PostgreSQL applicatif — une app restée en Boot 3.2.1 (socle ≤ 5.8.0) prend `0.1.0-SNAPSHOT`, cf. §4
+**Versions vérifiées au code :** `socle-pack-pipeline` **0.2.0**, branche `feat/boot4` @ `4cb5aa6` · compilé contre `socle-v005` 5.9.0 / Spring Boot 4.0.6 (compile aussi contre 5.8.4 et 5.8.8) · date 2026-10-28
 **Temps estimé :** 30 min
 
 > Vue d'ensemble du pack : [[README|socle-pack-pipeline]]
@@ -85,17 +85,18 @@ Le pack n'est publié sur **aucun** dépôt distant. Il vit dans le `~/.m2` de l
 
 ```bash
 cd /opt/2026-TheHub4TheSocle/socle-pack-pipeline
-git checkout feat/p1-p4-dag-engine
+git checkout feat/boot4               # 0.2.0, Boot 4 — app Boot 3 : feat/p1-p4-dag-engine (0.1.0-SNAPSHOT)
 mvn -q clean install -DskipTests      # compile aussi les tests : ils doivent compiler
 
+V=0.2.0
 APP=/opt/2026-TheHub4TheSocle/APP-XX-MonApp/monapp
-D=$APP/mvn-repo/eu/lmvi/socle-pack-pipeline/0.1.0-SNAPSHOT
+D=$APP/mvn-repo/eu/lmvi/socle-pack-pipeline/$V
 mkdir -p "$D"
-cp ~/.m2/repository/eu/lmvi/socle-pack-pipeline/0.1.0-SNAPSHOT/socle-pack-pipeline-0.1.0-SNAPSHOT.jar "$D/"
-cp ~/.m2/repository/eu/lmvi/socle-pack-pipeline/0.1.0-SNAPSHOT/socle-pack-pipeline-0.1.0-SNAPSHOT.pom "$D/"
+cp ~/.m2/repository/eu/lmvi/socle-pack-pipeline/$V/socle-pack-pipeline-$V.jar "$D/"
+cp ~/.m2/repository/eu/lmvi/socle-pack-pipeline/$V/socle-pack-pipeline-$V.pom "$D/"
 ```
 
-**Voie de secours** : `mvn install` du pack sur la machine qui construit l'app. Un SNAPSHOT installé
+**Voie de secours** : `mvn install` du pack sur la machine qui construit l'app. Un artefact installé
 ainsi n'existe que sur cette machine.
 
 ---
@@ -109,7 +110,6 @@ ainsi n'existe que sur cette machine.
         <name>Dépôt Maven vendorisé (in-repo)</name>
         <url>file://${project.basedir}/mvn-repo</url>
         <releases><enabled>true</enabled></releases>
-        <snapshots><enabled>true</enabled></snapshots>
     </repository>
 </repositories>
 
@@ -124,7 +124,14 @@ ainsi n'existe que sur cette machine.
     <dependency>
         <groupId>eu.lmvi</groupId>
         <artifactId>socle-pack-pipeline</artifactId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>0.2.0</version>   <!-- app Boot 3.2.1 : 0.1.0-SNAPSHOT -->
+    </dependency>
+
+    <!-- Jackson 2 : le pack l'emploie (provided), comme le socle. Le parent Boot 4.0.6 en gère la version
+         (com.fasterxml.jackson.core:jackson-databind) ; le socle la tire déjà, la déclarer ne coûte rien. -->
+    <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
     </dependency>
 
     <!-- PostgreSQL : le pack le déclare provided, l'app doit l'apporter -->
@@ -145,8 +152,22 @@ ainsi n'existe que sur cette machine.
 </dependencies>
 ```
 
-Le dépôt local doit autoriser les **snapshots** (`<snapshots><enabled>true</enabled></snapshots>`) : la
-version du pack se termine par `-SNAPSHOT`. Les cinq apps consommatrices déclarent toutes `jnats`.
+| Version du pack | Parent Spring Boot de l'app | socle-v005 de l'app |
+|---|---|---|
+| **0.2.0** | **4.0.6** | 5.8.4 → 5.9.x |
+| 0.1.0-SNAPSHOT (dernière Boot 3) | 3.2.1 | 5.7.4 → 5.8.0 |
+
+Le parent Spring Boot de l'app doit être **celui du socle** (`lib/socle-v005-<v>.pom`) et donc celui du
+pack : un pack bâti sur un autre Boot compile, puis casse à l'exécution. Une app qui reste en
+`0.1.0-SNAPSHOT` garde `<snapshots><enabled>true</enabled></snapshots>` sur son dépôt `project-local`.
+
+**Jackson** : Boot 4 sérialise les requêtes et réponses HTTP en Jackson 3 (`tools.jackson.*`). Le pack, lui,
+reste en Jackson 2 (`com.fasterxml`) et n'expose aucun contrôleur. Si l'app rend dans **son** contrôleur un
+`JsonNode` venu du pack (`graph`, `payload`, `lineage`…), le convertir d'abord en `Map`/`List`
+(`PipelineJson.mapper().convertValue(n, Object.class)`) ; un `com.fasterxml…JsonNode` en `@RequestBody`
+échoue (500) — lire le corps en `String` puis `PipelineJson.mapper().readTree(...)`.
+
+Les cinq apps consommatrices déclarent toutes `jnats` ; 0.2.0 ne change rien à ce point.
 
 ---
 
@@ -186,91 +207,44 @@ dans le même bloc.
 
 ---
 
-## 6. Étape 4 — Lever la collision de beans (socle ≥ 5.8.6)
+## 6. Étape 4 — Noms de beans : rien à faire depuis 0.2.0
 
-À partir de **socle 5.8.6**, le framework déclare `eu.lmvi.socle.config.PipelineProperties`. Le pack
-déclare `eu.lmvi.socle.pack.pipeline.config.PipelineProperties`. Spring nomme les deux beans
-`pipelineProperties` et l'application **refuse de démarrer** (`ConflictingBeanDefinitionException`).
-Vérifié dans les JAR : la classe est absente de 5.7.4 et 5.8.0, présente en 5.8.6, 5.8.9, 5.9.0 et 5.9.4.
+À partir de **socle 5.8.6**, le framework déclare `eu.lmvi.socle.config.PipelineProperties` (préfixe
+`socle.pipeline`, réglages du Pipeline V1). Jusqu'à 0.1.0-SNAPSHOT, le pack déclarait
+`eu.lmvi.socle.pack.pipeline.config.PipelineProperties` sans nom explicite : Spring nommait les deux beans
+`pipelineProperties` et l'application **refusait de démarrer** (`ConflictingBeanDefinitionException`).
 
-Remède en service dans **APP-21-TheDiffuseur** (1.7.0) : qualifier le nom des beans **venus d'un pack**
-uniquement, pour tout le contexte.
+**Corrigé en 0.2.0** : tous les beans du pack ont un nom explicite préfixé `pipelinePack`.
 
-`src/main/java/eu/lmvi/PackQualifiedBeanNameGenerator.java` :
+| Classe | Nom de bean (0.2.0) |
+|---|---|
+| `config.PipelineProperties` | `pipelinePackProperties` |
+| `PipelineWorker` | `pipelinePackWorker` (le worker garde son nom MOP `pipeline_worker`) |
+| `repo.PipelineRepository` | `pipelinePackRepository` |
+| `engine.DagPipelineBuilder` | `pipelinePackDagBuilder` |
+| `engine.StageHandlerRegistry` | `pipelinePackStageHandlerRegistry` |
+| `engine.handlers.CompositeHandler` | `pipelinePackCompositeHandler` |
+| `runtime.PipelineRuntimeManager` | `pipelinePackRuntimeManager` |
+| `runtime.SubPipelineRunner` | `pipelinePackSubPipelineRunner` |
+| `validation.DagValidator` | `pipelinePackDagValidator` |
+| `service.ConfigReloadService` | `pipelinePackConfigReloadService` |
+| `service.PackMigrationRunner` | `pipelinePackMigrationRunner` (inchangé) |
 
-```java
-package eu.lmvi;
+Les deux `PipelineProperties` coexistent : types distincts, l'injection **par type** n'est pas ambiguë, et
+chacune lit ses propres clés du bloc `socle.pipeline`. Le test `PackContexteSocleTest` du pack le prouve sur
+un contexte Spring avec le socle 5.9.0 (et 5.8.8) ; il échoue si le nom explicite est retiré.
 
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.AnnotationBeanNameGenerator;
-import org.springframework.context.annotation.ScannedGenericBeanDefinition;
+Conséquences pour l'app :
 
-/** Les beans des packs portent leur nom complet ; ceux du socle et de l'app gardent leur nom court. */
-public class PackQualifiedBeanNameGenerator extends AnnotationBeanNameGenerator {
+- Une app qui ne fait que l'injection par type (`PipelineWorker`, `PipelineRepository`…) n'a rien à changer.
+- Le générateur `PackQualifiedBeanNameGenerator` + `NomsDesPacks` (TheDiffuseur 1.7.0) **n'est plus requis
+  pour ce pack**. Le garder est sans effet sur lui : un nom explicite prime sur le générateur. Le retirer
+  seulement si aucun autre pack n'en a besoin.
+- Une app qui cherchait un bean du pack **par son nom** (`getBean("pipelineWorker")`, `@Qualifier`) doit
+  prendre le nouveau nom — aucune des cinq apps consommatrices ne le fait (vérifié le 2026-10-28).
 
-    private static final String PACKS = "eu.lmvi.socle.pack.";
-
-    @Override
-    protected String buildDefaultBeanName(BeanDefinition definition) {
-        String className = definition.getBeanClassName();
-        if (className != null && className.startsWith(PACKS)) {
-            return className;
-        }
-        if (!(definition instanceof ScannedGenericBeanDefinition) && className != null) {
-            return className;   // classe importée : nom complet, comme Spring le fait d'ordinaire
-        }
-        return super.buildDefaultBeanName(definition);
-    }
-}
-```
-
-`src/main/java/eu/lmvi/NomsDesPacks.java` :
-
-```java
-package eu.lmvi;
-
-import org.springframework.context.ApplicationContextInitializer;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigUtils;
-
-/** Pose le générateur pour TOUT le contexte, y compris les balayages lancés par le socle et les essais. */
-public class NomsDesPacks implements ApplicationContextInitializer<ConfigurableApplicationContext> {
-
-    @Override
-    public void initialize(ConfigurableApplicationContext contexte) {
-        var usine = contexte.getBeanFactory();
-        if (!usine.containsSingleton(AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR)) {
-            usine.registerSingleton(AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR,
-                    new PackQualifiedBeanNameGenerator());
-        }
-    }
-}
-```
-
-`src/main/resources/META-INF/spring.factories` :
-
-```properties
-org.springframework.context.ApplicationContextInitializer=eu.lmvi.NomsDesPacks
-```
-
-L'`Application.java` reste standard :
-
-```java
-package eu.lmvi;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-@SpringBootApplication
-public class Application {
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
-}
-```
-
-Le `@SpringBootApplication` du package `eu.lmvi` balaie `eu.lmvi.socle.pack.pipeline.*` : les beans du
-pack sont trouvés sans `@ComponentScan` supplémentaire.
+L'`Application.java` reste standard : le `@SpringBootApplication` du package `eu.lmvi` balaie
+`eu.lmvi.socle.pack.pipeline.*`, sans `@ComponentScan` supplémentaire.
 
 ---
 
@@ -394,8 +368,8 @@ La donnée est une **chaîne JSON** dans `result.content[0].text` : `{"handlers"
 |---|---|---|
 | 1 | Démarrer l'app sur une base vierge | 6 tables + `z_pack_migrations` dans `socle.pipeline.schema`, rien dans `public` |
 | 2 | Redémarrer | `skip … (already applied)` en DEBUG, aucune ré-exécution |
-| 3 | Socle ≥ 5.8.6 sans `NomsDesPacks` | échec `ConflictingBeanDefinitionException … pipelineProperties` (preuve que le remède sert) |
-| 4 | Socle ≥ 5.8.6 avec `NomsDesPacks` | démarrage normal, `pipeline_worker` visible sur `/dashboard` |
+| 3 | Socle ≥ 5.8.6, pack 0.2.0, **sans** générateur de noms dans l'app | démarrage normal, `pipeline_worker` visible sur `/dashboard` |
+| 4 | Dans le contexte : `getBeanNamesForType(eu.lmvi.socle.pack.pipeline.config.PipelineProperties)` | `[pipelinePackProperties]` ; `pipelineProperties` reste celui du socle |
 | 5 | `list_handlers` | contient vos handlers en plus des 6 built-ins |
 | 6 | Deux apps avec le pack sur la même base, schémas distincts | chacune a ses 6 tables et son registre |
 
@@ -405,14 +379,14 @@ La donnée est une **chaîne JSON** dans `result.content[0].text` : `{"handlers"
 
 | Piège | Symptôme | Correction |
 |---|---|---|
-| **Socle ≥ 5.8.6 + pack** | l'app ne démarre pas : deux beans `pipelineProperties` | `PackQualifiedBeanNameGenerator` + `NomsDesPacks` via `spring.factories` (§6) |
-| Générateur posé par `@SpringBootApplication(nameGenerator=…)` ou dans `main` | collision toujours là, ou essais rouges | l'initialiseur de `spring.factories` couvre les balayages du socle **et** les essais |
-| Générateur qui qualifie **tous** les beans | des beans du socle cherchés par leur nom court disparaissent (NotionSocle) | ne qualifier que `eu.lmvi.socle.pack.*` et les classes importées |
+| Socle ≥ 5.8.6 + pack **0.1.0-SNAPSHOT** (app Boot 4 pas encore montée) | l'app ne démarre pas : deux beans `pipelineProperties` | passer au pack **0.2.0** (§6) ; à défaut, le générateur `NomsDesPacks` de TheDiffuseur 1.7.0 |
+| Pack 0.2.0 dans une app **Boot 3.2.1** | compile, puis `NoSuchMethodError`/`ClassNotFoundException` Spring à l'exécution | une app Boot 3 reste en `0.1.0-SNAPSHOT` |
+| `JsonNode` du pack rendu tel quel par un contrôleur de l'app (Boot 4) | JSON mal écrit ou 500 (Jackson 3 côté HTTP) | convertir en `Map`/`List` avant de rendre (§4) |
 | `socle.pipeline.schema` oublié | tables du pack dans `public`, mêlées aux autres apps | toujours fixer le schéma de l'app |
 | PostgreSQL 14 ou moins | `V002` échoue : `syntax error at or near "NULLS"`, l'app ne démarre pas | PostgreSQL ≥ 15 |
 | Rôle sans droit de création dans le schéma | `failed to apply V001…`, démarrage bloqué | provisionner le schéma au nom du rôle applicatif |
 | Checksum modifié d'un script déjà appliqué | `checksum mismatch … Skipping` : la migration n'est **pas** rejouée | ne jamais modifier un `V*.sql` publié ; écrire un `V00n` |
-| Dépôt vendorisé sans `<snapshots>` | `Could not find artifact …0.1.0-SNAPSHOT` | activer les snapshots sur le dépôt `project-local` |
+| Dépôt vendorisé sans `<snapshots>` (app restée en 0.1.0-SNAPSHOT) | `Could not find artifact …0.1.0-SNAPSHOT` | activer les snapshots sur le dépôt `project-local` ; 0.2.0 est une release |
 | `mvn install -DskipTests` du pack après avoir modifié le constructeur de `PipelineWorker` | échec de compilation des tests | `-DskipTests` compile les tests ; mettre à jour les `new PipelineWorker(...)` des tests |
 | `queue-backend` laissé à `techdb` | `object is already closed` sous charge (RssArchiver, BilanSocle, NotionSocle) | `memory`, cf. [[howto-pipeline-04-executer-un-run\|PIPELINE-04]] §6 |
 | **`jnats` absent** (quel que soit le backend) | `NoClassDefFoundError: io/nats/client/Connection` au démarrage, à la création de `DagPipelineBuilder` | ajouter `io.nats:jnats:2.19.1` (scope `runtime` suffit) |

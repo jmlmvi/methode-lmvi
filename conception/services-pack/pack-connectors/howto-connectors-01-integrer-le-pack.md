@@ -2,9 +2,10 @@
 
 **Niveau :** Intermédiaire
 **Cible :** une APP-* V005 qui doit parler à Notion, Google Drive, Stripe ou HubSpot
-**Versions vérifiées au code (2026-10-28) :** `eu.lmvi:socle-pack-connectors:2.0.0` — compilé contre
-`socle-v005:5.7.4` (provided) et `spring-boot-starter-parent:3.2.1` ; branche `feat/connectors-enabled`
-@ `298f758` (identique à `main` @ `9e6d106` pour le code)
+**Versions vérifiées au code (2026-10-28) :** `eu.lmvi:socle-pack-connectors:3.0.0` — construit contre
+`socle-v005:5.9.0` (provided, compile aussi contre 5.8.8) et `spring-boot-starter-parent:4.0.6` ; branche
+`feat/boot4` @ `2be4a46` (non fusionnée). **App Boot 3 / socle ≤ 5.7.x : rester sur `2.0.0`**, dernière
+version Boot 3 (Boot 3.2.1, socle 5.7.4).
 **Temps estimé :** 30 min
 
 > Fiche générique sur les packs : [[howto-28-integrer-un-socle-pack-dans-une-app|HOWTO 28]].
@@ -62,7 +63,7 @@ Ce que le pack apporte à l'app :
 
 ## 3. Étape 1 — Rendre l'artefact résolvable
 
-L'artefact `2.0.0` est installé dans `~/.m2` de la box de build ; il n'est vendorisé dans **aucun**
+L'artefact `3.0.0` est installé dans `~/.m2` de la box de build ; il n'est vendorisé dans **aucun**
 `mvn-repo/` du dépôt au 2026-10-28. Le construire puis le vendoriser dans l'app :
 
 ```bash
@@ -70,11 +71,11 @@ cd /opt/2026-TheHub4TheSocle/socle-pack-Connectors
 mvn clean install -DskipTests
 
 APP=/opt/2026-TheHub4TheSocle/APP-XX-MonApp
-mkdir -p $APP/mvn-repo/eu/lmvi/socle-pack-connectors/2.0.0
-cp target/socle-pack-connectors-2.0.0.jar pom.xml \
-   $APP/mvn-repo/eu/lmvi/socle-pack-connectors/2.0.0/
-mv $APP/mvn-repo/eu/lmvi/socle-pack-connectors/2.0.0/pom.xml \
-   $APP/mvn-repo/eu/lmvi/socle-pack-connectors/2.0.0/socle-pack-connectors-2.0.0.pom
+mkdir -p $APP/mvn-repo/eu/lmvi/socle-pack-connectors/3.0.0
+cp target/socle-pack-connectors-3.0.0.jar pom.xml \
+   $APP/mvn-repo/eu/lmvi/socle-pack-connectors/3.0.0/
+mv $APP/mvn-repo/eu/lmvi/socle-pack-connectors/3.0.0/pom.xml \
+   $APP/mvn-repo/eu/lmvi/socle-pack-connectors/3.0.0/socle-pack-connectors-3.0.0.pom
 ```
 
 ---
@@ -95,13 +96,13 @@ mv $APP/mvn-repo/eu/lmvi/socle-pack-connectors/2.0.0/pom.xml \
     <dependency>
         <groupId>eu.lmvi</groupId>
         <artifactId>socle-v005</artifactId>
-        <version>5.7.4</version>
+        <version>5.9.0</version> <!-- ≥ 5.8.4 ; parent spring-boot-starter-parent 4.0.6 -->
     </dependency>
 
     <dependency>
         <groupId>eu.lmvi</groupId>
         <artifactId>socle-pack-connectors</artifactId>
-        <version>2.0.0</version>
+        <version>3.0.0</version> <!-- 2.0.0 pour une app Boot 3 -->
     </dependency>
 
     <!-- Le pack les déclare en scope provided : l'app doit les fournir -->
@@ -114,6 +115,9 @@ mv $APP/mvn-repo/eu/lmvi/socle-pack-connectors/2.0.0/pom.xml \
         <artifactId>postgresql</artifactId>
         <scope>runtime</scope>
     </dependency>
+    <!-- Jackson 2 (com.fasterxml) : celui qu'utilise le pack. Boot 4 sérialise le HTTP en Jackson 3
+         (tools.jackson) mais la nomenclature 4.0.6 gère toujours jackson-databind 2 ; le déclarer
+         rend la dépendance explicite. -->
     <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
@@ -282,7 +286,8 @@ curl -s -H "X-Admin-Key: $ADMIN_API_KEY" -H "Content-Type: application/json" \
 | 4 | Schéma absent | Échec au démarrage `Migration V000__init.sql failed` |
 | 5 | `test_connection` | `connected: true` |
 
-Test unitaire du pack couvrant le contrat d'activation : `ConnectorsActivationTest` (5 cas).
+Tests du pack : `ConnectorsActivationTest` (contrat d'activation, 5 cas), `NotionResultatJackson3Test`
+(résultats Notion écrits en Jackson 3), `StripeWebhookBoot4Test` (webhook signé sous Boot 4) — 9 tests, `mvn verify` vert.
 
 ---
 
@@ -296,8 +301,9 @@ Test unitaire du pack couvrant le contrat d'activation : `ConnectorsActivationTe
 | DataSource absente ou H2 | Échec du runner (fonctions `plpgsql`, `TIMESTAMPTZ`, `JSONB`) | PostgreSQL ≥ 14 obligatoire |
 | Modifier un `V00x` déjà joué | `checksum mismatch … skipping` : la modification n'est jamais appliquée | Nouveau script `V003__…` |
 | Suivre les `curl` du README du pack | `POST /api/actions/notion_worker__…` rend 404 sur une app | `POST /admin/workers/<worker>/actions/<action>` (`X-Admin-Key`) ou `POST /mcp` |
-| Croire README/manifeste sur les versions | README annonce « v1.0.0 » et « socle ≥ 5.0.0 » ; `socle-pack.json` dit `minSocleVersion 5.0.0` | Le code est compilé contre socle **5.7.4** / Boot **3.2.1** ; sur une app Boot 4 (socle ≥ 5.8.4), vérifier la présence de Jackson 2 (`com.fasterxml`) avant de livrer |
-| Compter 53 actions | Le code en expose **54** : `create_database` (Notion) est absent du manifeste et du README | Lire `getActions()` ou `GET /admin/workers/notion_worker/actions` |
+| Mettre la 3.0.0 dans une app Boot 3 (ou la 2.0.0 dans une app Boot 4) | Compile, puis casse à l'exécution (classes Spring absentes ou déplacées) | Boot 4 / socle ≥ 5.8.4 → **3.0.0** ; Boot 3 → **2.0.0**. Le manifeste dit vrai depuis 3.0.0 (`minSocleVersion 5.8.4`, `springBootVersion 4.0.6`) |
+| Placer un `JsonNode` Jackson 2 (`com.fasterxml`) dans une réponse ou un `@RequestBody` côté app | `500` ou JSON méconnaissable : Boot 4 et le serveur MCP du socle écrivent en Jackson 3 | Lire le corps en `String`, rendre des `Map`/`List`. Le pack lui-même est conforme depuis 3.0.0 (en 2.0.0 sur socle ≥ 5.8, `get_page` et `get_database_full` sortaient faux) |
+| Compter 53 actions (README avant 3.0.0) | Le code en expose **54** | Manifeste corrigé en 3.0.0 (`create_database` ajouté) ; `GET /admin/workers/notion_worker/actions` fait foi |
 
 ---
 

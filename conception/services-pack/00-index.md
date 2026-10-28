@@ -25,12 +25,12 @@
 | Pack | Ce qu'il apporte à l'app | Version documentée | Spring Boot / socle | Apps qui le consomment |
 |---|---|---|---|---|
 | [`pack-ai`](pack-ai/README.md) | génération, embeddings, RAG, classification, web, agents | 2.7.14 (`main`) — lignée 2.4.x pour Boot 3 | Boot 4.0.6 / 5.8.8 | LeSachant, IdeaBoxDev, NotionSocle, UniqPersonnality ; 2.4.x : SDR2, REGIES, BilanSocle |
-| [`pack-com`](pack-com/README.md) | notifications multicanal : courriel, SMS, Telegram, Slack, webhook, in-app | 1.1.0 (`main`) | Boot 3.2.1 / 5.7.4 | BingFetch, UniqPersonnality, RssArchiver |
-| [`pack-connectors`](pack-connectors/README.md) | Notion, Google Drive, Stripe, HubSpot | 2.0.0 (`feat/connectors-enabled`) | Boot 3.2.1 / 5.7.4 | aucune à ce jour |
-| [`pack-editorial`](pack-editorial/README.md) | RSS → curation LLM → validation humaine → newsletter | 1.0.0-SNAPSHOT (`main`) | Boot 3.2.1 / 5.7.4 | RssArchiver |
-| [`pack-egress`](pack-egress/README.md) | faire sortir les appels HTTPS de l'app par un miniMiniHub du Hub | 1.0.0 (`main`) | Boot 3 / 5.7.4 | KEW, RssArchiver |
+| [`pack-com`](pack-com/README.md) | notifications multicanal : courriel, SMS, Telegram, Slack, webhook, in-app | 2.0.0 (`feat/boot4`) — Boot 3 : 1.1.0 | Boot 4.0.6 / 5.9.0 (min. 5.8.6) | BingFetch, UniqPersonnality, RssArchiver |
+| [`pack-connectors`](pack-connectors/README.md) | Notion, Google Drive, Stripe, HubSpot | 3.0.0 (`feat/boot4`) — Boot 3 : 2.0.0 | Boot 4.0.6 / 5.9.0 (min. 5.8.4) | aucune à ce jour |
+| [`pack-editorial`](pack-editorial/README.md) | RSS → curation LLM → validation humaine → newsletter | 2.0.0 (`feat/boot4`) — Boot 3 : 1.0.0-SNAPSHOT | Boot 4.0.6 / 5.9.0 (min. 5.8.8), ai 2.7.13, comm 2.0.0 | RssArchiver |
+| [`pack-egress`](pack-egress/README.md) | faire sortir les appels HTTPS de l'app par un miniMiniHub du Hub | 2.0.0 (`feat/boot4`) — Boot 3 : 1.0.0 | Boot 4.0.6 / gRPC aligné sur le socle (min. 5.8.4) | KEW, RssArchiver |
 | [`pack-mail`](pack-mail/README.md) | boîte de chaque utilisateur (IMAP, Gmail, Outlook), envoi, boîte applicative, lien d'activation | 1.4.0 (copie de travail **non commitée**) | Boot 4.0.6 / 5.9.5 | aucune déclarée (TheIdeaBox s'y prépare) |
-| [`pack-pipeline`](pack-pipeline/README.md) | moteur de pipelines DAG : runs, étapes humaines, DLQ, catalogue, NATS | 0.1.0-SNAPSHOT (`feat/p1-p4-dag-engine`) | Boot 3.2.1 / 5.8.0 | RssArchiver, BilanSocle, NotionSocle, REGIES, TheDiffuseur |
+| [`pack-pipeline`](pack-pipeline/README.md) | moteur de pipelines DAG : runs, étapes humaines, DLQ, catalogue, NATS | 0.2.0 (`feat/boot4`) — Boot 3 : 0.1.0-SNAPSHOT | Boot 4.0.6 / 5.9.0 (min. 5.8.4) | RssArchiver, BilanSocle, NotionSocle, REGIES, TheDiffuseur |
 | [`pack-tenant`](pack-tenant/README.md) | fiche société, marque, équipe et multi-tenant lus depuis l'IAM du Hub | 0.5.0 (`main`) | Boot 4.0.6 / 5.9.0 | Your360, TheSociety, UniqPersonnality |
 
 Dépendances entre packs : `editorial` → `ai` + `com` ; `mail` → `ai`. Les autres sont autonomes.
@@ -152,10 +152,15 @@ Relevés en écrivant les howtos ; chaque fiche les reprend là où ils mordent.
 2. **« Vault » ne lit rien dans quatre packs.** ai, com, connectors et mail appellent leur résolveur
    avec `appId = null` : `vault.enabled: true` ne change rien, les clés viennent des variables
    d'environnement. Ne pas planifier une brique sur une lecture Vault par le pack.
-3. **Deux lignées Spring Boot.** ai (2.7.x), mail et tenant sont en Boot 4 ; com, connectors,
-   editorial, egress et pipeline sont encore en Boot 3.2.1. Une app en socle ≥ 5.8.4 (Boot 4) qui
-   embarque un pack Boot 3 doit le vérifier avant M6 ; une app Boot 3 prend pack-ai en 2.4.x
-   ([`AI-09`](pack-ai/howto-ai-09-lignee-2-4-x-pour-les-apps-boot-3.md)).
+3. **Deux lignées Spring Boot.** Depuis le 2026-10-28, les huit packs ont une version Boot 4.0.6
+   (socle ≥ 5.8.4) : ai 2.7.x, mail 1.4.0, tenant 0.5.0, et les montées com 2.0.0, connectors
+   3.0.0, editorial 2.0.0, egress 2.0.0, pipeline 0.2.0 — ces cinq-là sur une branche
+   `feat/boot4` **non fusionnée**, jar dans `~/.m2`, à vendoriser. Une app restée en Boot 3.2.1
+   (socle ≤ 5.8.0) garde la dernière version Boot 3 de chaque pack (colonne ci-dessus ; pack-ai en
+   2.4.x, [`AI-09`](pack-ai/howto-ai-09-lignee-2-4-x-pour-les-apps-boot-3.md)). Une app Boot 4 qui
+   embarque plusieurs packs exclut `spring-boot-starter-logging` du starter jdbc, balaie
+   `eu.lmvi.socle` (l'`ObjectMapper` Jackson 2 vient du socle) et qualifie les beans en double
+   (`PackMigrationRunner`, `TenantResolver`) — voir `EDITORIAL-01`.
 4. **Un pack n'est disponible que s'il est vendorisé.** Aucun pack n'est servi par
    `maven.thesocle.net` dans sa dernière version ; plusieurs ne vivent que dans le `~/.m2` de la box
    de build. L'app copie le jar et le pom dans son `mvn-repo/` (cf. CLAUDE.md racine), sinon un clone

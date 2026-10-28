@@ -2,7 +2,7 @@
 
 **Niveau :** Confirmé
 **Cible :** app qui a intégré `socle-pack-egress` et doit maîtriser l'IP vue par le site appelé
-**Versions vérifiées au code (2026-10-28) :** `socle-pack-egress` **1.0.0** · Hub `soclehub` **3.73.0** (`EgressProxyServer`, `EgressTunnelGrpcService`, `MiniMiniHubDeployWorker`)
+**Versions vérifiées au code (2026-10-28) :** `socle-pack-egress` **2.0.0** (comportement identique à la 1.0.0, dernière version Boot 3) · Hub `soclehub` **3.73.0** (`EgressProxyServer`, `EgressTunnelGrpcService`, `MiniMiniHubDeployWorker`)
 **Prérequis :** accès MCP au Hub `.net` (lecture du pool) ; clé IAM de l'app
 **Temps estimé :** 15 min
 
@@ -129,7 +129,7 @@ socle:
     affinity: ${HOSTNAME}        # chaque réplique garde sa sortie pendant 10 min
 ```
 
-Pour plusieurs politiques dans une même app (deux IP fixes, par exemple), le pack 1.0.0 n'offre
+Pour plusieurs politiques dans une même app (deux IP fixes, par exemple), le pack (1.0.0 comme 2.0.0) n'offre
 qu'un bean : la voie est un second `EgressTunnelProxy` construit à la main avec ses propres
 `EgressClientProperties`, démarré par `start()` et fermé par `close()`.
 

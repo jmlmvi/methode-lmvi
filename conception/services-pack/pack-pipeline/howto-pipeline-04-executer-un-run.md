@@ -2,7 +2,7 @@
 
 **Niveau :** Confirmé
 **Cible :** application qui embarque `socle-pack-pipeline`, avec un template publié ([[howto-pipeline-02-declarer-valider-publier-un-dag|PIPELINE-02]])
-**Versions vérifiées au code :** `socle-pack-pipeline` 0.1.0-SNAPSHOT @ `5fa8f05` (branche `feat/p1-p4-dag-engine`) · `socle-v005` 5.8.0 · date 2026-10-28
+**Versions vérifiées au code :** `socle-pack-pipeline` 0.2.0 @ `4cb5aa6` (branche `feat/boot4`, code fonctionnel identique à 0.1.0-SNAPSHOT @ `5fa8f05`) · `socle-v005` 5.9.0 / Spring Boot 4.0.6 · date 2026-10-28
 **Temps estimé :** 30 min
 
 > Classes de référence : `runtime/PipelineRuntimeManager`, `engine/DagPipelineBuilder`, `engine/CompiledPipeline`
