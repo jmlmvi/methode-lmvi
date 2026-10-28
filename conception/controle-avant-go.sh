@@ -147,13 +147,17 @@ FUITES=$(grep -rlEi '(password|secret|api[_-]?key|token)[[:space:]]*[:=][[:space
 titre "5. Ce qui ne doit pas être réécrit"
 
 # La table de routage de M6 (§3 bis du gabarit) : chaque brique cite un guide de
-# service (howto-NN), une fiche de mécanisme (UC-XXX-NN), ou porte NON COUVERT.
-# Les catalogues sont ceux d'APP-ZZ-TEMPLATE, voisin des apps ; surchargeables.
-# À défaut, les copies livrées avec le kit, à côté de ce script.
+# service (howto-NN), un howto de pack (howto-<pack>-NN) ou une EXTENSION / un
+# PACK NEUF, une fiche de mécanisme (UC-XXX-NN), ou porte NON COUVERT.
+# Les catalogues services et mécanismes sont ceux d'APP-ZZ-TEMPLATE, voisin des
+# apps ; à défaut, les copies livrées avec le kit. Les howtos de pack ne vivent
+# que dans le kit (services-pack/, à côté de ce script). Tous surchargeables.
+KIT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CAT_RACINE="$(dirname "$APP_DIR")/APP-ZZ-TEMPLATE/docs"
-[ -d "$CAT_RACINE/use-cases" ] || CAT_RACINE="$(cd "$(dirname "$0")" && pwd)"
+[ -d "$CAT_RACINE/use-cases" ] || CAT_RACINE="$KIT_DIR"
 CAT_SERVICES="${CATALOGUE_SERVICES:-$CAT_RACINE/services-disponibles}"
 CAT_UC="${CATALOGUE_UC:-$CAT_RACINE/use-cases}"
+CAT_PACKS="${CATALOGUE_PACKS:-$KIT_DIR/services-pack}"
 M6_PLAN="$CHANTIER/M6-plan-technique/README.md"
 
 if [ ! -f "$M6_PLAN" ]; then
@@ -172,26 +176,35 @@ else
   if [ -z "$ROUTAGE" ]; then
     ecart "5.6" "aucune table de routage dans M6 (colonnes Brique, howto-NN, UC-XXX-NN)"
   else
-    NB=0; NC=0; SANS=""; INVENTES=""; CAT_ABSENT=""
+    NB=0; NC=0; NX=0; SANS=""; INVENTES=""; CAT_ABSENT=""
     while IFS=$'\t' read -r b r; do
       NB=$((NB+1))
       if echo "$r" | grep -q '{{'; then SANS="$SANS $b"; continue; fi
-      REFS=$(echo "$r" | grep -oiE 'howto-[0-9]{2}|UC-[A-Z]{2,3}-[0-9]{2}' | sed -E 's/^[Hh][Oo][Ww][Tt][Oo]/howto/')
+      # Une extension de pack peut citer un howto qu'elle va créer : non vérifié.
+      EXT=0; echo "$r" | grep -qiE 'EXTENSION|PACK NEUF' && { EXT=1; NX=$((NX+1)); }
+      REFS=$(echo "$r" | grep -oiE 'howto-[a-z]+-[0-9]{2}|howto-[0-9]{2}|UC-[A-Z]{2,3}-[0-9]{2}' \
+             | sed -E 's/^[Hh][Oo][Ww][Tt][Oo]/howto/' | tr 'A-Z' 'a-z' | sed -E 's/^uc-/UC-/; s/^(UC-[a-z]+)/\U\1/')
       if [ -z "$REFS" ]; then
-        if echo "$r" | grep -qi 'NON COUVERT'; then NC=$((NC+1)); else SANS="$SANS $b"; fi
+        if echo "$r" | grep -qi 'NON COUVERT'; then NC=$((NC+1))
+        elif [ "$EXT" = 0 ]; then SANS="$SANS $b"; fi
         continue
       fi
       for x in $REFS; do
-        case "$x" in howto-*) d="$CAT_SERVICES" ;; *) d="$CAT_UC" ;; esac
+        case "$x" in
+          howto-[0-9]*) d="$CAT_SERVICES"; motif="$d/$x-*.md" ;;
+          howto-*)      [ "$EXT" = 1 ] && continue
+                        d="$CAT_PACKS";    motif="$d/*/$x-*.md" ;;
+          *)            d="$CAT_UC";       motif="$d/$x-*.md" ;;
+        esac
         if [ ! -d "$d" ]; then CAT_ABSENT="$d"
-        elif ! ls "$d/$x"-*.md >/dev/null 2>&1; then INVENTES="$INVENTES $x"; fi
+        elif ! ls $motif >/dev/null 2>&1; then INVENTES="$INVENTES $x"; fi
       done
     done <<< "$ROUTAGE"
 
-    [ -z "$SANS" ] && ok "5.6" "$NB brique(s) routée(s), dont $NC NON COUVERT" \
+    [ -z "$SANS" ] && ok "5.6" "$NB brique(s) routée(s), dont $NX extension(s) de pack et $NC NON COUVERT" \
                    || ecart "5.6" "brique(s) sans référence :$SANS"
     if [ -n "$CAT_ABSENT" ]; then
-      inconnu "5.7" "catalogue introuvable : $CAT_ABSENT (CATALOGUE_SERVICES / CATALOGUE_UC)"
+      inconnu "5.7" "catalogue introuvable : $CAT_ABSENT (CATALOGUE_SERVICES / CATALOGUE_PACKS / CATALOGUE_UC)"
     elif [ -z "$INVENTES" ]; then
       ok "5.7" "toutes les références citées existent dans les catalogues"
     else

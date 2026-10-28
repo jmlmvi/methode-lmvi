@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.12.2 -->
+<!-- KIT-VERSION: 1.13.0 -->
 # L'essentiel de la méthode — en une page
 
 > La philosophie, sans un seul template. À lire avant tout le reste.
@@ -35,9 +35,12 @@ a des boucles de retour, y compris celle qui sait **arrêter** un chantier propr
 
 Zéro mock, zéro simulation, zéro faux vert : sans dépendance réelle, un état honnête
 (`en_attente`) — jamais un résultat inventé. On ne recode pas ce que la plateforme fournit, et on
-sait où le vérifier : deux catalogues livrés avec le kit, `CATALOGUE-SERVICES.md` (*la plateforme
-le rend-elle déjà ?*) puis `CATALOGUE-MECANISMES.md` (*par quel mécanisme écrire le reste ?*),
-consultés dans cet ordre ; ce qu'aucun ne couvre est déclaré `NON COUVERT` avant d'être codé. Et on
+sait où le vérifier : trois catalogues livrés avec le kit, `CATALOGUE-SERVICES.md` (*le Hub le
+rend-il déjà ?*), `CATALOGUE-PACKS.md` (*un pack le rend-il dans l'app ?*) puis
+`CATALOGUE-MECANISMES.md` (*par quel mécanisme écrire le reste ?*), consultés dans cet ordre ; ce
+qu'aucun ne couvre est déclaré `NON COUVERT` avant d'être codé. Et **service-pack first** : ce qui
+peut être mutualisé l'est — un pack s'embarque quand on en a besoin et s'amende quand il lui manque
+quelque chose, plutôt qu'un contournement dans l'app (schéma : `conception/README.md`). Et on
 n'applique pas la méthode à ce qui n'en a pas besoin : si l'intention tient dans un message et se
 prouve par un test, on fait, on prouve, on n'instrumente pas.
 

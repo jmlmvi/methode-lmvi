@@ -1,6 +1,6 @@
 # SocleHub — HOWTOs : Index
 
-> Index de la section `use-cases/`. **43 HOWTOs** avec code complet (zéro pseudo-code), section « Pièges courants » obligatoire en fin de chaque fichier. Liens Obsidian `[[fiche|titre]]`.
+> Index de la section `use-cases/`. **45 HOWTOs** avec code complet (zéro pseudo-code), section « Pièges courants » obligatoire en fin de chaque fichier. Liens Obsidian `[[fiche|titre]]`.
 >
 > **État de référence** : Hub **3.70.3** / framework **socle-v005 5.9.4** / Java 21 GraalVM CE — vérifié au code et **mesuré en production** le 2026-10-16.
 > Les domaines d'exemple utilisent la convention staging `*.thesocle.net`.
@@ -140,6 +140,14 @@
 
 ---
 
+## Décider sur un texte (KEV)
+
+| HOWTO | Description |
+|---|---|
+| [[howto-45-classer-un-texte-avec-kev\|HOWTO 45 — Classer un texte avec KEV]] | Rubrique, catégorie, routage, oui/non : `choisir` / `oui_non` / `noter` / `decider` par l'APIM, deux moteurs (Spark 9B, nas4 4B). **La règle de l'écart au-delà de trois options** (le seuil de 0,80 y envoie tout en revue — mesuré), plugin WordPress complet, repli quand le moteur tombe. **Publié en recette (`.net`) seulement au 2026-10-28.** |
+
+---
+
 ## APIM (API Management)
 
 | HOWTO | Description |
@@ -202,6 +210,7 @@
 | Publier / consommer NATS depuis une app | [[howto-37-publier-des-messages-nats-depuis-une-app\|HOWTO 37]], [[howto-38-consommer-des-messages-nats-depuis-une-app\|HOWTO 38]] |
 | Publier une app TheFront signée | [[howto-26-publier-une-app-thefront\|HOWTO 26]], [[howto-29-rotation-publisher-keys-thefront\|HOWTO 29]] |
 | Configurer le LLM Gateway AgentIA | [[howto-27-configurer-agentia-gateway\|HOWTO 27]] |
+| Classer un texte (rubrique d'article, routage de ticket, oui/non) sans LLM | [[howto-45-classer-un-texte-avec-kev\|HOWTO 45]] |
 | Intégrer un socle-pack dans une app | [[howto-28-integrer-un-socle-pack-dans-une-app\|HOWTO 28]] |
 | Publier / tarifer une API APIM | [[howto-30-publier-une-api-apim\|HOWTO 30]], [[howto-31-creer-une-regle-jdm-apim\|HOWTO 31]], [[howto-35-configurer-le-wallet-et-la-facturation-apim\|HOWTO 35]] |
 | Donner sa propre entrée API à un programme, avec repli | [[howto-36-exposer-un-programme-en-api-avec-repli-janino\|HOWTO 36]] |

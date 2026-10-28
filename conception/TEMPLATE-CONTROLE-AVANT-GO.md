@@ -102,10 +102,11 @@
 | 5.3 | Les fichiers vont sur S3 via `storage_worker`, jamais sur le disque du conteneur | | |
 | 5.4 | Chaque worker de M6 porte une logique **que seule cette app connaît** | | |
 | 5.5 | L'interface vient de `@lmvi/ui` par étiquette npm — aucune copie de composant dans l'app | | |
-| 5.6 | 🤖 Chaque brique de la table de routage de M6 cite un guide de service (`howto-NN`, `services-disponibles/`), une fiche de mécanisme (`UC-XXX-NN`, `use-cases/`), ou porte `NON COUVERT` | | |
-| 5.7 | 🤖 Chaque référence citée existe dans le catalogue — un guide ou une fiche inventés comptent comme un écart | | |
-| 5.8 | L'ordre a été suivi : pour chaque brique à fiche `UC-*` seule, aucun service du Hub ne rend déjà ce besoin | | |
+| 5.6 | 🤖 Chaque brique de la table de routage de M6 cite un guide de service (`howto-NN`, `services-disponibles/`), un howto de pack (`howto-<pack>-NN`, `services-pack/`) ou une `EXTENSION`/`PACK NEUF`, une fiche de mécanisme (`UC-XXX-NN`, `use-cases/`), ou porte `NON COUVERT` | | |
+| 5.7 | 🤖 Chaque référence citée existe dans le catalogue — un guide, un howto de pack ou une fiche inventés comptent comme un écart | | |
+| 5.8 | L'ordre a été suivi : pour chaque brique à fiche `UC-*` seule, ni un service du Hub ni un pack ne rend déjà ce besoin | | |
 | 5.9 | Chaque `NON COUVERT` dit pourquoi, et quel catalogue sera enrichi en M7 | | |
+| 5.10 | **Service-pack first** : aucune brique d'app ne refait ce qu'un **pack** fait déjà (`CATALOGUE-PACKS.md`) — client LLM ou HTTP, notifications, connecteur SaaS, résolution du tenant… ; ce qui est mutualisable est une `EXTENSION <pack>` ou un `PACK NEUF`, planifié avant l'app qui le consomme. Signal : `okhttp`/`HttpClient` en dépendance directe de l'app | | |
 
 > C'est la ligne la plus rentable de cette grille. Un service réécrit ne se voit pas à la revue de
 > code : il se voit trois mois plus tard, quand les deux versions ont divergé.

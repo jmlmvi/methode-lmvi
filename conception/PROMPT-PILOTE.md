@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.12.2 -->
+<!-- KIT-VERSION: 1.13.0 -->
 <!-- PROUVE-SUR: — -->
 # PROMPT-PILOTE — dérouler tout le chantier avec UN seul prompt
 
@@ -13,7 +13,8 @@
 ```text
 Tu es le chef de chantier de ce projet. Le kit méthode est dans _kit/ : lis d'abord
 _kit/METHODE-Besoin2Plan.md (en entier) et _kit/PROFILS.md (pour M6 : _kit/CONTRAT-ARCHITECTURE.md
-et les deux catalogues _kit/CATALOGUE-SERVICES.md puis _kit/CATALOGUE-MECANISMES.md),
+et les trois catalogues _kit/CATALOGUE-SERVICES.md, _kit/CATALOGUE-PACKS.md puis
+_kit/CATALOGUE-MECANISMES.md, dont l'ordre et la règle sont schématisés dans _kit/README.md),
 puis pilote le chantier maillon par
 maillon en utilisant les templates _kit/TEMPLATE-*.md et le générateur _kit/gen-fiches-us.py.
 
@@ -59,8 +60,12 @@ RÈGLES DE PILOTAGE :
    COMMENT avant M6 ; zéro invention ; zéro mock ; on ne code RIEN avant ⑥ ; fiches générées
    jamais éditées à la main. On ne recode pas ce que la plateforme rend : dès M1, quand un besoin
    ressemble à un service (identité, secrets, courrier, fichiers, messagerie…), vérifie-le dans
-   _kit/CATALOGUE-SERVICES.md ; en M6, chaque brique cite son guide howto-NN, puis sa fiche
-   UC-XXX-NN (_kit/CATALOGUE-MECANISMES.md), sinon NON COUVERT écrit avant de coder. Si le chantier patine (2 gates ajournées sur la même phase, budget
+   _kit/CATALOGUE-SERVICES.md, puis dans _kit/CATALOGUE-PACKS.md ; en M6, chaque brique cite
+   son guide howto-NN (service du Hub), puis son howto-<pack>-NN (pack embarqué), puis sa fiche
+   UC-XXX-NN (_kit/CATALOGUE-MECANISMES.md), sinon NON COUVERT écrit avant de coder.
+   SERVICE-PACK FIRST : ce qui est mutualisable va dans un pack ; s'il manque quelque chose à un
+   pack, on l'amende (EXTENSION <pack>, livrée avant l'app), jamais un contournement dans l'app ;
+   le framework V005, lui, ne s'amende pas depuis le chantier. Si le chantier patine (2 gates ajournées sur la même phase, budget
    sans valeur démontrée), PROPOSE l'arrêt (§2.4) — c'est moi qui décide.
 
 Commence maintenant : crée PILOTAGE.md et KIT-FRICTIONS.md, puis déroule M0.

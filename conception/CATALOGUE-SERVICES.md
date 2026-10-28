@@ -6,9 +6,16 @@
 > `howto-NN`, que la brique cite dans la table de routage.
 >
 > **Les guides sont dans le kit** : [`services-disponibles/`](services-disponibles/00-index.md) — un clic
-> sur une référence ouvre le guide. Source canonique : `docs/02-DocHub/use-cases/` (44 guides),
+> sur une référence ouvre le guide. Source canonique : `docs/02-DocHub/use-cases/` (45 guides),
 > recopiée dans `APP-ZZ-TEMPLATE/docs/services-disponibles/` puis ici. Recensé le 2026-10-27 ; la source fait foi — si elle a grandi, ajouter
 > la ligne ici.
+>
+> **Entre les deux, les packs du socle** : si le besoin n'est pas un service du Hub mais une capacité
+> qu'un `socle-pack-*` embarque dans l'app (IA, notifications, connecteurs SaaS, chaîne éditoriale,
+> courrier par utilisateur, pipelines DAG, tenant, sortie réseau), la brique cite le howto du pack :
+> [`CATALOGUE-PACKS.md`](CATALOGUE-PACKS.md) (table « besoin → howto » des 61 howtos de
+> [`services-pack/`](services-pack/00-index.md), un par grande fonctionnalité des 8 packs). Ordre de
+> routage et règle « service-pack first » : [`README.md`](README.md).
 >
 > Ce qui reste à écrire dans l'app se route ensuite vers les 148 fiches de mécanismes
 > (`APP-ZZ-TEMPLATE/docs/use-cases/INDEX.md`).
@@ -36,6 +43,7 @@ d'administration du Hub ou de livraison, utile en M7 mais qu'aucune brique ne r�
 | donner une entrée API à un programme, avec repli sur 429/5xx | [`howto-36`](services-disponibles/howto-36-exposer-un-programme-en-api-avec-repli-janino.md) programme en API + repli Janino | app |
 | une clé pour appeler un LLM ou toute API APIM | [`howto-39`](services-disponibles/howto-39-provisionner-une-cle-apim-pour-une-app.md) provisionner une clé APIM | app |
 | appeler un LLM (providers, quotas, tenant) | [`howto-27`](services-disponibles/howto-27-configurer-agentia-gateway.md) passerelle AgentIA | app |
+| classer un texte (rubrique, catégorie, routage, oui/non) sans LLM, avec une probabilité par réponse | [`howto-45`](services-disponibles/howto-45-classer-un-texte-avec-kev.md) classer avec KEV | app |
 | exposer ses actions à un agent (agrégation MCP) | [`howto-13`](services-disponibles/howto-13-utiliser-mcpagger.md) MCPagger | app |
 
 ### Messagerie et événements
@@ -79,7 +87,7 @@ d'administration du Hub ou de livraison, utile en M7 mais qu'aucune brique ne r�
 |---|---|---|
 | créer l'app de zéro (arborescence, manifeste, front, Dockerfile) | [`howto-24`](services-disponibles/howto-24-creer-une-app-socle-from-scratch.md) app from scratch | app |
 | monter la version du socle ou du front | [`howto-25`](services-disponibles/howto-25-upgrader-une-app-socle.md) upgrader une app | app |
-| intégrer un socle-pack (IA, pipeline, tenant…) | [`howto-28`](services-disponibles/howto-28-integrer-un-socle-pack-dans-une-app.md) intégrer un socle-pack | app |
+| intégrer un socle-pack (IA, pipeline, tenant…) | [`howto-28`](services-disponibles/howto-28-integrer-un-socle-pack-dans-une-app.md) intégrer un socle-pack (vue générale, daté) — le détail à jour par pack : [`services-pack/`](services-pack/00-index.md), howto `-01` de chaque pack | app |
 | ajouter une fonctionnalité au Hub lui-même | [`howto-01`](services-disponibles/howto-01-ajouter-une-fonctionnalite.md) ajouter une fonctionnalité | plateforme |
 | corriger un bug | [`howto-02`](services-disponibles/howto-02-corriger-un-bug.md) corriger un bug | plateforme |
 | suivre la fabrication de l'app (salon, dossier TheDash, tableaux) | [`howto-44`](services-disponibles/howto-44-suivre-la-fabrication-dune-app.md) suivre la fabrication | plateforme |
@@ -100,6 +108,6 @@ d'administration du Hub ou de livraison, utile en M7 mais qu'aucune brique ne r�
 | installer un Hub neuf | [`howto-17`](services-disponibles/howto-17-deployer-en-production.md) déployer en production | plateforme |
 | restaurer une sauvegarde | [`howto-18`](services-disponibles/howto-18-restaurer-backup.md) restaurer un backup | plateforme |
 
-> **Aucune ligne ne répond ?** Le service existe peut-être sans guide : le §22.A de
+> **Aucune ligne ne répond ?** Un pack le rend peut-être dans l'app : [`CATALOGUE-PACKS.md`](CATALOGUE-PACKS.md). Sinon, le service existe peut-être sans guide : le §22.A de
 > `CATALOGUE-FONCTIONS-TSH.md` (même dossier) recense les fonctions du Hub qui n'ont pas encore de
 > HowTo. Sinon, la brique porte `NON COUVERT` dans la table de routage de M6, avec sa raison.

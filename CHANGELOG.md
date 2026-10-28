@@ -4,6 +4,45 @@
 > (procédure : README racine, « Resync d'une instance »). Ce fichier est auto-versionné par ses
 > entrées (pas de marqueur `KIT-VERSION`, cf. charte U-DOCS §3).
 
+## 1.13.0 — 2026-10-28
+
+**Les packs du socle documentés : `conception/services-pack/`.** 61 howtos, un par grande
+fonctionnalité de chacun des 8 `socle-pack-*` (ai 9, com 8, connectors 10, editorial 6, egress 4,
+mail 7, pipeline 9, tenant 8), au modèle de `services-disponibles/` (code complet, vérification,
+« Pièges courants »). Écrits à partir du code de chaque pack le 2026-10-28 ; un `README.md` par pack
+donne la version et le commit documentés, les écarts README ↔ code et les apps consommatrices.
+`00-index.md` ajoute six pièges communs (porte `/mcp`, Vault jamais lu, deux lignées Boot,
+vendorisation, mono-tenant, manifeste en retard). Chaque pack porte désormais dans son `CLAUDE.md`
+la consigne de tenir ses howtos à jour.
+
+**Un troisième catalogue : `CATALOGUE-PACKS.md`** (besoin → `howto-<pack>-NN`, avec une colonne
+« État » : prêt / à construire / défaut connu). Le routage M6 passe de 2 à 3 catalogues, consultés
+dans cet ordre : services du Hub → packs → mécanismes.
+
+**La règle « service-pack first » entre dans la méthode.** Ce qui peut être mutualisé l'est : un
+pack s'embarque quand on en a besoin, et **s'amende** quand il lui manque quelque chose
+(`EXTENSION <pack>`, ou `PACK NEUF`), livré avant l'app qui le consomme — jamais un contournement
+dans l'app. Les trois étages n'ont pas le même propriétaire : service du Hub = on consomme ; pack =
+on embarque et on amende ; framework V005 = on n'amende pas depuis un chantier.
+- `conception/README.md` : section « Services, packs et mécanismes » — tableau des trois étages et
+  deux schémas mermaid (ordre des appels à l'exécution, ordre des recherches en M6) ;
+- `METHODE` M6 : routage en 5 temps (service, pack, mutualisable, mécanisme, NON COUVERT) et
+  propriétaires ; `TEMPLATE-M6` §3 bis : colonne « Pack embarqué » ; `PROMPT-PILOTE` invariant 5 et
+  lectures ; `ESSENTIEL` §5 ;
+- contrôle avant go : 5.6/5.7/5.8 étendus aux packs, **5.10** nouveau (aucune brique d'app ne refait
+  ce qu'un pack fait) ; `controle-avant-go.sh` reconnaît `howto-<pack>-NN` (vérifié dans
+  `services-pack/`, surchargeable par `CATALOGUE_PACKS`) et les lignes `EXTENSION` / `PACK NEUF`.
+  Les tables M6 à l'ancien format restent valides (testé).
+- `CATALOGUE-SERVICES.md` renvoie au catalogue des packs.
+
+## 1.12.3 — 2026-10-28
+
+**Un 45e guide : classer un texte avec KEV.** `howto-45-classer-un-texte-avec-kev.md` reprend le
+HOWTO de l'app `APP-32-KEV` au format des guides de services. Il ajoute la règle de l'écart au-delà
+de trois options, mesurée le 2026-10-15, et un plugin WordPress complet. Écrit dans la source
+(`docs/02-DocHub/use-cases/`), recopié dans `APP-ZZ-TEMPLATE/docs/services-disponibles/` et ici ;
+une ligne dans `CATALOGUE-SERVICES.md` (« Exposer et appeler des API »), « 44 guides » devient 45.
+
 ## 1.12.2 — 2026-10-27
 
 **Les catalogues annoncés dès le départ.** Jusqu'ici, l'agent ne découvrait les deux catalogues

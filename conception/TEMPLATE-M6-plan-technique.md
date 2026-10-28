@@ -1,8 +1,9 @@
-<!-- KIT-VERSION: 1.11.3 -->
+<!-- KIT-VERSION: 1.13.0 -->
 <!-- PROUVE-SUR: — (niveau Feature v1.8 non prouvé ; chaîne de base prouvée sur Régie kit v1.0) -->
 # M6 · Plan technique + matrice de couverture — {{nom du chantier}}
 
-> Template. Choisir les briques **par nature** (arbre V005), **jamais par épic**. Réutiliser la plateforme.
+> Template. Choisir les briques **par nature** (arbre V005), **jamais par épic**. Réutiliser la
+> plateforme, puis les packs (**service-pack first** : ce qui est mutualisable va dans un pack).
 > La matrice est la **seule source de vérité** du mapping US→phase→brique (méthode §0).
 > **Relecture requise** (méthode §1).
 
@@ -19,24 +20,32 @@ Traduire chaque phase en briques techniques + prouver la couverture.
 des gates précédentes) · 6. **Mapping habilitations → IAM** (rôles métier → rôles/scopes
 `manifest.json` + mode SSO par route, §3 de `TEMPLATE-HABILITATIONS.md`).
 
-### 3 bis. Routage des briques (dans cet ordre : services, puis mécanismes)
-Avant d'écrire une brique, on cherche où elle est déjà décrite :
-1. **un service de la plateforme ?** → `APP-ZZ-TEMPLATE/docs/services-disponibles/` (index
-   `00-index.md`) : on le **consomme** et on cite le guide — la table « besoin → guide » des 44
-   guides est dans `CATALOGUE-SERVICES.md` (même dossier) ;
-2. **sinon, un mécanisme du socle ?** → `APP-ZZ-TEMPLATE/docs/use-cases/` (index `INDEX.md` ; table
-   « besoin → fiche » des 148 fiches dans `CATALOGUE-MECANISMES.md`, même dossier) : on
-   cite la fiche et on **suit le mécanisme qu'elle prescrit** ;
-3. **sinon** → `NON COUVERT`, écrit ici avant de coder ; le catalogue s'enrichit en M7.
+### 3 bis. Routage des briques (dans cet ordre : services, packs, mécanismes)
+Avant d'écrire une brique, on cherche où elle est déjà décrite (schéma : `README.md` du kit) :
+1. **un service de la plateforme ?** → `services-disponibles/` (table « besoin → guide » dans
+   `CATALOGUE-SERVICES.md`, même dossier) : on le **consomme** et on cite le guide `howto-NN` ;
+2. **sinon, un pack du socle ?** → `services-pack/` (table « besoin → howto » dans
+   `CATALOGUE-PACKS.md`) : on **embarque** le pack et on cite `howto-<pack>-NN`. S'il lui manque
+   presque rien ou s'il a un défaut connu (colonne « État ») : `EXTENSION <pack> — <ajout>`, livrée
+   dans le pack avant l'app ;
+3. **sinon, est-ce mutualisable ?** → **service-pack first** : `EXTENSION <pack>` ou
+   `PACK NEUF <nom> — <capacité>`, pas du code d'app ;
+4. **sinon, un mécanisme du socle ?** → `use-cases/` (table « besoin → fiche » dans
+   `CATALOGUE-MECANISMES.md`) : on cite la fiche et on **suit le mécanisme qu'elle prescrit** ;
+5. **sinon** → `NON COUVERT`, écrit ici avant de coder ; le catalogue s'enrichit en M7.
 
-| Brique | Ce qu'elle fait | Service consommé (`howto-NN`) | Mécanisme suivi (`UC-XXX-NN`) | Non couvert |
-|--------|-----------------|-------------------------------|-------------------------------|-------------|
-| `{{NomWorker}}` | `{{publie l'événement « idée reçue » sur NATS}}` | `{{howto-37}}` | `{{UC-RES-01}}` | |
-| `{{NomService}}` | `{{calcule le score}}` | — | `{{UC-DOM-02}}` | |
-| `{{NomStage}}` | `{{…}}` | — | — | `{{NON COUVERT — pourquoi, et quel catalogue enrichir}}` |
+| Brique | Ce qu'elle fait | Service consommé (`howto-NN`) | Pack embarqué (`howto-<pack>-NN` · `EXTENSION`) | Mécanisme suivi (`UC-XXX-NN`) | Non couvert |
+|--------|-----------------|-------------------------------|--------------------------------------------------|-------------------------------|-------------|
+| `{{NomWorker}}` | `{{publie l'événement « idée reçue » sur NATS}}` | `{{howto-37}}` | — | `{{UC-RES-01}}` | |
+| `{{NomService}}` | `{{répond aux questions avec citations}}` | — | `{{howto-ai-04}}` | — | |
+| `{{NomExtension}}` | `{{ajoute le fournisseur X au pack}}` | — | `{{EXTENSION ai — fournisseur X (howto-ai-03 mis à jour)}}` | — | |
+| `{{NomService2}}` | `{{calcule le score}}` | — | — | `{{UC-DOM-02}}` | |
+| `{{NomStage}}` | `{{…}}` | — | — | — | `{{NON COUVERT — pourquoi, et quel catalogue enrichir}}` |
 
-> Une brique peut citer un guide **et** une fiche : elle consomme un service par un mécanisme du
-> socle. Une ligne sans aucune des trois colonnes remplies bloque le contrôle avant go.
+> Une brique peut citer plusieurs colonnes : elle consomme un service par un pack, ou suit un
+> mécanisme du socle pour écrire un handler de pack. Une ligne sans aucune colonne remplie bloque
+> le contrôle avant go. Une `EXTENSION` ou un `PACK NEUF` est une brique à part entière : phase,
+> tests et version du pack, howtos de `services-pack/` mis à jour.
 
 ## 4. Relations (mermaid)
 ```mermaid

@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.11.3 -->
+<!-- KIT-VERSION: 1.13.0 -->
 # Méthode AgileIA — Besoin → Plan (Spec de besoins → US → Features → Épics → Phasage → Plan technique)
 
 > **But** : passer proprement d'un **besoin métier exprimé** à un **plan technique exécutable**, sans
@@ -164,18 +164,32 @@ glm47 via APIM…) : une autre session du même modèle est une relecture de con
      **Le routage de chaque brique, dans cet ordre** — avant d'écrire une brique, on cherche
      où elle est déjà décrite :
      1. **le besoin est-il un service rendu par la plateforme ?** → le catalogue des services
-        (`APP-ZZ-TEMPLATE/docs/services-disponibles/`, 44 guides, table « besoin → guide »
-        dans `CATALOGUE-SERVICES.md`) ; si oui, la brique
-        **consomme** ce service et cite son guide (`howto-NN`), elle ne le réimplémente pas ;
-     2. **ce qui reste à écrire dans l'app** → le catalogue des mécanismes
-        (`APP-ZZ-TEMPLATE/docs/use-cases/`, 148 fiches, table « besoin → fiche »
-        dans `CATALOGUE-MECANISMES.md`) ; la brique cite sa fiche (`UC-XXX-NN`)
-        et **suit le mécanisme qu'elle prescrit**, pas le code d'un voisin ;
-     3. **aucun des deux ne couvre le cas** → la brique porte `NON COUVERT`, c'est dit avant de
-        coder, et le catalogue concerné s'enrichit une fois la solution trouvée (M7).
+        (`services-disponibles/`, table « besoin → guide » dans `CATALOGUE-SERVICES.md`) ; si
+        oui, la brique **consomme** ce service et cite son guide (`howto-NN`), elle ne le
+        réimplémente pas ;
+     2. **un pack du socle le rend-il dans l'app ?** → le catalogue des packs
+        (`services-pack/`, table « besoin → howto » dans `CATALOGUE-PACKS.md`) ; si oui, la brique
+        **embarque** le pack et cite son howto (`howto-<pack>-NN`). S'il manque presque rien au
+        pack (un réglage, un fournisseur, une action) ou s'il a un défaut connu, la brique
+        **amende le pack** : `EXTENSION <pack> — <ajout>`, livrée dans le pack avant l'app ;
+     3. **le besoin est-il mutualisable ?** (une autre app en aura besoin) → règle
+        **service-pack first** : il devient une extension de pack ou un pack neuf, pas du code
+        d'app ;
+     4. **ce qui reste, propre à cette app** → le catalogue des mécanismes
+        (`use-cases/`, table « besoin → fiche » dans `CATALOGUE-MECANISMES.md`) ; la brique cite
+        sa fiche (`UC-XXX-NN`) et **suit le mécanisme qu'elle prescrit**, pas le code d'un voisin ;
+     5. **aucun ne couvre le cas** → la brique porte `NON COUVERT`, c'est dit avant de coder, et
+        le catalogue concerné s'enrichit une fois la solution trouvée (M7).
 
-     L'ordre compte : interrogé à l'envers, l'agent réécrit un service que la plateforme rend déjà.
-     Une brique **sans référence** n'est pas prête : le contrôle avant go la bloque.
+     L'ordre compte : interrogé à l'envers, l'agent réécrit dans l'app un service que la
+     plateforme rend déjà, ou une capacité qu'un pack porte déjà. Une brique **sans référence**
+     n'est pas prête : le contrôle avant go la bloque. Schéma des étages (Hub / pack / framework),
+     de l'ordre des appels et de l'ordre des recherches : [`README.md`](README.md) du kit.
+
+     **Les trois étages n'ont pas le même propriétaire** : un service du Hub se **consomme**
+     (s'il manque, on le demande au Hub) ; un pack **s'embarque quand on en a besoin et
+     s'amende** (c'est notre périmètre) ; le framework V005 **ne s'amende pas** depuis un
+     chantier (il a son propre responsable : la demande lui est passée).
   3. **Modèle de données** (tables, standard THESOCLE).
   4. **Matrice de couverture** `US → épic → phase → brique → tests` (le garde-fou, **source de
      vérité du mapping**, cf. §0 et §3 — colonne Tests : tags `@US-x`/`@RG-x`/`@neg`).
