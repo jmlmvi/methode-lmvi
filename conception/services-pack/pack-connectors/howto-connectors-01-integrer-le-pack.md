@@ -2,8 +2,10 @@
 
 **Niveau :** Intermédiaire
 **Cible :** une APP-* V005 qui doit parler à Notion, Google Drive, Stripe ou HubSpot
-**Versions vérifiées au code (2026-10-28) :** `eu.lmvi:socle-pack-connectors:3.1.0` — construit contre
-`socle-v005:5.10.0` (provided) et `spring-boot-starter-parent:4.1.2` ; `main` @ `69da4ab`, tag `v3.1.0`.
+**Versions vérifiées au code (2026-10-28) :** `eu.lmvi:socle-pack-connectors:3.2.0` — construit contre
+`socle-v005:5.11.0` (provided ; minimum 5.10.0) avec pour parent `eu.lmvi:socle-v005-parent:5.11.0`
+(fils de `spring-boot-starter-parent:4.1.2`) ; `main` @ `edac18b`, tag `v3.2.0` — code identique à 3.1.0
+(`69da4ab`, tag `v3.1.0`), qui reste valide sur socle 5.10.x-5.11.x.
 **App socle 5.8.x-5.9.x / Boot 4.0.6 : rester sur `3.0.0`. App Boot 3 / socle ≤ 5.7.x : `2.0.0`**,
 dernière version Boot 3 (Boot 3.2.1, socle 5.7.4).
 **Temps estimé :** 30 min
@@ -63,7 +65,7 @@ Ce que le pack apporte à l'app :
 
 ## 3. Étape 1 — Rendre l'artefact résolvable
 
-L'artefact `3.1.0` est installé dans `~/.m2` de la box de build ; il n'est vendorisé dans **aucun**
+L'artefact `3.2.0` est installé dans `~/.m2` de la box de build ; il n'est vendorisé dans **aucun**
 `mvn-repo/` du dépôt au 2026-10-28. Le construire puis le vendoriser dans l'app :
 
 ```bash
@@ -71,18 +73,35 @@ cd /opt/2026-TheHub4TheSocle/socle-pack-Connectors
 mvn clean install -DskipTests
 
 APP=/opt/2026-TheHub4TheSocle/APP-XX-MonApp
-mkdir -p $APP/mvn-repo/eu/lmvi/socle-pack-connectors/3.1.0
-cp target/socle-pack-connectors-3.1.0.jar pom.xml \
-   $APP/mvn-repo/eu/lmvi/socle-pack-connectors/3.1.0/
-mv $APP/mvn-repo/eu/lmvi/socle-pack-connectors/3.1.0/pom.xml \
-   $APP/mvn-repo/eu/lmvi/socle-pack-connectors/3.1.0/socle-pack-connectors-3.1.0.pom
+mkdir -p $APP/mvn-repo/eu/lmvi/socle-pack-connectors/3.2.0
+cp target/socle-pack-connectors-3.2.0.jar pom.xml \
+   $APP/mvn-repo/eu/lmvi/socle-pack-connectors/3.2.0/
+mv $APP/mvn-repo/eu/lmvi/socle-pack-connectors/3.2.0/pom.xml \
+   $APP/mvn-repo/eu/lmvi/socle-pack-connectors/3.2.0/socle-pack-connectors-3.2.0.pom
 ```
+
+Le pom du pack a pour parent `eu.lmvi:socle-v005-parent` 5.11.0 : ce parent et `eu.lmvi:socle-v005-bom`
+5.11.0 doivent être résolvables aussi (vendoriser leurs `.pom` sous `mvn-repo/eu/lmvi/socle-v005-parent/5.11.0/`
+et `mvn-repo/eu/lmvi/socle-v005-bom/5.11.0/`).
 
 ---
 
 ## 4. Étape 2 — `pom.xml` de l'app
 
+Parent recommandé : **`eu.lmvi:socle-v005-parent`** 5.11.0, fils de `spring-boot-starter-parent` 4.1.2. Il
+fournit `${socle.version}` (5.11.0), importe `eu.lmvi:socle-v005-bom` (gRPC 1.85.1, Testcontainers 1.21.4,
+H2 2.5.252, Jedis 8.0.2, kafka-clients 4.4.0, mysql-connector-j 26.10.0, mariadb-java-client 4.0.0) et
+pose la règle enforcer `socle-versions-testees` (phase `validate`) : le build échoue si une de ces
+bibliothèques, ou `grpc-core`, retombe sous la version testée par le socle.
+
 ```xml
+<parent>
+    <groupId>eu.lmvi</groupId>
+    <artifactId>socle-v005-parent</artifactId>
+    <version>5.11.0</version> <!-- fils de spring-boot-starter-parent 4.1.2 ; fournit ${socle.version} -->
+    <relativePath/>
+</parent>
+
 <repositories>
     <repository>
         <id>project-local</id>
@@ -96,13 +115,13 @@ mv $APP/mvn-repo/eu/lmvi/socle-pack-connectors/3.1.0/pom.xml \
     <dependency>
         <groupId>eu.lmvi</groupId>
         <artifactId>socle-v005</artifactId>
-        <version>5.10.0</version> <!-- ≥ 5.10.0 ; parent spring-boot-starter-parent 4.1.2 -->
+        <version>${socle.version}</version> <!-- fournie par le parent ; ne pas la redéclarer -->
     </dependency>
 
     <dependency>
         <groupId>eu.lmvi</groupId>
         <artifactId>socle-pack-connectors</artifactId>
-        <version>3.1.0</version> <!-- 3.0.0 pour socle 5.8.x-5.9.x / Boot 4.0.6 ; 2.0.0 pour Boot 3 -->
+        <version>3.2.0</version> <!-- 3.1.0 : même code ; 3.0.0 pour socle 5.8.x-5.9.x / Boot 4.0.6 ; 2.0.0 pour Boot 3 -->
     </dependency>
 
     <!-- Le pack les déclare en scope provided : l'app doit les fournir -->
@@ -126,11 +145,20 @@ mv $APP/mvn-repo/eu/lmvi/socle-pack-connectors/3.1.0/pom.xml \
 ```
 
 Depuis 3.1.0 le pack n'a **aucune dépendance `compile`** : `socle-v005`, `okhttp-jvm` (OkHttp 5.5.1,
-amené par le socle 5.10), `spring-boot-starter-web`, `spring-boot-starter-jdbc`, `postgresql`,
-`jackson-databind`, `log4j2`, `disruptor` sont en scope `provided`. **Ne pas déclarer `okhttp` 4.x dans
+amené par le socle 5.10 et 5.11), `spring-boot-starter-web`, `spring-boot-starter-jdbc`, `postgresql`,
+`jackson-databind`, `log4j2` sont en scope `provided`. Disruptor vient du socle (4.0.0) ; jusqu'en 3.1.0
+le pack déclarait `disruptor` 3.4.4 en `provided` (sans effet sur l'app, retiré en 3.2.0). **Ne pas déclarer `okhttp` 4.x dans
 l'app** : depuis OkHttp 5 la variante JVM s'appelle `okhttp-jvm`, Maven ne déduplique pas deux artefacts
 aux coordonnées différentes, et deux copies de `okhttp3.*` se retrouvent sur le classpath. (Jusqu'à 3.0.0,
 le pack apportait lui-même `okhttp` 4.12.0 en compile.)
+
+**App qui garde son propre parent** (`spring-boot-starter-parent` 4.1.2 ou un parent maison) : voie
+supportée. Déclarer `<socle.version>5.11.0</socle.version>`, importer `eu.lmvi:socle-v005-bom:5.11.0` en
+`<type>pom</type><scope>import</scope>` dans `<dependencyManagement>`, **et** surcharger cinq propriétés
+— un BOM importé ne bat pas les entrées directes de `spring-boot-dependencies` : `h2.version` 2.5.252,
+`jedis.version` 8.0.2, `kafka.version` 4.4.0, `mysql.version` 26.10.0, `mariadb.version` 4.0.0. Sans
+ces gestes, l'app reçoit gRPC 1.84.1, H2 2.4.240, Jedis 7.4.1 (versions de Boot). Cette voie n'a pas la
+règle enforcer du parent.
 
 ---
 
@@ -289,11 +317,11 @@ curl -s -H "X-Admin-Key: $ADMIN_API_KEY" -H "Content-Type: application/json" \
 | 4 | Schéma absent | Échec au démarrage `Migration V000__init.sql failed` |
 | 5 | `test_connection` | `connected: true` |
 
-Tests du pack : `DemarrageContexteSpringTest` (vrai contexte Boot 4.1.2 + socle 5.10.0 + PostgreSQL
+Tests du pack : `DemarrageContexteSpringTest` (vrai contexte Boot 4.1.2 + socle 5.11.0 en 3.2.0, 5.10.0 en 3.1.0 + PostgreSQL
 Testcontainers : les quatre workers, leurs actions, les tables et la version de Boot comparés au
 manifeste), `ConnectorsActivationTest` (contrat d'activation, 5 cas), `NotionResultatJackson3Test`
 (résultats Notion écrits en Jackson 3), `StripeWebhookBoot4Test` (webhook signé sous Boot 4) —
-10 tests, 0 sauté, `mvn verify` vert (Docker requis).
+10 tests, 0 sauté, `mvn verify` vert, règle enforcer passée (Docker requis).
 
 ---
 
@@ -307,11 +335,14 @@ manifeste), `ConnectorsActivationTest` (contrat d'activation, 5 cas), `NotionRes
 | DataSource absente ou H2 | Échec du runner (fonctions `plpgsql`, `TIMESTAMPTZ`, `JSONB`) | PostgreSQL ≥ 14 obligatoire |
 | Modifier un `V00x` déjà joué | `checksum mismatch … skipping` : la modification n'est jamais appliquée | Nouveau script `V003__…` |
 | Suivre les `curl` du README du pack | `POST /api/actions/notion_worker__…` rend 404 sur une app | `POST /admin/workers/<worker>/actions/<action>` (`X-Admin-Key`) ou `POST /mcp` |
-| Prendre une version du pack bâtie sur un autre Boot que le socle de l'app | Compile, puis casse à l'exécution (classes Spring absentes ou déplacées) | Socle 5.10.x / Boot 4.1.2 → **3.1.0** ; socle 5.8.x-5.9.x / Boot 4.0.6 → **3.0.0** ; Boot 3 → **2.0.0**. Le manifeste dit vrai (`minSocleVersion`, `springBootVersion`), vérifié par `DemarrageContexteSpringTest` depuis 3.1.0 |
-| Pack 3.0.0 (ou app déclarant `okhttp` 4.x) avec socle 5.10 | Deux copies de `okhttp3.*` / okio sur le classpath ; `NoSuchMethodError` ou comportement selon l'ordre du classpath | Pack **3.1.0** (OkHttp fourni par le socle, `okhttp-jvm` 5.5.1) ; retirer `okhttp` 4.x du pom de l'app |
+| Prendre une version du pack bâtie sur un autre Boot que le socle de l'app | Compile, puis casse à l'exécution (classes Spring absentes ou déplacées) | Socle 5.10.x-5.11.x / Boot 4.1.2 → **3.2.0** (ou 3.1.0, même code) ; socle 5.8.x-5.9.x / Boot 4.0.6 → **3.0.0** ; Boot 3 → **2.0.0**. Le manifeste dit vrai (`minSocleVersion`, `springBootVersion`), vérifié par `DemarrageContexteSpringTest` depuis 3.1.0 |
+| Pack 3.0.0 (ou app déclarant `okhttp` 4.x) avec socle 5.10 ou 5.11 | Deux copies de `okhttp3.*` / okio sur le classpath ; `NoSuchMethodError` ou comportement selon l'ordre du classpath | Pack **3.2.0** ou 3.1.0 (OkHttp fourni par le socle, `okhttp-jvm` 5.5.1) ; retirer `okhttp` 4.x du pom de l'app |
 | `@Qualifier("packMigrationRunner")`, `"vaultCredentialResolver"`, `"notionWorker"`… dans l'app | `NoSuchBeanDefinitionException` après passage en 3.1.0 | Noms préfixés `connectors*` depuis 3.1.0 (tableau dans le README du kit) ; mieux : injecter par type. Ce préfixe évite la collision avec les beans homonymes d'autres packs (`PackMigrationRunner` de pack-ai/comm/pipeline, `NotionWorker` d'APP-04) |
 | Placer un `JsonNode` Jackson 2 (`com.fasterxml`) dans une réponse ou un `@RequestBody` côté app | `500` ou JSON méconnaissable : Boot 4 et le serveur MCP du socle écrivent en Jackson 3 | Lire le corps en `String`, rendre des `Map`/`List`. Le pack lui-même est conforme depuis 3.0.0 (en 2.0.0 sur socle ≥ 5.8, `get_page` et `get_database_full` sortaient faux) |
 | Compter 53 actions (README avant 3.0.0) | Le code en expose **54** | Manifeste corrigé en 3.0.0 (`create_database` ajouté) ; `GET /admin/workers/notion_worker/actions` fait foi |
+| Déclarer une `<configuration>` sur `maven-enforcer-plugin` dans le pom de l'app (liste `bannedDependencies/excludes`, `combine.self="override"`, `<skip>true</skip>`) | aucun message : la liste redéclarée **remplace** celle du parent, ou la règle est coupée — les bornes de `socle-versions-testees` disparaissent | Ne jamais configurer le plugin dans l'app. Une règle de plus = une autre `<execution>` avec son propre `<id>` |
+| Redéclarer `h2.version`, `jedis.version`, `kafka.version`, `mysql.version` ou `mariadb.version` sous la version du socle dans une app au parent `socle-v005-parent` | build en échec à `validate` (règle `socle-versions-testees`) | Voulu : retirer la surcharge, la version vient du parent |
+| App au parent `spring-boot-starter-parent` sans `socle-v005-bom` (ou avec le BOM sans les cinq propriétés) | l'app reçoit gRPC 1.84.1, H2 2.4.240, Jedis 7.4.1 de Boot au lieu des versions du socle | Parent `socle-v005-parent` 5.11.0 ; sinon BOM + cinq propriétés (§4) — corrigé côté socle en 5.10.1 (BOM étendu) et 5.11.0 (parent) |
 
 ---
 

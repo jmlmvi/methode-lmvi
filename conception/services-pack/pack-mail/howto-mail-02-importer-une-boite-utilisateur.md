@@ -2,7 +2,7 @@
 
 **Niveau :** Confirmé
 **Cible :** application V005 qui embarque `socle-pack-mail`
-**Versions vérifiées au code (2026-10-28) :** `socle-pack-mail` **1.5.0** (commit `a396ada`, tag `v1.5.0`) · socle **5.10.0** · Spring Boot 4.1.2 · `jakarta.mail-api` 2.1.5 + `angus-mail` 2.0.5 · OkHttp `okhttp-jvm` 5.5.1 (du socle) — comportement inchangé depuis 1.4.0
+**Versions vérifiées au code (2026-10-28) :** `socle-pack-mail` **1.6.0** (commit `932cf29`, tag `v1.6.0` ; code identique à 1.5.0 `a396ada`) · socle **5.11.0** (minimum 5.10.0) · Spring Boot 4.1.2 · `jakarta.mail-api` 2.1.5 + `angus-mail` 2.0.5 · OkHttp `okhttp-jvm` 5.5.1 (du socle) — comportement inchangé depuis 1.4.0
 **Prérequis :** [[howto-mail-01-integrer-le-pack|MAIL-01]] fait ; accès IMAP de l'utilisateur, ou jeton OAuth2 Gmail, ou export CSV Outlook
 **Temps estimé :** 30 min
 
@@ -163,7 +163,7 @@ public class ContactsDepot {
 ## 7. Identifiants : inline aujourd'hui, Vault plus tard
 
 Le code prévoit une lecture Vault (`VaultCredentialResolver`) sur
-`soclehub/apps/{appId}/users/{user_id}/imap|gmail`. En 1.4.0 comme en 1.5.0 elle **ne s'active pas** :
+`soclehub/apps/{appId}/users/{user_id}/imap|gmail`. En 1.4.0 comme en 1.5.0 et 1.6.0 elle **ne s'active pas** :
 
 - `appId` est la « partition » de l'appel, et `safePartition()` rend **toujours `null`** depuis le
   socle 5.6.0 (commentaire du code) ; `readCredentials` rend alors `null` sans chercher ;

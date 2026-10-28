@@ -1,13 +1,13 @@
 # HOWTO 00 — Créer ou amender un pack du socle (`EXTENSION <pack>` · `PACK NEUF <id>`)
 
 **Niveau :** Avancé
-**Cible :** `socle-v005` 5.10.0 · Spring Boot 4.1.2 · Java 21 · modèle `socle-pack-ZZ-TEMPLATE` 1.0.0
-**Vérifié au code :** 2026-10-28 (pack d'essai généré par le modèle : `mvn clean verify`, 16 tests verts)
+**Cible :** parent `eu.lmvi:socle-v005-parent` 5.11.0 (`socle-v005` 5.11.0, minimum 5.10.0) · Spring Boot 4.1.2 · Java 21 · modèle `socle-pack-ZZ-TEMPLATE` 1.1.0
+**Vérifié au code :** 2026-10-28 (pack d'essai généré par le modèle 1.1.0 : `mvn clean verify`, 16 tests verts, règle enforcer du parent passée)
 **Prérequis :** la brique a été routée au plan technique (M6, §3 bis) vers `EXTENSION <pack>` ou `PACK NEUF <id>` ; Docker local (tests PostgreSQL)
 **Temps estimé :** extension simple 1–2 h · pack neuf jusqu'à la 1re version : ½ à 2 jours
 
 > Index des packs : [[00-index|services-pack]] · Table besoin → howto : [`CATALOGUE-PACKS.md`](../CATALOGUE-PACKS.md)
-> Modèle : `/opt/2026-TheHub4TheSocle/socle-pack-ZZ-TEMPLATE/` (dépôt privé `jmlmvi/socle-pack-ZZ-TEMPLATE`, tag `v1.0.0`)
+> Modèle : `/opt/2026-TheHub4TheSocle/socle-pack-ZZ-TEMPLATE/` (dépôt privé `jmlmvi/socle-pack-ZZ-TEMPLATE`, tag `v1.1.0`)
 
 ---
 
@@ -47,7 +47,7 @@ ligne de compatibilité de plus à tenir pour toutes les apps.
 ```
 /opt/2026-TheHub4TheSocle/
 ├── socle-pack-<id>/                      dépôt git du pack (jmlmvi/socle-pack-<id>, privé)
-│   ├── pom.xml                           parent Boot = parent du pom du socle ; socle en provided
+│   ├── pom.xml                           parent socle-v005-parent du socle visé (Boot inclus) ; socle en provided
 │   ├── src/main/java/eu/lmvi/socle/pack/<id>/
 │   │   ├── config/<Id>PackConfiguration  noms de beans (préfixe <id>Pack)
 │   │   ├── config/<Id>Properties         socle.<id>.*
@@ -273,7 +273,7 @@ Un pack qui a besoin d'appeler un service HTTP prend l'OkHttp **du socle** :
 
 ```xml
 <properties>
-    <!-- celle du socle 5.10.0 ; ne jamais en fixer une autre -->
+    <!-- celle du socle (5.10.0 et 5.11.0) ; ne jamais en fixer une autre -->
     <okhttp.version>5.5.1</okhttp.version>
 </properties>
 <dependency>
@@ -294,7 +294,7 @@ Un pack qui a besoin d'appeler un service HTTP prend l'OkHttp **du socle** :
    ```bash
    cd /opt/2026-TheHub4TheSocle/socle-pack-facture
    gh repo create jmlmvi/socle-pack-facture --private --source . --push
-   git tag -a v0.1.0 -m "socle-pack-facture 0.1.0 — socle 5.10.0 / Boot 4.1.2" && git push origin v0.1.0
+   git tag -a v0.1.0 -m "socle-pack-facture 0.1.0 — socle 5.11.0 / Boot 4.1.2" && git push origin v0.1.0
    ```
 4. `mvn -q clean install`, puis vendorisation dans la première app (§ A.8).
 
@@ -355,7 +355,7 @@ Clés existantes, pas de clé nouvelle (`socleMin` n'existe pas) :
   "description": "Factures : numérotation légale, PDF, archivage.",
   "minSocleVersion": "5.10.0",
   "springBootVersion": "4.1.2",
-  "builtAgainstSocleVersion": "5.10.0",
+  "builtAgainstSocleVersion": "5.11.0",
   "workers": [
     {
       "name": "facture_worker",
@@ -386,12 +386,23 @@ abandonnée. `dependencies` liste les autres packs requis (`socle-pack-editorial
 
 ### C.5 Compatibilité socle / Spring Boot
 
-- `socle-v005` en `provided`, version dans `<socle.version>` : l'app embarque **son** socle.
-- Parent Spring Boot = parent de `socle-v005-<v>.pom` (5.10.0 → **4.1.2** ; 5.8.6–5.9.x → 4.0.6 ;
-  ≤ 5.8.0 → 3.2.1). Changer l'un, c'est changer l'autre.
+- Parent Maven = **`eu.lmvi:socle-v005-parent`** à la version du socle visé (depuis 5.11.0 ; fils de
+  `spring-boot-starter-parent` 4.1.2). Il fournit `${socle.version}`, importe `socle-v005-bom` (gRPC
+  1.85.1, Testcontainers 1.21.4, h2/jedis/kafka/mysql/mariadb testés) et la règle enforcer
+  `socle-versions-testees`. Le pom du pack ne redéclare ni `socle.version`, ni `testcontainers.version`,
+  ni ces propriétés de pilotes, ni un import `grpc-bom` / `testcontainers-bom`. Pour gRPC :
+  `${socle.grpc.version}`, jamais `${grpc-java.version}` (celle de Boot, 1.84.1).
+- `socle-v005` en `provided`, version `${socle.version}` : l'app embarque **son** socle.
+- Sans ce parent (packs antérieurs au socle 5.11) : parent Spring Boot = parent de
+  `socle-v005-<v>.pom` (5.10.0 → **4.1.2** ; 5.8.6–5.9.x → 4.0.6 ; ≤ 5.8.0 → 3.2.1).
+- **Piège enforcer** : ne jamais déclarer de `<configuration>` sur `maven-enforcer-plugin`. Une liste
+  `bannedDependencies/excludes` redéclarée **remplace** celle du parent ; `combine.self="override"` ou
+  `skip` coupent tout — les bornes disparaissent sans message (mesuré sur un pack généré). Une règle
+  de plus = une autre `<execution>` avec son propre `<id>`. Contrôle : la sortie de `mvn verify`
+  montre `enforce (socle-versions-testees)` puis `BannedDependencies passed`.
 - Tout starter déclaré exclut `spring-boot-starter-logging` (Log4j2 partout).
-- Testcontainers : BOM `testcontainers-bom` 1.21.4 importée (Boot 4.1 en impose 2.x, le mélange casse
-  la découverte de Docker), docker-java 3.5.0 et `DOCKER_API_VERSION=1.44` pour les démons Docker ≥ 29.
+- Testcontainers : 1.21.4 par le parent (Boot 4.1 en impose 2.x, le mélange casse la découverte de
+  Docker ; avant le parent, il fallait importer `testcontainers-bom`), docker-java 3.5.0 et `DOCKER_API_VERSION=1.44` pour les démons Docker ≥ 29.
 - OkHttp : `okhttp-jvm` 5.5.1 du socle en `provided` ; **jamais** `okhttp` 4.x en `compile` — l'app
   recevrait deux jeux de classes `okhttp3.*` et la première sur le classpath gagnerait.
 - Jackson : la ligne 2 (`com.fasterxml`) vient du socle ; le pack ne fait sortir que des
@@ -421,7 +432,8 @@ cd /opt/2026-TheHub4TheSocle/socle-pack-<id>
 mvn -q clean verify
 grep -h 'testsuite ' target/surefire-reports/*.xml | grep -oP 'tests="\d+"|failures="\d+"|errors="\d+"|skipped="\d+"'
 python3 -c "import json;m=json.load(open('src/main/resources/META-INF/socle-pack.json'));print(m['version'],m['minSocleVersion'],m['springBootVersion'],m['builtAgainstSocleVersion'])"
-grep -m1 -A0 '<version>' pom.xml   # parent Boot
+grep -m1 -A0 '<version>' pom.xml   # parent socle-v005-parent = socle visé
+mvn -q validate                    # règle enforcer socle-versions-testees du parent
 ```
 
 Puis, dans l'app consommatrice : `mvn -o -q package` sur un clone frais (vendorisation), démarrage
@@ -436,7 +448,8 @@ sans `ConflictingBeanDefinitionException`, et `<id>_worker__get_status` par `POS
 | `@Component` sans nom sur une classe au nom générique (`PackMigrationRunner`, `TenantResolver`) | l'app qui embarque deux packs ne démarre plus : `ConflictingBeanDefinitionException` | nom explicite `<id>Pack…`, `NomsDeBeansPrefixesTest` |
 | classe homonyme d'une classe du socle (`PipelineProperties`) | même échec, dès qu'une app balaie `eu.lmvi.socle` | nom explicite ; le balayage socle + pack du test le voit |
 | pack qui publie un `JdbcTemplate` | l'app perd son `JdbcTemplate` auto-configuré, ou injection ambiguë avec deux packs | `new JdbcTemplate(dataSource)` privé |
-| parent Boot ≠ parent du socle | `NoSuchMethodError` / `ClassNotFoundException` à l'exécution dans l'app | aligner sur `socle-v005-<v>.pom` ; `AlignementSocleTest` |
+| parent Boot ≠ parent du socle | `NoSuchMethodError` / `ClassNotFoundException` à l'exécution dans l'app | parent `socle-v005-parent` du socle visé ; `AlignementSocleTest` |
+| `<configuration>` sur `maven-enforcer-plugin` dans le pom du pack | bornes de versions du socle neutralisées, build vert | ne pas configurer ce plugin ; une autre `<execution>` si besoin |
 | `okhttp` 4.x en `compile` | deux copies de `okhttp3.*` dans l'app, comportement selon l'ordre du classpath | `okhttp-jvm` 5.5.1 du socle en `provided` |
 | manifeste non tenu | agents et `CapabilityRagWorker` décrivent un pack qui n'existe plus | tests de manifeste du modèle |
 | clé de manifeste inventée (`socleMin`) | les outils qui lisent `minSocleVersion` ne voient rien | clés existantes (C.4) |

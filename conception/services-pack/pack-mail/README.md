@@ -12,13 +12,14 @@ restent des **services du Hub**, que le pack ne réimplémente pas.
 
 | | |
 |---|---|
-| Version | **1.5.0** (CHANGELOG daté du 2026-10-28) — tag `v1.5.0` |
+| Version | **1.6.0** (CHANGELOG daté du 2026-10-28) — tag `v1.6.0` ; code identique à 1.5.0, seul le build change |
 | Source | `/opt/2026-TheHub4TheSocle/socle-pack-Mail/`, branche `main` (origine `github.com/jmlmvi/socle-pack-Mail`) |
-| Réf. git | **commit `a396ada`** (tag annoté `v1.5.0`, poussé) ; la 1.4.0 est le commit `23d3d07` (tag `v1.4.0`) |
+| Réf. git | **commit `932cf29`** (tag `v1.6.0`, poussé) ; la 1.5.0 est le commit `a396ada` (tag `v1.5.0`, même code) ; la 1.4.0 est le commit `23d3d07` (tag `v1.4.0`) |
 | Statut | commitée, taguée, installée dans `~/.m2` de la box de build. Publiée sur aucun dépôt distant : la vendoriser (MAIL-01) |
-| Socle | `socle-v005` **5.10.0** (`minSocleVersion` du manifeste), Spring Boot **4.1.2**, `socle-pack-ai` **2.8.0** |
+| Socle | construit contre `socle-v005` **5.11.0** (parent `eu.lmvi:socle-v005-parent` 5.11.0), minimum **5.10.0** (`minSocleVersion` du manifeste), Spring Boot **4.1.2**, `socle-pack-ai` **2.9.0** (`provided` ; 2.8.0 accepté) — lignée « Socle 5.10-5.11 · Boot 4.1.2 » |
+| Même lignée | **1.5.0** (parent Boot 4.1.2 direct, pack-ai 2.8.0) reste valide sur socle 5.10.x et 5.11.x |
 | Lignée précédente | **1.4.0** pour socle 5.8.x-5.9.x / Boot 4.0.6 / pack-ai 2.7.x |
-| Tests | 145, 0 échec, 0 sauté (surefire), dont un démarrage `SpringApplication` complet (socle 5.10.0 + pack-ai 2.8.0, PostgreSQL pgvector) ; PostgreSQL 17 réel, GreenMail 2.1.8 |
+| Tests | 145, 0 échec, 0 sauté (surefire), dont un démarrage `SpringApplication` complet (socle 5.11.0 + pack-ai 2.9.0, PostgreSQL pgvector) ; PostgreSQL 17 réel, GreenMail 2.1.8 ; règle enforcer `socle-versions-testees` passée |
 | Vérifié | au code et à l'exécution, le **2026-10-28** |
 
 ## Besoin → HOWTO
@@ -45,10 +46,11 @@ restent des **services du Hub**, que le pack ne réimplémente pas.
 
 ## Dépendances
 
-- **`socle-pack-ai`** 2.8.0, en `provided` : l'application le déclare et le configure
+- **`socle-pack-ai`** 2.9.0 (2.8.0 accepté), en `provided` : l'application le déclare et le configure
   ([[howto-ai-01-integrer-le-pack|HOWTO AI-01]]). Requis par `mail_generation_worker`.
 - Fournies par l'hôte : `socle-v005` (qui apporte OkHttp `okhttp-jvm` 5.5.1, disruptor 4.0.0, gRPC
-  1.85.1), `spring-boot-starter-jdbc`, `spring-boot-starter-web`, pilote PostgreSQL, Jackson.
+  1.85.1 — versions effectivement reçues par l'app au parent `socle-v005-parent`, ou par l'import de
+  `socle-v005-bom` ; voir MAIL-01), `spring-boot-starter-jdbc`, `spring-boot-starter-web`, pilote PostgreSQL, Jackson.
 - Embarquées : `jakarta.mail-api` 2.1.5 + `angus-mail` 2.0.5 (versions gérées par Boot 4.1.2, sans
   version écrite dans le pom du pack), jsoup 1.17.2. Jusqu'en 1.4.0 : `com.sun.mail:jakarta.mail`
   2.0.1, OkHttp 4.12.0 et disruptor 3.4.4 embarqués.
@@ -61,15 +63,15 @@ restent des **services du Hub**, que le pack ne réimplémente pas.
   (suivi : « socle-pack-mail 1.4.0 codé, 144 tests verts ; gate sur la recette »). C'est pour elle
   qu'ont été écrites la boîte applicative et l'activation. ⚠️ Elle est en Boot 4.0.6 : elle reste
   donc sur la lignée 1.4.0, dont les défauts de démarrage (corrigés en 1.5.0, ci-dessous) l'empêcheront
-  de démarrer dès qu'elle déclarera la dépendance — à trancher : monter l'app en socle 5.10 / pack
-  1.5.0, ou une 1.4.1 rétroportant les trois correctifs.
+  de démarrer dès qu'elle déclarera la dépendance — à trancher : monter l'app en socle 5.10-5.11 / pack
+  1.6.0, ou une 1.4.1 rétroportant les trois correctifs.
 - **APP-18 SDR2** — origine du moteur d'épuration et de `SignatureParser`
   (`docs/CONVERGENCE-SDR2.md`) ; ne dépend pas du pack.
 - Aucune autre `APP-*` ne déclare le pack (recherche des `pom.xml` du 2026-10-28).
 
 ## Écarts relevés entre documentation et code (le code fait foi)
 
-| Affirmation | Code 1.5.0 |
+| Affirmation | Code 1.5.0 / 1.6.0 |
 |---|---|
 | Lecture Vault des identifiants par utilisateur (README, `CLAUDE.md`) | jamais active : `appId` = partition = `null` (`safePartition`) et le socle ne publie aucun bean Vault lisible (5.9.5 comme 5.10.0) → import en `source_config` obligatoire, **envoi impossible sans résolveur de l'hôte** (MAIL-03) |
 | Synchronisation incrémentale quotidienne | inerte : le poller ne lit que Vault |
@@ -103,3 +105,9 @@ Corrigés en **1.5.0** :
 
 Ces trois défauts de démarrage existaient en 1.4.0 : une app restée en 1.4.0 (Boot 4.0.6) doit
 s'attendre à les rencontrer.
+
+**1.6.0** (aucun changement de code) : parent `eu.lmvi:socle-v005-parent` 5.11.0 — `${socle.version}`,
+`socle-v005-bom` et règle enforcer `socle-versions-testees` hérités ; imports `grpc-bom` /
+`testcontainers-bom` retirés du pom ; pack-ai 2.9.0 en `provided`. Côté socle, le défaut « l'app au
+parent Boot 4.1.2 reçoit gRPC 1.84.1 / H2 2.4.240 / Jedis 7.4.1 au lieu des versions du socle » est
+corrigé par `socle-v005-bom` 5.10.1 et par le parent 5.11.0 (MAIL-01 §3).

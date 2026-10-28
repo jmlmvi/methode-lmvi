@@ -1,7 +1,7 @@
 # HOWTO tenant-07 — Fraîcheur, cache et mode dégradé
 
 **Niveau :** Confirmé
-**Cible :** `socle-pack-tenant` ≥ 0.2.1 (séparation `revalidation` / `fraicheur-max`) — documenté sur 0.6.0 (comportement identique à 0.5.0)
+**Cible :** `socle-pack-tenant` ≥ 0.2.1 (séparation `revalidation` / `fraicheur-max`) — documenté sur 0.7.0 (tag `v0.7.0`, commit `7235f83`, socle 5.11.0 — minimum 5.10.0 — / Boot 4.1.2 ; code identique à 0.6.0 `c3b70e3`, comportement identique à 0.5.0)
 **Hub :** ≥ 3.63.0 (`ETag` + `304` sur `If-None-Match`, mesurés le 2026-10-02)
 **Vérifié au code :** 2026-10-28 (`FicheService`, `FicheCache`, `TenantFicheWorker`, `ModeDegradeTest`)
 **Prérequis :** [[howto-tenant-01-integrer-le-pack|tenant-01]]

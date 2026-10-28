@@ -2,7 +2,7 @@
 
 **Niveau :** Confirmé
 **Cible :** application V005 qui embarque `socle-pack-mail`
-**Versions vérifiées au code (2026-10-28) :** `socle-pack-mail` **1.5.0** (commit `a396ada`, tag `v1.5.0`) · socle **5.10.0** · Spring Boot 4.1.2 · `jakarta.mail-api` 2.1.5 + `angus-mail` 2.0.5 · OkHttp `okhttp-jvm` 5.5.1 (du socle) — comportement inchangé depuis 1.4.0
+**Versions vérifiées au code (2026-10-28) :** `socle-pack-mail` **1.6.0** (commit `932cf29`, tag `v1.6.0` ; code identique à 1.5.0 `a396ada`) · socle **5.11.0** (minimum 5.10.0) · Spring Boot 4.1.2 · `jakarta.mail-api` 2.1.5 + `angus-mail` 2.0.5 · OkHttp `okhttp-jvm` 5.5.1 (du socle) — comportement inchangé depuis 1.4.0
 **Prérequis :** [[howto-mail-01-integrer-le-pack|MAIL-01]] ; accès SMTP/IMAP de l'utilisateur ou OAuth2 Gmail avec le droit d'envoi
 **Temps estimé :** 40 min
 
@@ -65,7 +65,7 @@ Deux transports, choisis par les identifiants disponibles (Gmail prioritaire) :
 ## 3. Étape 1 — Fournir les identifiants d'envoi
 
 `send_mail` **ne prend aucun identifiant en paramètre** : il les demande à
-`VaultCredentialResolver.readCredentials(appId, userId, type)`. En 1.4.0 comme en 1.5.0 cette méthode rend toujours
+`VaultCredentialResolver.readCredentials(appId, userId, type)`. En 1.4.0 comme en 1.5.0 et 1.6.0 cette méthode rend toujours
 `null` dans une app (la partition `appId` vaut `null` — `safePartition()` — et le socle (5.9.5 comme 5.10.0) ne
 publie aucun bean Vault lisible par le pack). **Sans action de l'hôte, tout envoi échoue** avec
 `No mail credentials for user alice (neither gmail nor imap in Vault)`.

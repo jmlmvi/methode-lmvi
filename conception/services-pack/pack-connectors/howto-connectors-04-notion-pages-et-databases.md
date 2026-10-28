@@ -2,7 +2,7 @@
 
 **Niveau :** Intermédiaire
 **Cible :** app, agent MCP ou opérateur qui pilote un workspace Notion via `notion_worker`
-**Versions vérifiées au code (2026-10-28) :** `socle-pack-connectors:3.1.0` (Boot 4.1.2, socle 5.10.0 ; comportement identique à 3.0.0) — `NotionWorker` (20 actions),
+**Versions vérifiées au code (2026-10-28) :** `socle-pack-connectors:3.2.0` (tag `v3.2.0`, commit `edac18b`, code identique à 3.1.0 `69da4ab` ; Boot 4.1.2, socle 5.11.0, minimum 5.10.0 ; comportement identique à 3.0.0) — `NotionWorker` (20 actions),
 `NotionClient`, `PropertyConverter` ; API Notion `2022-06-28` (défaut `socle.conn.notion.version`)
 **Temps estimé :** 20 min
 

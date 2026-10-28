@@ -1,8 +1,8 @@
 # HOWTO tenant-02 — Poser le tenant courant pour le pack (MDC `tenant_id`)
 
 **Niveau :** Intermédiaire
-**Cible :** `socle-pack-tenant` 0.6.0 (socle-v005 5.10.x) et 0.5.0 (socle 5.8.9 → 5.9.x) — même contrat MDC
-**Vérifié au code :** 2026-10-28 (pack `FicheService.slugCourant()` ; JAR socle 5.9.5 **et 5.10.0** inspectés)
+**Cible :** `socle-pack-tenant` 0.7.0 (tag `v0.7.0`, commit `7235f83` ; code identique à 0.6.0 `c3b70e3`) — socle-v005 5.11.0 (minimum 5.10.0) / Boot 4.1.2 ; 0.6.0 (socle 5.10.x) et 0.5.0 (socle 5.8.9 → 5.9.x) — même contrat MDC côté pack
+**Vérifié au code :** 2026-10-28 (pack `FicheService.slugCourant()` ; JAR socle 5.9.5 et 5.10.0 inspectés ; bytecode socle **5.11.0** inspecté : `ActionExecutor.executeSync`)
 **Prérequis :** [[howto-tenant-01-integrer-le-pack|tenant-01]] ; l'app est derrière le proxy du Hub (SSO) et `TRUSTED_PROXIES` est réglé (`UC-SEC-06`)
 **Temps estimé :** 20 min
 
@@ -21,11 +21,28 @@ return (ctx != null && ctx.isPresent()) ? ctx.tenantId() : null;
 Le pack lit donc le tenant **dans le MDC SLF4J, clé `tenant_id`** (`TenantContext.MDC_KEY`). Il ne
 lit ni l'en-tête `X-SSO-Tenant`, ni le JWT, ni l'`ActionContext`.
 
-Et **aucune classe du socle ne pose cette clé** — **toujours pas en 5.10.0**. Vérifié dans les JAR
-5.9.5 et 5.10.0 : aucun `MDC.put` du socle ne porte sur `tenant_id` ; seule `TenantContext` (la
-constante `MDC_KEY` et `fromMdc()`) la lit. Les classes `TenantContextFilter` /
-`TenantContextHolder`, longtemps citées par le `CLAUDE.md` du pack (corrigé en 0.6.0), n'existent pas. Le
-socle définit le contrat MDC ; **c'est à l'application de le remplir**, à chaque point d'entrée.
+**Qui pose cette clé dépend de la version du socle et du point d'entrée :**
+
+| Socle | Pendant une action MCP / REST | Hors action (contrôleur HTTP, page Thymeleaf, worker, tâche) |
+|---|---|---|
+| ≤ 5.10.0 | l'application | l'application |
+| ≥ **5.10.1** (5.11.0 compris) | **le socle** | l'application |
+
+- **≤ 5.10.0** : aucune classe du socle ne pose `tenant_id` (vérifié dans les JAR 5.9.5 et 5.10.0 :
+  aucun `MDC.put` du socle sur cette clé ; seule `TenantContext` — constante `MDC_KEY`, `fromMdc()` — la lit).
+- **≥ 5.10.1** : `ActionExecutor.executeSync` — passage obligé de toutes les actions MCP et REST,
+  `executeAsync` y délègue — pose `tenant_id` = `ActionContext.tenantId()` pour la durée de l'appel et
+  restaure la valeur précédente à la sortie : un appel imbriqué ne détruit pas le tenant de l'appelant, et
+  un contexte sans tenant n'écrase pas celui déjà présent. `ActionContext.tenantId` est rempli par
+  `SocleMcpServer` (`POST /mcp`) et `AdminRestApi` depuis `CallerIdentity.tenant()`, l'identité
+  authentifiée de l'appelant. La traversée jusqu'au thread virtuel de l'action repose sur la propriété
+  Log4j2 `log4j2.isThreadContextMapInheritable=true`, que le jar du socle pose lui-même
+  (`log4j2.component.properties`, vérifié en 5.11.0) : l'app n'a rien à écrire, seulement à ne pas la surcharger.
+- **Hors action**, rien ne pose la clé, quelle que soit la version : **c'est à l'application de la
+  remplir**, à chaque point d'entrée qui n'est pas une action.
+
+Les classes `TenantContextFilter` / `TenantContextHolder`, longtemps citées par le `CLAUDE.md` du pack
+(corrigé en 0.6.0), n'existent pas. Le pack ne pose rien dans le MDC : il lit `TenantContext.fromMdc()`.
 
 C'est le point de couture avec les fiches `UC-SEC-05` (le tenant arrive par l'identité, jamais par
 les paramètres) et `UC-SEC-06` (l'en-tête n'est cru que derrière un proxy de confiance).
@@ -42,10 +59,14 @@ Cas réel : `APP-24-TheSociety`, `ContexteAppelantFilter` + `ContexteAppelantFil
                                           ▼
               ┌──────────── Point d'entrée de l'app ────────────┐
               │ HTTP  : filtre servlet   lit X-SSO-Tenant        │
-              │ MCP/REST action : TenantContext.fromActionContext│
               │ Worker planifié : boucle explicite sur les slugs │
               │            MDC.put("tenant_id", slug)            │
               │            try { … } finally { MDC.remove(…) }   │
+              ├──────────────────────────────────────────────────┤
+              │ MCP/REST action, socle ≥ 5.10.1 :                │
+              │   ActionExecutor pose tenant_id (CallerIdentity) │
+              │ MCP/REST action, socle ≤ 5.10.0 :                │
+              │   l'app, depuis TenantContext.fromActionContext  │
               └───────────────────────┬──────────────────────────┘
                                       ▼
                      socle-pack-tenant : TenantContext.fromMdc()
@@ -73,7 +94,7 @@ import java.io.IOException;
 
 /**
  * Pose le tenant de la requête dans le MDC, clé tenant_id : c'est là que socle-pack-tenant le lit.
- * Le socle ne le fait pas lui-même.
+ * Hors action MCP/REST, le socle ne le pose pas (en action, il le pose lui-même depuis 5.10.1).
  */
 @Component
 @Order(2)
@@ -105,11 +126,21 @@ public class TenantMdcFilter implements Filter {
 `X-SSO-Tenant` porte le **slug** du tenant (= sous-domaine = `x_partition`). C'est la valeur
 attendue par `/api/iam/tenant/{slug}/fiche`.
 
+Ce filtre reste nécessaire avec un socle ≥ 5.10.1 : il sert les contrôleurs et les pages Thymeleaf,
+que le socle ne couvre pas.
+
 ---
 
 ## 4. Étape 2 — Actions MCP / REST
 
-Une action reçoit son tenant dans l'`ActionContext`, pas dans le MDC. Deux façons correctes :
+Une action reçoit son tenant dans l'`ActionContext`. **En socle ≥ 5.10.1**, le socle le recopie aussi
+dans le MDC pour la durée de l'action : `profil.fiche()`, `TenantBranding` et `TenantMembres.membres()`
+servent directement le tenant de l'appelant, sans rien poser. Un filtre ou un intercepteur de l'app qui
+posait déjà `tenant_id` pour les actions devient redondant **pour elles** ; il reste nécessaire pour les
+pages et les contrôleurs (§3).
+
+**En socle ≤ 5.10.0**, le MDC est vide dans l'action. Deux façons correctes, la A restant valable sur
+toutes les versions :
 
 **A — désigner le tenant explicitement** (recommandé, rien à nettoyer) :
 
@@ -175,8 +206,9 @@ public class SocieteWorker implements Worker, ActionProvider {
 }
 ```
 
-**B — poser le MDC le temps de l'action**, quand le code appelé utilise les méthodes « courantes »
-(`fiche()`, `TenantBranding`, `TenantMembres.membres()`) :
+**B — poser le MDC le temps de l'action** (socle ≤ 5.10.0 seulement ; redondant en ≥ 5.10.1, où le
+socle le fait déjà), quand le code appelé utilise les méthodes « courantes » (`fiche()`,
+`TenantBranding`, `TenantMembres.membres()`) :
 
 ```java
 TenantContext t = TenantContext.fromActionContext(ctx);
@@ -272,6 +304,7 @@ class TenantMdcFilterTest {
 | 1 | Deux requêtes successives, tenants différents, même thread | chaque réponse porte sa propre société |
 | 2 | Chaîne qui lève | MDC vide après |
 | 3 | Action MCP avec un appelant porteur d'un tenant | la société de ce tenant |
+| 3 bis | Socle ≥ 5.10.1 : action qui appelle `profil.fiche()` sans rien poser | la société du tenant de l'appelant |
 | 4 | Worker planifié sans boucle explicite | `TenantSansFiche` — jamais la fiche d'un tenant « au hasard » |
 
 ---
@@ -280,11 +313,12 @@ class TenantMdcFilterTest {
 
 | Piège | Symptôme | Correction |
 |---|---|---|
-| Croire que le socle pose le tenant | une route de l'app répond 200 (contexte propre de l'app), la route qui passe par le pack 500 | filtre §3 |
+| Croire que le socle pose le tenant hors action | une route de l'app répond 200 (contexte propre de l'app), la route ou la page qui passe par le pack 500 | filtre §3 — le socle ne pose `tenant_id` que pendant les actions MCP/REST (≥ 5.10.1) |
 | Oublier le `finally` | la fiche d'une société servie à une autre, de façon intermittente | `MDC.remove` dans `finally`, test §7 |
 | Lire le tenant dans un paramètre de requête ou un corps | falsifiable par l'appelant | identité seulement (`UC-SEC-05`) |
 | Croire `X-SSO-Tenant` sans proxy de confiance | n'importe qui choisit son tenant | `TRUSTED_PROXIES` (`UC-SEC-06`) |
-| Action qui appelle `profil.fiche()` sans MDC | `TenantSansFiche` dans une action pourtant authentifiée | `ficheDe(fromActionContext(ctx).tenantId())` ou §4-B |
+| Socle ≤ 5.10.0 : action qui appelle `profil.fiche()` sans MDC | `TenantSansFiche` dans une action pourtant authentifiée | monter en socle ≥ 5.10.1, ou `ficheDe(fromActionContext(ctx).tenantId())`, ou §4-B |
+| Socle ≥ 5.10.1 : `log4j2.isThreadContextMapInheritable` forcé à `false` par l'app | `TenantSansFiche` dans l'action alors que l'appelant porte un tenant | ne pas la surcharger : le jar du socle la pose à `true` (`log4j2.component.properties`, vérifié en 5.11.0) ; un `log4j2.component.properties` ou une propriété système de l'app qui la remet à `false` coupe la traversée vers le thread virtuel de l'action |
 | Poser le slug en majuscules ou le libellé du tenant | 404 côté Hub → `TenantSansFiche` | le slug exact (`atelier-des-parcours`) |
 
 ---

@@ -8,17 +8,25 @@
 4. Résilience commune (rate limiter, retry ×3, circuit breaker par fournisseur) et journal `tr_connector_log` dans le schéma PostgreSQL de l'app.
 5. Services Notion réutilisables sans worker (`NotionDatabaseService`, `PropertyConverter`) et récepteur webhook Stripe signé (`POST /api/webhooks/stripe`, qui valide et journalise seulement).
 
-**Version documentée :** `3.1.0` (pom, `socle-pack.json`) — **Spring Boot `4.1.2`**, construite et
-testée contre `socle-v005:5.10.0` (provided) ; socle minimal déclaré 5.10.0 ; Java 21.
-**Référence git :** dépôt `socle-pack-Connectors`, `main` @ `69da4ab`, tag **`v3.1.0`** (code : `10ad868`).
+**Version documentée :** `3.2.0` (pom, `socle-pack.json`) — **Spring Boot `4.1.2`**, construite et
+testée contre `socle-v005:5.11.0` (provided, parent `eu.lmvi:socle-v005-parent` 5.11.0) ; socle minimal
+déclaré 5.10.0 (`builtAgainstSocleVersion` 5.11.0) ; Java 21. Tests : 10 verts, 0 sauté ; règle enforcer
+`socle-versions-testees` passée.
+**Référence git :** dépôt `socle-pack-Connectors`, `main` @ `edac18b`, tag **`v3.2.0`** — code identique à
+3.1.0 (`69da4ab`, tag `v3.1.0` ; code : `10ad868`), seul le build change.
 
 | Version du pack | Socle V005 | Spring Boot | OkHttp |
 |---|---|---|---|
-| **3.1.0** | **5.10.x** (≥ 5.10.0) | **4.1.2** | `okhttp-jvm` 5.5.1, fourni par le socle |
+| **3.2.0** | **5.10.x – 5.11.x** (≥ 5.10.0 ; construit contre 5.11.0) | **4.1.2** | `okhttp-jvm` 5.5.1, fourni par le socle |
+| 3.1.0 | 5.10.x – 5.11.x (≥ 5.10.0) | 4.1.2 | `okhttp-jvm` 5.5.1, fourni par le socle |
 | 3.0.0 | 5.8.x – 5.9.x (≥ 5.8.4) | 4.0.6 | `okhttp` 4.12.0, embarqué par le pack |
 | 2.0.0 | ≤ 5.7.x | 3.2.1 — **dernière Boot 3** | `okhttp` 4.12.0 |
 
-Ce que la 3.1.0 change pour une app : socle ≥ 5.10.0 / Boot 4.1.2 obligatoires ; OkHttp vient du socle
+Ce que la 3.2.0 change pour une app : rien au code ni à l'API (lignée « Socle 5.10-5.11 · Boot 4.1.2 »,
+comme 3.1.0). Le pom du pack prend pour parent `eu.lmvi:socle-v005-parent` 5.11.0 (BOM du socle et règle
+enforcer hérités ; `socle.version`, `testcontainers.version` et l'import `testcontainers-bom` retirés), et
+`disruptor` 3.4.4 (`provided`) en sort : les tests tournent sur la 4.0.0 du socle, comme l'app.
+Ce que la 3.1.0 avait changé pour une app : socle ≥ 5.10.0 / Boot 4.1.2 obligatoires ; OkHttp vient du socle
 (`okhttp-jvm`), le pack n'a plus aucune dépendance `compile` ; tous les beans du pack ont un nom explicite
 préfixé `connectors` (tableau ci-dessous). Workers, actions, propriétés, tables : inchangés.
 Ce que la 3.0.0 avait changé : Boot 4 ; `get_page.blocks` et `get_database_full.properties_schema` sortent
@@ -73,14 +81,14 @@ en JSON (voir CONNECTORS-04) ; `create_database` figure au manifeste.
 import de `socle-pack-ai` ou `socle-pack-comm` (les classes de résilience sont recopiées localement).
 Dépendances techniques attendues de l'app hôte (scope `provided` dans le pack) : `socle-v005`,
 `spring-boot-starter-web`, `spring-boot-starter-jdbc`, `postgresql`, `jackson-databind` (Jackson 2),
-`log4j2`, et depuis 3.1.0 OkHttp (`okhttp-jvm` 5.5.1, amené par le socle 5.10) : le pack n'a plus
+`log4j2`, et depuis 3.1.0 OkHttp (`okhttp-jvm` 5.5.1, amené par le socle 5.10 et 5.11) : le pack n'a plus
 aucune dépendance `compile` (jusqu'à 3.0.0 il apportait `okhttp` 4.12.0). Le pack reste en Jackson 2 (`com.fasterxml`), comme le socle
 et les packs tenant/mail/ai ; Boot 4 apporte Jackson 2 et 3 côte à côte.
 
 ## Applications consommatrices
 
 Au 2026-10-28, **aucune APP-* du dépôt ne déclare la dépendance** (`grep -rl socle-pack-connectors
---include=pom.xml` : zéro résultat hors du pack). Les versions `1.0.0-SNAPSHOT` → `3.1.0` sont
+--include=pom.xml` : zéro résultat hors du pack). Les versions `1.0.0-SNAPSHOT` → `3.2.0` sont
 installées dans `~/.m2` de la box de build ; aucune n'est vendorisée dans un `mvn-repo/`. Les
 exemples de code des HOWTOs utilisent donc une app fictive `monapp` (`schema_monapp`).
 

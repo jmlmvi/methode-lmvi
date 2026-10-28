@@ -2,7 +2,7 @@
 
 **Niveau :** Confirmé
 **Cible :** application V005 **Spring Boot 4.1.2** (socle ≥ 5.10.0) avec un PostgreSQL applicatif — une app en Boot 4.0.6 (socle 5.8.4 → 5.9.x) prend `0.2.0`, une app restée en Boot 3.2.1 (socle ≤ 5.8.0) prend `0.1.0-SNAPSHOT`, cf. §4
-**Versions vérifiées au code :** `socle-pack-pipeline` **0.3.0**, `main` @ `fef144d` (tag `v0.3.0`) · compilé contre `socle-v005` 5.10.0 / Spring Boot 4.1.2 · date 2026-10-28
+**Versions vérifiées au code :** `socle-pack-pipeline` **0.4.0**, `main` @ `2e477c2` (tag `v0.4.0` ; code identique à 0.3.0 @ `fef144d`) · compilé contre `socle-v005` 5.11.0 (minimum 5.10.0), parent `eu.lmvi:socle-v005-parent` 5.11.0 / Spring Boot 4.1.2 · 15 tests verts, 0 sauté · date 2026-10-28
 **Temps estimé :** 30 min
 
 > Vue d'ensemble du pack : [[README|socle-pack-pipeline]]
@@ -85,16 +85,20 @@ Le pack n'est publié sur **aucun** dépôt distant. Il vit dans le `~/.m2` de l
 
 ```bash
 cd /opt/2026-TheHub4TheSocle/socle-pack-pipeline
-git checkout v0.3.0                   # Boot 4.1.2 / socle 5.10 — Boot 4.0.6 : v0.2.0 — Boot 3 : feat/p1-p4-dag-engine (0.1.0-SNAPSHOT)
+git checkout v0.4.0                   # Boot 4.1.2 / socle 5.10-5.11 — Boot 4.0.6 : v0.2.0 — Boot 3 : feat/p1-p4-dag-engine (0.1.0-SNAPSHOT)
 mvn -q clean install -DskipTests      # compile aussi les tests : ils doivent compiler
 
-V=0.3.0
+V=0.4.0
 APP=/opt/2026-TheHub4TheSocle/APP-XX-MonApp/monapp
 D=$APP/mvn-repo/eu/lmvi/socle-pack-pipeline/$V
 mkdir -p "$D"
 cp ~/.m2/repository/eu/lmvi/socle-pack-pipeline/$V/socle-pack-pipeline-$V.jar "$D/"
 cp ~/.m2/repository/eu/lmvi/socle-pack-pipeline/$V/socle-pack-pipeline-$V.pom "$D/"
 ```
+
+Le pom du pack a pour parent `eu.lmvi:socle-v005-parent` 5.11.0 : ce parent et `eu.lmvi:socle-v005-bom`
+5.11.0 doivent être résolvables aussi (vendoriser leurs `.pom` sous `mvn-repo/eu/lmvi/socle-v005-parent/5.11.0/`
+et `mvn-repo/eu/lmvi/socle-v005-bom/5.11.0/`).
 
 **Voie de secours** : `mvn install` du pack sur la machine qui construit l'app. Un artefact installé
 ainsi n'existe que sur cette machine.
@@ -103,7 +107,23 @@ ainsi n'existe que sur cette machine.
 
 ## 4. Étape 2 — `pom.xml` de l'application
 
+Parent recommandé : **`eu.lmvi:socle-v005-parent`** 5.11.0, fils de `spring-boot-starter-parent` 4.1.2. Il
+fournit `${socle.version}` (5.11.0), importe `eu.lmvi:socle-v005-bom` (gRPC 1.85.1, Testcontainers 1.21.4,
+H2 2.5.252, Jedis 8.0.2, kafka-clients 4.4.0, mysql-connector-j 26.10.0, mariadb-java-client 4.0.0) et
+pose la règle enforcer `socle-versions-testees` (phase `validate`) : le build échoue si une de ces
+bibliothèques, ou `grpc-core`, retombe sous la version testée, ou si `socle-v005` est résolu dans une
+autre version que `${socle.version}`.
+
 ```xml
+<parent>
+    <groupId>eu.lmvi</groupId>
+    <artifactId>socle-v005-parent</artifactId>
+    <version>5.11.0</version> <!-- fils de spring-boot-starter-parent 4.1.2 ; fournit ${socle.version} -->
+    <relativePath/>
+</parent>
+
+<!-- pas de <socle.version> dans <properties> : le parent la fournit -->
+
 <repositories>
     <repository>
         <id>project-local</id>
@@ -124,7 +144,7 @@ ainsi n'existe que sur cette machine.
     <dependency>
         <groupId>eu.lmvi</groupId>
         <artifactId>socle-pack-pipeline</artifactId>
-        <version>0.3.0</version>   <!-- app Boot 4.0.6 : 0.2.0 ; app Boot 3.2.1 : 0.1.0-SNAPSHOT -->
+        <version>0.4.0</version>   <!-- 0.3.0 : même code, mais disruptor 3.4.4 ; app Boot 4.0.6 : 0.2.0 ; app Boot 3.2.1 : 0.1.0-SNAPSHOT -->
     </dependency>
 
     <!-- Jackson 2 : le pack l'emploie (provided), comme le socle. Le parent Boot 4.1.2 en gère la version
@@ -154,12 +174,13 @@ ainsi n'existe que sur cette machine.
 
 | Version du pack | Parent Spring Boot de l'app | socle-v005 de l'app |
 |---|---|---|
-| **0.3.0** | **4.1.2** | ≥ 5.10.0 |
+| **0.4.0** | **4.1.2** (parent `socle-v005-parent` 5.11.0) | ≥ 5.10.0 (construit contre 5.11.0) |
+| 0.3.0 | 4.1.2 | ≥ 5.10.0 |
 | 0.2.0 (dernière Boot 4.0.6) | 4.0.6 | 5.8.4 → 5.9.x |
 | 0.1.0-SNAPSHOT (dernière Boot 3) | 3.2.1 | 5.7.4 → 5.8.0 |
 
-Le parent Spring Boot de l'app doit être **celui du socle** (`lib/socle-v005-<v>.pom`) et donc celui du
-pack : un pack bâti sur un autre Boot compile, puis casse à l'exécution. Une app qui reste en
+Le Spring Boot de l'app doit être **celui du socle** et donc celui du pack — le parent `socle-v005-parent`
+l'assure : un pack bâti sur un autre Boot compile, puis casse à l'exécution. Une app qui reste en
 `0.1.0-SNAPSHOT` garde `<snapshots><enabled>true</enabled></snapshots>` sur son dépôt `project-local`.
 
 **Jackson** : Boot 4 sérialise les requêtes et réponses HTTP en Jackson 3 (`tools.jackson.*`). Le pack, lui,
@@ -168,20 +189,31 @@ reste en Jackson 2 (`com.fasterxml`) et n'expose aucun contrôleur. Si l'app ren
 (`PipelineJson.mapper().convertValue(n, Object.class)`) ; un `com.fasterxml…JsonNode` en `@RequestBody`
 échoue (500) — lire le corps en `String` puis `PipelineJson.mapper().readTree(...)`.
 
-Les cinq apps consommatrices déclarent toutes `jnats` ; 0.3.0 ne change rien à ce point (jnats 2.19.1, non
+Les cinq apps consommatrices déclarent toutes `jnats` ; 0.3.0 et 0.4.0 ne changent rien à ce point (jnats 2.19.1, non
 géré par la nomenclature Boot 4.1.2).
 
 **Journalisation (0.3.0)** : le pack n'apporte plus Logback. Jusqu'en 0.2.0, `spring-boot-starter-jdbc` tirait
 `spring-boot-starter-logging` en portée compile ; une app qui comptait sur l'exclusion faite chez elle n'a rien
 à changer, une app qui l'avait oubliée voyait Logback et Log4j2 se disputer SLF4J.
 
-**OkHttp** : le pack n'en dépend pas. Le socle 5.10.0 apporte `com.squareup.okhttp3:okhttp-jvm` 5.5.1 (et non
+**OkHttp** : le pack n'en dépend pas. Le socle (5.10.0 et 5.11.0) apporte `com.squareup.okhttp3:okhttp-jvm` 5.5.1 (et non
 plus `okhttp`) : une app qui déclare encore `okhttp` 4.x aura deux copies de `okhttp3.*`.
 
-**Versions transitives du socle 5.10.0** : avec un parent Boot 4.1.2, la nomenclature Boot l'emporte sur les
-versions écrites dans le pom du socle. L'app reçoit gRPC **1.84.1** (le socle annonce 1.85.1), H2 2.4.240
-(annoncé 2.5.252), Jedis 7.4.1 (annoncé 8.0.2). Sans effet sur le pack ; fixer la propriété
-(`grpc-java.version`, `h2.version`, `jedis.version`) dans l'app si elle a besoin de la version du socle.
+**Disruptor (0.4.0)** : le pack n'en déclare plus. Jusqu'en 0.3.0, `com.lmax:disruptor:3.4.4` en portée
+compile passait dans l'app et y battait la 4.0.0 du socle (règle du plus proche). Une app restée en 0.3.0
+déclare `com.lmax:disruptor:4.0.0` elle-même.
+
+**Versions transitives du socle** : avec le parent `socle-v005-parent` 5.11.0, l'app reçoit les versions du
+socle (gRPC 1.85.1, H2 2.5.252, Jedis 8.0.2…). Le défaut « parent Boot 4.1.2 → gRPC 1.84.1, H2 2.4.240,
+Jedis 7.4.1 » relevé sur le socle 5.10.0 est corrigé côté socle par `socle-v005-bom` 5.10.1 et le parent
+5.11.0.
+
+**App qui garde son propre parent** (`spring-boot-starter-parent` 4.1.2 ou un parent maison) : voie
+supportée. Déclarer `<socle.version>5.11.0</socle.version>`, importer `eu.lmvi:socle-v005-bom:5.11.0` en
+`<type>pom</type><scope>import</scope>` dans `<dependencyManagement>`, **et** surcharger cinq propriétés
+— un BOM importé ne bat pas les entrées directes de `spring-boot-dependencies` : `h2.version` 2.5.252,
+`jedis.version` 8.0.2, `kafka.version` 4.4.0, `mysql.version` 26.10.0, `mariadb.version` 4.0.0. Cette
+voie n'a pas la règle enforcer du parent.
 
 ---
 
@@ -246,7 +278,7 @@ dans le même bloc.
 
 Les deux `PipelineProperties` coexistent : types distincts, l'injection **par type** n'est pas ambiguë, et
 chacune lit ses propres clés du bloc `socle.pipeline`. Le test `PackContexteSocleTest` du pack le prouve sur
-un contexte Spring avec le socle 5.10.0 / Boot 4.1.2 (0.3.0 ; 5.9.0 et 5.8.8 en 0.2.0) ; il échoue si le nom explicite est retiré. Le socle 5.10.0 n'introduit aucune nouvelle collision.
+un contexte Spring avec le socle 5.11.0 / Boot 4.1.2 (0.4.0 ; 5.10.0 en 0.3.0 ; 5.9.0 et 5.8.8 en 0.2.0) ; il échoue si le nom explicite est retiré. Ni le socle 5.10.0 ni le 5.11.0 n'introduisent de nouvelle collision.
 
 Conséquences pour l'app :
 
@@ -395,17 +427,21 @@ La donnée est une **chaîne JSON** dans `result.content[0].text` : `{"handlers"
 |---|---|---|
 | Socle ≥ 5.8.6 + pack **0.1.0-SNAPSHOT** (app Boot 4 pas encore montée) | l'app ne démarre pas : deux beans `pipelineProperties` | passer au pack **0.2.0** (§6) ; à défaut, le générateur `NomsDesPacks` de TheDiffuseur 1.7.0 |
 | Pack 0.2.0 dans une app **Boot 3.2.1** | compile, puis `NoSuchMethodError`/`ClassNotFoundException` Spring à l'exécution | une app Boot 3 reste en `0.1.0-SNAPSHOT` |
-| Pack 0.3.0 dans une app Boot 4.0.6 (socle ≤ 5.9.x), ou 0.2.0 dans une app socle 5.10.0 | Boot du pack ≠ Boot de l'app : risque d'erreur Spring à l'exécution | aligner : socle 5.10 / Boot 4.1.2 → 0.3.0 ; socle 5.8.4–5.9.x / Boot 4.0.6 → 0.2.0 |
-| App en socle 5.10.0 qui déclare encore `com.squareup.okhttp3:okhttp` 4.x | deux copies de `okhttp3.*` sur le classpath | passer à `okhttp-jvm` 5.5.1 (celui du socle) ou ne rien déclarer |
+| Pack 0.4.0 / 0.3.0 dans une app Boot 4.0.6 (socle ≤ 5.9.x), ou 0.2.0 dans une app socle 5.10.x-5.11.x | Boot du pack ≠ Boot de l'app : risque d'erreur Spring à l'exécution | aligner : socle 5.10-5.11 / Boot 4.1.2 → 0.4.0 ; socle 5.8.4–5.9.x / Boot 4.0.6 → 0.2.0 |
+| App sur pack **≤ 0.3.0** | `disruptor` 3.4.4 dans l'app au lieu de la 4.0.0 du socle (`mvn dependency:tree`) ; Log4j2 du socle attend la 4.x | prendre **0.4.0**, ou déclarer `com.lmax:disruptor:4.0.0` dans l'app |
+| App en socle 5.10.x-5.11.x qui déclare encore `com.squareup.okhttp3:okhttp` 4.x | deux copies de `okhttp3.*` sur le classpath | passer à `okhttp-jvm` 5.5.1 (celui du socle) ou ne rien déclarer |
 | `JsonNode` du pack rendu tel quel par un contrôleur de l'app (Boot 4) | JSON mal écrit ou 500 (Jackson 3 côté HTTP) | convertir en `Map`/`List` avant de rendre (§4) |
 | `socle.pipeline.schema` oublié | tables du pack dans `public`, mêlées aux autres apps | toujours fixer le schéma de l'app |
 | PostgreSQL 14 ou moins | `V002` échoue : `syntax error at or near "NULLS"`, l'app ne démarre pas | PostgreSQL ≥ 15 |
 | Rôle sans droit de création dans le schéma | `failed to apply V001…`, démarrage bloqué | provisionner le schéma au nom du rôle applicatif |
 | Checksum modifié d'un script déjà appliqué | `checksum mismatch … Skipping` : la migration n'est **pas** rejouée | ne jamais modifier un `V*.sql` publié ; écrire un `V00n` |
-| Dépôt vendorisé sans `<snapshots>` (app restée en 0.1.0-SNAPSHOT) | `Could not find artifact …0.1.0-SNAPSHOT` | activer les snapshots sur le dépôt `project-local` ; 0.2.0 et 0.3.0 sont des releases |
+| Dépôt vendorisé sans `<snapshots>` (app restée en 0.1.0-SNAPSHOT) | `Could not find artifact …0.1.0-SNAPSHOT` | activer les snapshots sur le dépôt `project-local` ; 0.2.0, 0.3.0 et 0.4.0 sont des releases |
 | `mvn install -DskipTests` du pack après avoir modifié le constructeur de `PipelineWorker` | échec de compilation des tests | `-DskipTests` compile les tests ; mettre à jour les `new PipelineWorker(...)` des tests |
 | `queue-backend` laissé à `techdb` | `object is already closed` sous charge (RssArchiver, BilanSocle, NotionSocle) | `memory`, cf. [[howto-pipeline-04-executer-un-run\|PIPELINE-04]] §6 |
 | **`jnats` absent** (quel que soit le backend) | `NoClassDefFoundError: io/nats/client/Connection` au démarrage, à la création de `DagPipelineBuilder` | ajouter `io.nats:jnats:2.19.1` (scope `runtime` suffit) |
+| Déclarer une `<configuration>` sur `maven-enforcer-plugin` dans le pom de l'app (liste `bannedDependencies/excludes`, `combine.self="override"`, `<skip>true</skip>`) | aucun message : la liste redéclarée **remplace** celle du parent, ou la règle est coupée — les bornes de `socle-versions-testees` disparaissent | Ne jamais configurer le plugin dans l'app. Une règle de plus = une autre `<execution>` avec son propre `<id>` |
+| Redéclarer `h2.version`, `jedis.version`, `kafka.version`, `mysql.version` ou `mariadb.version` sous la version du socle dans une app au parent `socle-v005-parent` | build en échec à `validate` (règle `socle-versions-testees`) | Voulu : retirer la surcharge, la version vient du parent |
+| App au parent `spring-boot-starter-parent` sans `socle-v005-bom` (ou avec le BOM sans les cinq propriétés) | l'app reçoit gRPC 1.84.1, H2 2.4.240, Jedis 7.4.1 de Boot au lieu des versions du socle | Parent `socle-v005-parent` 5.11.0 ; sinon BOM + cinq propriétés (§4) — corrigé côté socle en 5.10.1 (BOM étendu) et 5.11.0 (parent) |
 
 ---
 

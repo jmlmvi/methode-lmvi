@@ -2,7 +2,7 @@
 
 **Niveau :** Expert
 **Cible :** application qui embarque `socle-pack-pipeline` et joint un serveur NATS JetStream
-**Versions vérifiées au code :** `socle-pack-pipeline` 0.3.0 @ `fef144d` (tag `v0.3.0`, `main` ; code fonctionnel identique à 0.2.0 et à 0.1.0-SNAPSHOT @ `5fa8f05`) · `socle-v005` 5.10.0 / Spring Boot 4.1.2 · `io.nats:jnats` 2.19.1 · date 2026-10-28
+**Versions vérifiées au code :** `socle-pack-pipeline` 0.4.0 @ `2e477c2` (tag `v0.4.0`, `main` ; code identique à 0.3.0 @ `fef144d` ; code fonctionnel identique à 0.2.0 et à 0.1.0-SNAPSHOT @ `5fa8f05`) · `socle-v005` 5.11.0 (minimum 5.10.0) / Spring Boot 4.1.2 · `io.nats:jnats` 2.19.1 · date 2026-10-28
 **Temps estimé :** 30 min
 
 > Classe de référence : `engine/NatsStageQueue` (implémente `eu.lmvi.socle.pipeline.queue.StageQueue` du framework)

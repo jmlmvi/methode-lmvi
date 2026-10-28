@@ -1,7 +1,7 @@
 # HOWTO COM-04 — Envoyer des courriels : Hub, James ou Brevo
 
 **Niveau :** Intermédiaire
-**Cible :** `eu.lmvi:socle-pack-comm` **2.1.0** (branche `main`, commit `ba69578`, tag `v2.1.0` ; Spring Boot 4.1.2, socle 5.10.0) — comportement identique à 2.0.0 (socle 5.8.6-5.9.x, Boot 4.0.6) et à 1.1.0, dernière version Boot 3 · `mail_worker` lu dans `soclehub` 3.73.0 (commit `35fdcd0`)
+**Cible :** `eu.lmvi:socle-pack-comm` **2.2.0** (branche `main`, commit `227fe5e`, tag `v2.2.0`, code identique à 2.1.0 — commit `ba69578` ; Spring Boot 4.1.2, socle 5.11.0, minimum 5.10.0) — comportement identique à 2.1.0, à 2.0.0 (socle 5.8.6-5.9.x, Boot 4.0.6) et à 1.1.0, dernière version Boot 3 · `mail_worker` lu dans `soclehub` 3.73.0 (commit `35fdcd0`)
 **Vérifié au code le :** 2026-10-28
 **Prérequis :** [[howto-com-01-integrer-le-pack|COM-01]] ; James provisionné ([[howto-11-configurer-james-mail|HOWTO 11]]) ou clé IAM du Hub
 **Temps estimé :** 20 min

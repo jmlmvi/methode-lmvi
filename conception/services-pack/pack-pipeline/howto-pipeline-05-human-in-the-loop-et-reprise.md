@@ -2,7 +2,7 @@
 
 **Niveau :** Confirmé
 **Cible :** application qui embarque `socle-pack-pipeline`
-**Versions vérifiées au code :** `socle-pack-pipeline` 0.3.0 @ `fef144d` (tag `v0.3.0`, `main` ; code fonctionnel identique à 0.2.0 et à 0.1.0-SNAPSHOT @ `5fa8f05`) · `socle-v005` 5.10.0 / Spring Boot 4.1.2 · date 2026-10-28
+**Versions vérifiées au code :** `socle-pack-pipeline` 0.4.0 @ `2e477c2` (tag `v0.4.0`, `main` ; code identique à 0.3.0 @ `fef144d` ; code fonctionnel identique à 0.2.0 et à 0.1.0-SNAPSHOT @ `5fa8f05`) · `socle-v005` 5.11.0 (minimum 5.10.0) / Spring Boot 4.1.2 · date 2026-10-28
 **Temps estimé :** 40 min
 
 > Classes de référence : `engine/HumanParkingService`, `engine/CompiledPipeline` (`resumeHuman`, `reloadParked`),

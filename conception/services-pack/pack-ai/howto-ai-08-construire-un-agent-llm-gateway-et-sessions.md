@@ -1,7 +1,7 @@
 # HOWTO AI-08 — Construire un agent : passerelle LLM, boucle d'outils, sessions
 
 **Niveau :** Expert
-**Pack :** `eu.lmvi:socle-pack-ai:2.8.0` — tag `v2.8.0`, code au commit `f8d7dac` (socle-v005 5.10.0 / Spring Boot 4.1.2) — vérifié au code le 2026-10-28 ; aucune action ni comportement ne change depuis 2.7.14 (`a357a95`)
+**Pack :** `eu.lmvi:socle-pack-ai:2.9.0` — tag `v2.9.0`, commit `8c771e8`, code identique à 2.8.0 (commit de code `f8d7dac`) (socle-v005 5.11.0, minimum 5.10.0 / Spring Boot 4.1.2) — vérifié au code le 2026-10-28 ; aucune action ni comportement ne change depuis 2.7.14 (`a357a95`)
 **Composants :** `LlmGatewayWorker` (`llm_gateway_worker`), `LlmProviderRegistry`, `LlmModelRegistry`, `LlmRouter`, 4 `LlmStreamProvider`, `AgentRuntime`, `AbstractAgentWorker`, `AgentToolBridge`, `AgentSessionStore`, `OrphanSessionResolver` (bean `aiOrphanSessionResolver` depuis 2.8.0), `AgentToolsetWorker` (`agent_toolset`), `WorkspaceManagerWorker`, `WorkspaceGcWorker`, `AgentGrpcService` ; tables `db_model_pricing`, `tr_llm_call_audit`, `tr_circuit_breaker_state`, `tr_rate_limit_state`, `tr_agent_session`, `tr_agent_message`, `tr_tool_call_audit`, `tr_tool_index`, `tr_workspace_session_meta`
 **Statut :** plateforme **partielle** (jalon V003.0 de la spec `docs/AgentIA/SPEC-AGENT-IA-V003-PHASED.md`) — voir §2
 **Prérequis :** [[howto-ai-01-integrer-le-pack|AI-01]] sans exclure `eu.lmvi.socle.pack.ai.agent.*`

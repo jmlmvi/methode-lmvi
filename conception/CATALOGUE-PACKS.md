@@ -1,4 +1,4 @@
-<!-- KIT-VERSION: 1.15.0 -->
+<!-- KIT-VERSION: 1.16.0 -->
 # Catalogue des packs du socle — de la brique au howto
 
 > **À quoi ça sert** : au plan technique (M6, §3 bis), une brique dont le besoin n'est pas un
@@ -23,15 +23,15 @@ touche cette fonctionnalité, le howto donne le contournement ; à corriger **da
 
 | Ma brique embarque… | Howto | État |
 |---|---|---|
-| `socle-pack-ai` 2.8.0 (socle 5.10 ; 2.7.14 pour 5.9.x ; 2.4.x pour Boot 3) | [`howto-ai-01`](services-pack/pack-ai/howto-ai-01-integrer-le-pack.md) · [`howto-ai-09`](services-pack/pack-ai/howto-ai-09-lignee-2-4-x-pour-les-apps-boot-3.md) | prêt (tag `v2.8.0`, jar dans `~/.m2`, à vendoriser) |
-| `socle-pack-comm` 2.1.0 (socle 5.10 ; 2.0.0 pour 5.9.x ; 1.1.0 pour Boot 3) | [`howto-com-01`](services-pack/pack-com/howto-com-01-integrer-le-pack.md) | prêt (tag `v2.1.0`) |
-| `socle-pack-connectors` 3.1.0 (socle 5.10 ; 3.0.0 / 2.0.0) | [`howto-connectors-01`](services-pack/pack-connectors/howto-connectors-01-integrer-le-pack.md) | prêt (tag `v3.1.0`) |
-| `socle-pack-editorial` 2.1.0 (socle 5.10, ai 2.8.0 + comm 2.1.0 ; 2.0.0 pour 5.9.x) | [`howto-editorial-01`](services-pack/pack-editorial/howto-editorial-01-integrer-le-pack.md) | prêt (tag `v2.1.0`) |
-| `socle-pack-egress` 3.0.0 (socle 5.10, protobuf 4 ; 2.0.0 / 1.0.0) | [`howto-egress-01`](services-pack/pack-egress/howto-egress-01-integrer-le-pack.md) | prêt (tag `v3.0.0` ; test contre le Hub à rejouer) |
-| `socle-pack-mail` 1.5.0 (socle 5.10, ai 2.8.0 ; 1.4.0 pour 5.9.x) | [`howto-mail-01`](services-pack/pack-mail/howto-mail-01-integrer-le-pack.md) | prêt (tag `v1.5.0`) |
-| `socle-pack-pipeline` 0.3.0 (socle 5.10 ; 0.2.0 / 0.1.0-SNAPSHOT) | [`howto-pipeline-01`](services-pack/pack-pipeline/howto-pipeline-01-integrer-le-pack.md) | prêt (tag `v0.3.0`) |
-| `socle-pack-tenant` 0.6.0 (socle 5.10 ; 0.5.0 pour 5.9.x) | [`howto-tenant-01`](services-pack/pack-tenant/howto-tenant-01-integrer-le-pack.md) | prêt (tag `v0.6.0`) |
-| **un pack qui n'existe pas encore**, ou une extension d'un pack | [`00-creer-ou-amender-un-pack`](services-pack/00-creer-ou-amender-un-pack.md) — modèle `socle-pack-ZZ-TEMPLATE` (`bootstrap.sh`) | service-pack first |
+| `socle-pack-ai` 2.9.0 (socle 5.10-5.11, 2.8.0 aussi ; 2.7.14 pour 5.9.x ; 2.4.x pour Boot 3) | [`howto-ai-01`](services-pack/pack-ai/howto-ai-01-integrer-le-pack.md) · [`howto-ai-09`](services-pack/pack-ai/howto-ai-09-lignee-2-4-x-pour-les-apps-boot-3.md) | prêt (tag `v2.9.0`, jar dans `~/.m2`, à vendoriser) |
+| `socle-pack-comm` 2.2.0 (socle 5.10-5.11, 2.1.0 aussi ; 2.0.0 pour 5.9.x ; 1.1.0 pour Boot 3) | [`howto-com-01`](services-pack/pack-com/howto-com-01-integrer-le-pack.md) | prêt (tag `v2.2.0`) |
+| `socle-pack-connectors` 3.2.0 (socle 5.10-5.11, 3.1.0 aussi ; 3.0.0 / 2.0.0) | [`howto-connectors-01`](services-pack/pack-connectors/howto-connectors-01-integrer-le-pack.md) | prêt (tag `v3.2.0`) |
+| `socle-pack-editorial` 2.2.0 (socle 5.10-5.11, ai 2.9.0 + comm 2.2.0 ; 2.1.0 aussi ; 2.0.0 pour 5.9.x) | [`howto-editorial-01`](services-pack/pack-editorial/howto-editorial-01-integrer-le-pack.md) | prêt (tag `v2.2.0`) |
+| `socle-pack-egress` 3.1.0 (socle 5.10-5.11, protobuf 4, 3.0.0 aussi ; 2.0.0 / 1.0.0) | [`howto-egress-01`](services-pack/pack-egress/howto-egress-01-integrer-le-pack.md) | prêt (tag `v3.1.0` ; test contre le Hub à rejouer) |
+| `socle-pack-mail` 1.6.0 (socle 5.10-5.11, ai 2.9.0 ; 1.5.0 aussi ; 1.4.0 pour 5.9.x) | [`howto-mail-01`](services-pack/pack-mail/howto-mail-01-integrer-le-pack.md) | prêt (tag `v1.6.0`) |
+| `socle-pack-pipeline` 0.4.0 (socle 5.10-5.11, 0.3.0 aussi ; 0.2.0 / 0.1.0-SNAPSHOT) | [`howto-pipeline-01`](services-pack/pack-pipeline/howto-pipeline-01-integrer-le-pack.md) | prêt (tag `v0.4.0`) |
+| `socle-pack-tenant` 0.7.0 (socle 5.10-5.11, 0.6.0 aussi ; 0.5.0 pour 5.9.x) | [`howto-tenant-01`](services-pack/pack-tenant/howto-tenant-01-integrer-le-pack.md) | prêt (tag `v0.7.0`) |
+| **un pack qui n'existe pas encore**, ou une extension d'un pack | [`00-creer-ou-amender-un-pack`](services-pack/00-creer-ou-amender-un-pack.md) — modèle `socle-pack-ZZ-TEMPLATE` 1.1.0 (`bootstrap.sh`, parent `socle-v005-parent`) | service-pack first |
 
 ### IA et texte
 

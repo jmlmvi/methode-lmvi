@@ -1,17 +1,20 @@
 # socle-pack-egress — sortir sur internet par un mmh du Hub
 
-> **Version documentée :** `eu.lmvi:socle-pack-egress:3.0.0` — dépôt `/opt/2026-TheHub4TheSocle/socle-pack-egress`,
-> branche `main`, tag `v3.0.0`, commit `aa521dc` — **Spring Boot 4.1.2, socle 5.10.0** (minimum 5.10.0),
-> gRPC 1.85.1 / protobuf 4.36.2 alignés sur le socle.
+> **Version documentée :** `eu.lmvi:socle-pack-egress:3.1.0` — dépôt `/opt/2026-TheHub4TheSocle/socle-pack-egress`,
+> branche `main`, tag `v3.1.0`, commit `b279f6d` — **Spring Boot 4.1.2, construit contre le socle 5.11.0**
+> (minimum 5.10.0), gRPC 1.85.1 / protobuf 4.36.2 alignés sur le socle. Comportement identique à la 3.0.0
+> (`aa521dc`) : seul le build change (parent `eu.lmvi:socle-v005-parent` 5.11.0).
 >
 > | Pack | Spring Boot | socle-v005 | gRPC / protobuf |
 > |---|---|---|---|
-> | **3.0.0** | 4.1.2 | 5.10.0 et suivants | 1.85.1 / 4.36.2 |
+> | **3.1.0** | 4.1.2 | 5.10.0 → 5.11.x (construit contre 5.11.0) | 1.85.1 / 4.36.2 |
+> | 3.0.0 (tag `v3.0.0`, commit `aa521dc`) | 4.1.2 | 5.10.0 et suivants | 1.85.1 / 4.36.2 |
 > | 2.0.0 (tag `v2.0.0`, commit `36be667`) | 4.0.6 | 5.8.4 → 5.9.x | 1.81.0 / 3.25.9 |
 > | 1.0.0 | 3.2.1 | 5.7.x | 1.60.0 / 3.25.1 |
 >
+> 3.1.0 et 3.0.0 forment la lignée « Socle 5.10-5.11 · Boot 4.1.2 » : la 3.0.0 reste valide.
 > 3.0.0 est une **majeure** : protobuf 4 change les classes générées publiques
-> (`eu.lmvi.socle.pack.egress.proto`) et le code généré refuse un protobuf-java < 4.36.2 — elle ne se
+> (`eu.lmvi.socle.pack.egress.proto`) et le code généré refuse un protobuf-java < 4.36.2 — la lignée 3.x ne se
 > charge pas sur un socle ≤ 5.9. L'API du pack (`EgressTunnelProxy`, `socle.egress-client.*`) est inchangée.
 > **Dernière version Boot 3 = 1.0.0** (`main`, commit `8c8544e`, Spring Boot 3.2.1, gRPC 1.60, socle 5.7.x) :
 > c'est celle qu'utilisent encore les consommateurs en socle 5.7.4.
@@ -50,25 +53,37 @@ Le tunnel gRPC qu'emploie le pack accepte une clé API IAM ou un JWT Bearer — 
 
 | Dépendance | Portée | Fournie par |
 |---|---|---|
-| `io.grpc:grpc-api`, `grpc-stub`, `grpc-protobuf` (**1.85.1**, la version du socle 5.10.0) | `provided` | le socle V005 de l'app |
-| `com.google.protobuf:protobuf-java` (**4.36.2**, la version du socle 5.10.0) | `provided` | le socle |
-| un transport gRPC à l'exécution (`grpc-netty-shaded`) | — | le socle (5.10.0 : déclaré 1.85.1, résolu 1.84.1 dans une app — voir plus bas) |
+| `io.grpc:grpc-api`, `grpc-stub`, `grpc-protobuf` (**1.85.1**, la version du socle 5.10.0 et 5.11.0) | `provided` | le socle V005 de l'app |
+| `com.google.protobuf:protobuf-java` (**4.36.2**, la version du socle 5.10.0 et 5.11.0) | `provided` | le socle |
+| un transport gRPC à l'exécution (`grpc-netty-shaded`) | — | le socle (1.85.1 dans une app au parent `socle-v005-parent` ou qui importe `socle-v005-bom` ≥ 5.10.1 ; 1.84.1 dans une app en socle 5.10.0 sans BOM — voir plus bas) |
 | `spring-boot-autoconfigure`, `slf4j-api` | `provided` | l'app |
 | OkHttp | — (aucune) | le socle (5.10 : `okhttp-jvm` 5.5.1), si l'app s'en sert |
 
-Le pack **ne dépend pas** de `socle-v005` (il n'en utilise aucune classe) : `<socle.version>5.10.0</socle.version>`
-ne sert qu'au test `GrpcAlignementSocleTest`, qui lit le pom embarqué dans le jar du socle et échoue si le gRPC
-ou le protobuf du pack divergent de ceux du socle (passe en 5.10.0, échoue en 5.9.0). Le pack surcharge
-`grpc-java.version` : sans cela, le `grpc-bom` 1.84.1 importé par Boot 4.1.2 mêlerait deux gRPC (voir les
-pièges d'[[howto-egress-01-integrer-le-pack|EGRESS-01]] : une app en socle 5.10.0 reçoit gRPC 1.84.1).
+Le pack **ne dépend pas** de `socle-v005` (il n'en utilise aucune classe ; son jar n'est présent qu'en
+portée `test`, sans transitifs). Depuis 3.1.0, le parent Maven du pack est **`eu.lmvi:socle-v005-parent` 5.11.0**
+(fils de `spring-boot-starter-parent` 4.1.2) : il fournit `${socle.version}` (5.11.0) et `${socle.grpc.version}`
+(1.85.1, d'où `grpc.version`), importe `socle-v005-bom` — dont le `grpc-bom` 1.85.1 bat le `grpc-bom` 1.84.1
+importé par Boot — et porte la règle enforcer `socle-versions-testees`. Les surcharges locales
+`<socle.version>`, `<grpc-java.version>` et `<protobuf-java.version>` de la 3.0.0 sont retirées (Boot 4.1.2 gère
+déjà protobuf-java en 4.36.2) ; `lesTestsTournentSurLeGrpcDuSocle` vérifie un gRPC homogène 1.85.1.
+`GrpcAlignementSocleTest` lit le pom embarqué dans le jar du socle et échoue si le gRPC ou le protobuf du pack
+divergent de ceux du socle (passe en 5.10.0 et 5.11.0, échoue en 5.9.0).
 
-`socle-pack.json` (3.0.0) : `minSocleVersion` **5.10.0**, `springBootVersion` 4.1.2, `grpcVersion` 1.85.1,
-`protobufVersion` 4.36.2, `beans` `["egressTunnelProxy"]`, aucun pack requis — comparé au pom par
-`SoclePackManifestTest`. Parent Maven du pack : Spring Boot **4.1.2**.
+Côté application, le défaut « une app en socle 5.10.0 reçoit tout gRPC en 1.84.1 » est corrigé par le socle :
+`socle-v005-bom` ≥ 5.10.1 importe `grpc-bom` 1.85.1, et le parent `socle-v005-parent` 5.11.0 en hérite. Il reste
+vrai pour une app en socle 5.10.0 qui n'importe pas le BOM (voir [[howto-egress-01-integrer-le-pack|EGRESS-01]]).
+
+`socle-pack.json` (3.1.0) : `minSocleVersion` **5.10.0**, `builtAgainstSocleVersion` **5.11.0** (champ nouveau en
+3.1.0), `springBootVersion` 4.1.2, `grpcVersion` 1.85.1, `protobufVersion` 4.36.2, `beans` `["egressTunnelProxy"]`,
+aucun pack requis — comparé au pom par `SoclePackManifestTest` (la version de Boot se lit dans la propriété
+`pack.boot.version`, `project.parent.version` valant désormais 5.11.0). User-Agent gRPC : `socle-pack-egress/3.1.0`.
+Tests : 17 verts, 0 sauté ; `EgressLiveIT` hors suite, faute de clé — aucun test contre le Hub réel n'a été fait
+avec la 3.x.
 
 | Pack | Boot | Socle | gRPC / protobuf |
 |---|---|---|---|
-| **3.0.0** | 4.1.2 | ≥ 5.10.0 | 1.85.1 / 4.36.2 |
+| **3.1.0** | 4.1.2 | 5.10.0 → 5.11.x (construit contre 5.11.0, parent `socle-v005-parent`) | 1.85.1 / 4.36.2 |
+| 3.0.0 | 4.1.2 | ≥ 5.10.0 (parent Boot direct) | 1.85.1 / 4.36.2 |
 | 2.0.0 | 4.0.6 | 5.8.4 → 5.9.x (testé 5.9.0 et 5.8.8) | 1.81.0 / 3.25.9 |
 | 1.0.0 — dernière Boot 3 | 3.2.1 | 5.7.x | 1.60.0 / 3.25.1 |
 

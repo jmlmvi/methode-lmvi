@@ -30,16 +30,20 @@
 
 ## Les huit packs
 
-| Pack | Ce qu'il apporte à l'app | Socle 5.10 · Boot 4.1.2 | Socle 5.8.4-5.9.x · Boot 4.0.6 | Boot 3.2.1 (socle ≤ 5.8.0) | Apps qui le consomment |
+| Pack | Ce qu'il apporte à l'app | Socle 5.10-5.11 · Boot 4.1.2 | Socle 5.8.4-5.9.x · Boot 4.0.6 | Boot 3.2.1 (socle ≤ 5.8.0) | Apps qui le consomment |
 |---|---|---|---|---|---|
-| [`pack-ai`](pack-ai/README.md) | génération, embeddings, RAG, classification, web, agents | **2.8.0** | 2.7.14 | 2.4.8 (lignée 2.4.x) | LeSachant, IdeaBoxDev, NotionSocle, UniqPersonnality ; 2.4.x : SDR2, REGIES, BilanSocle |
-| [`pack-com`](pack-com/README.md) | notifications multicanal : courriel, SMS, Telegram, Slack, webhook, in-app | **2.1.0** | 2.0.0 | 1.1.0 | BingFetch, UniqPersonnality, RssArchiver |
-| [`pack-connectors`](pack-connectors/README.md) | Notion, Google Drive, Stripe, HubSpot | **3.1.0** | 3.0.0 | 2.0.0 | aucune à ce jour |
-| [`pack-editorial`](pack-editorial/README.md) | RSS → curation LLM → validation humaine → newsletter (ai + comm) | **2.1.0** | 2.0.0 | 1.0.0-SNAPSHOT | RssArchiver |
-| [`pack-egress`](pack-egress/README.md) | faire sortir les appels HTTPS de l'app par un miniMiniHub du Hub | **3.0.0** (protobuf 4) | 2.0.0 | 1.0.0 | KEW, RssArchiver |
-| [`pack-mail`](pack-mail/README.md) | boîte de chaque utilisateur (IMAP, Gmail, Outlook), envoi, boîte applicative, lien d'activation (ai) | **1.5.0** | 1.4.0 | — | aucune déclarée (TheIdeaBox s'y prépare) |
-| [`pack-pipeline`](pack-pipeline/README.md) | moteur de pipelines DAG : runs, étapes humaines, DLQ, catalogue, NATS | **0.3.0** | 0.2.0 | 0.1.0-SNAPSHOT | RssArchiver, BilanSocle, NotionSocle, REGIES, TheDiffuseur |
-| [`pack-tenant`](pack-tenant/README.md) | fiche société, marque, équipe et multi-tenant lus depuis l'IAM du Hub | **0.6.0** | 0.5.0 | — | Your360, TheSociety, UniqPersonnality |
+| [`pack-ai`](pack-ai/README.md) | génération, embeddings, RAG, classification, web, agents | **2.9.0** (2.8.0) | 2.7.14 | 2.4.8 (lignée 2.4.x) | LeSachant, IdeaBoxDev, NotionSocle, UniqPersonnality ; 2.4.x : SDR2, REGIES, BilanSocle |
+| [`pack-com`](pack-com/README.md) | notifications multicanal : courriel, SMS, Telegram, Slack, webhook, in-app | **2.2.0** (2.1.0) | 2.0.0 | 1.1.0 | BingFetch, UniqPersonnality, RssArchiver |
+| [`pack-connectors`](pack-connectors/README.md) | Notion, Google Drive, Stripe, HubSpot | **3.2.0** (3.1.0) | 3.0.0 | 2.0.0 | aucune à ce jour |
+| [`pack-editorial`](pack-editorial/README.md) | RSS → curation LLM → validation humaine → newsletter (ai + comm) | **2.2.0** (2.1.0) | 2.0.0 | 1.0.0-SNAPSHOT | RssArchiver |
+| [`pack-egress`](pack-egress/README.md) | faire sortir les appels HTTPS de l'app par un miniMiniHub du Hub | **3.1.0** (3.0.0) — protobuf 4 | 2.0.0 | 1.0.0 | KEW, RssArchiver |
+| [`pack-mail`](pack-mail/README.md) | boîte de chaque utilisateur (IMAP, Gmail, Outlook), envoi, boîte applicative, lien d'activation (ai) | **1.6.0** (1.5.0) | 1.4.0 | — | aucune déclarée (TheIdeaBox s'y prépare) |
+| [`pack-pipeline`](pack-pipeline/README.md) | moteur de pipelines DAG : runs, étapes humaines, DLQ, catalogue, NATS | **0.4.0** (0.3.0) | 0.2.0 | 0.1.0-SNAPSHOT | RssArchiver, BilanSocle, NotionSocle, REGIES, TheDiffuseur |
+| [`pack-tenant`](pack-tenant/README.md) | fiche société, marque, équipe et multi-tenant lus depuis l'IAM du Hub | **0.7.0** (0.6.0) | 0.5.0 | — | Your360, TheSociety, UniqPersonnality |
+
+Colonne « Socle 5.10-5.11 » : en gras, la version construite le 2026-10-28 contre le socle **5.11.0** sur le parent
+`eu.lmvi:socle-v005-parent` (minimum **5.10.0**, aucune API 5.11 utilisée) ; entre parenthèses, la version
+construite plus tôt le même jour contre 5.10.0 — même lignée, même code, elle reste valide sur 5.10.x comme sur 5.11.x.
 
 Dépendances entre packs : `editorial` → `ai` + `com` ; `mail` → `ai`. Les autres sont autonomes.
 
@@ -161,17 +165,29 @@ Relevés en écrivant les howtos ; chaque fiche les reprend là où ils mordent.
    avec `appId = null` : `vault.enabled: true` ne change rien, les clés viennent des variables
    d'environnement. Ne pas planifier une brique sur une lecture Vault par le pack.
 3. **Trois lignées Spring Boot — prendre la colonne du socle de l'app.** Le 2026-10-28, les huit
-   packs ont été alignés sur le **socle 5.10.0 / Boot 4.1.2** (tableau ci-dessus, tags `vX.Y.Z` sur
-   `main`, jars dans `~/.m2`, à vendoriser). Une app en socle 5.8.4-5.9.x (Boot 4.0.6) garde la
-   colonne du milieu ; une app en Boot 3.2.1 garde la dernière colonne (pack-ai en 2.4.x,
+   packs ont été alignés sur le **socle 5.10.0 / Boot 4.1.2**, puis reconstruits le même jour contre le
+   **socle 5.11.0** sur son parent Maven (tableau ci-dessus, tags `vX.Y.Z` sur `main`, jars dans
+   `~/.m2`, à vendoriser). Une app en socle 5.8.4-5.9.x (Boot 4.0.6) garde la colonne du milieu ; une
+   app en Boot 3.2.1 garde la dernière colonne (pack-ai en 2.4.x,
    [`AI-09`](pack-ai/howto-ai-09-lignee-2-4-x-pour-les-apps-boot-3.md)). Ne jamais mélanger : un
-   pack 5.10 exige le socle 5.10 (`minSocleVersion`). Depuis l'alignement, **tous les beans des packs
+   pack de la lignée 5.10-5.11 exige un socle ≥ 5.10.0 (`minSocleVersion`). **Tous les beans des packs
    sont préfixés** (`aiPackMigrationRunner`, `commTenantResolver`…) : une app qui embarque plusieurs
    packs n'a plus à qualifier ses beans ; un `@Qualifier` sur un ancien nom est à mettre à jour.
-   Le socle 5.10 fournit OkHttp en `okhttp-jvm` 5.5.1 : aucun `okhttp` 4.x dans l'app. Il annonce
-   gRPC 1.85.1 mais Boot 4.1.2 impose 1.84.1 : importer `grpc-bom` 1.85.1 dans l'app qui utilise
-   gRPC (défaut du socle, signalé). L'app exclut `spring-boot-starter-logging` et balaie
-   `eu.lmvi.socle` (l'`ObjectMapper` Jackson 2 vient du socle).
+   **Le pom de l'app** : parent **`eu.lmvi:socle-v005-parent` 5.11.0** (recommandé). Il hérite de Boot
+   4.1.2, fournit `${socle.version}`, importe `socle-v005-bom` — gRPC 1.85.1, Testcontainers 1.21.4,
+   h2/jedis/kafka/mysql/mariadb aux versions testées par le socle — : **plus d'import `grpc-bom`** ni
+   `testcontainers-bom` à écrire (le défaut « gRPC 1.84.1 dans l'app » du socle 5.10.0 est corrigé par
+   `socle-v005-bom` 5.10.1 et par ce parent). Une app qui garde son propre parent importe
+   `eu.lmvi:socle-v005-bom` 5.11.0 et surcharge `h2.version`, `jedis.version`, `kafka.version`,
+   `mysql.version`, `mariadb.version`. OkHttp reste celui du socle (`okhttp-jvm` 5.5.1) : aucun
+   `okhttp` 4.x dans l'app. L'app exclut `spring-boot-starter-logging` et balaie `eu.lmvi.socle`
+   (l'`ObjectMapper` Jackson 2 vient du socle).
+   **Piège enforcer** : le parent embarque la règle `maven-enforcer-plugin` `socle-versions-testees`
+   (phase `validate`, échec si une bibliothèque retombe sous la version testée). Ne **jamais** déclarer
+   de `<configuration>` sur ce plugin dans le pom de l'app ou d'un pack : une liste
+   `bannedDependencies/excludes` redéclarée **remplace** celle du parent, `combine.self="override"` ou
+   `skip` coupent tout — sans message (mesuré sur un pack généré). Une règle de plus = une autre
+   `<execution>` avec son propre `<id>`.
 4. **Un pack n'est disponible que s'il est vendorisé.** Aucun pack n'est servi par
    `maven.thesocle.net` dans sa dernière version ; plusieurs ne vivent que dans le `~/.m2` de la box
    de build. L'app copie le jar et le pom dans son `mvn-repo/` (cf. CLAUDE.md racine), sinon un clone

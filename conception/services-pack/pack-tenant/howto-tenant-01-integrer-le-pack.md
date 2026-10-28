@@ -1,7 +1,7 @@
 # HOWTO tenant-01 — Intégrer socle-pack-tenant dans une application
 
 **Niveau :** Intermédiaire
-**Cible :** `eu.lmvi:socle-pack-tenant:0.6.0` (tag `v0.6.0`, commit `c3b70e3`) · socle-v005 **5.10.x** · Spring Boot **4.1.2**
+**Cible :** `eu.lmvi:socle-pack-tenant:0.7.0` (tag `v0.7.0`, commit `7235f83` ; code identique à 0.6.0 `c3b70e3`) · socle-v005 **5.11.0** (minimum **5.10.0**), parent `eu.lmvi:socle-v005-parent` 5.11.0 · Spring Boot **4.1.2**
 **Lignée précédente :** `0.5.0` (commit `bcddf0e`) pour une app en socle 5.8.9 → 5.9.x / Boot 4.0.6 — même mode d'emploi, OkHttp 4.12.0 embarqué
 **Hub :** ≥ 3.63.0 (routes `/api/iam/tenant/{slug}/…`)
 **Vérifié au code :** 2026-10-28
@@ -33,7 +33,7 @@ Cas réel : `APP-28-Your360` (pack 0.5.0, socle 5.9.4 — encore sur la lignée 
 
 | App en socle | Boot | Pack |
 |---|---|---|
-| 5.10.x | 4.1.2 | **0.6.0** |
+| 5.10.0 → 5.11.x | 4.1.2 | **0.7.0** (0.6.0 reste valide) |
 | 5.8.x – 5.9.x | 4.0.6 | 0.5.0 |
 
 ---
@@ -71,11 +71,16 @@ Cas réel : `APP-28-Your360` (pack 0.5.0, socle 5.9.4 — encore sur la lignée 
 
 ## 3. Étape 1 — Dépendance Maven, artefact vendorisé
 
+Pom d'application recommandé : le parent du socle. Il fournit `${socle.version}` (5.11.0), le BOM
+`socle-v005-bom` et la règle enforcer `socle-versions-testees` ; l'app n'écrit aucune version de framework.
+
 ```xml
-<properties>
-    <java.version>21</java.version>
-    <socle.version>5.10.0</socle.version>
-</properties>
+<parent>
+    <groupId>eu.lmvi</groupId>
+    <artifactId>socle-v005-parent</artifactId>
+    <version>5.11.0</version>   <!-- fils de spring-boot-starter-parent 4.1.2 -->
+    <relativePath/>
+</parent>
 
 <repositories>
     <repository>
@@ -89,15 +94,14 @@ Cas réel : `APP-28-Your360` (pack 0.5.0, socle 5.9.4 — encore sur la lignée 
 <dependencies>
     <dependency>
         <groupId>eu.lmvi</groupId>
-        <artifactId>socle-v005</artifactId>
-        <version>${socle.version}</version>
+        <artifactId>socle-v005</artifactId>   <!-- version gérée par le BOM hérité : 5.11.0 -->
     </dependency>
 
     <!-- La société derrière le tenant, lue au Hub (PACK FIRST) -->
     <dependency>
         <groupId>eu.lmvi</groupId>
         <artifactId>socle-pack-tenant</artifactId>
-        <version>0.6.0</version>
+        <version>0.7.0</version>
     </dependency>
 
     <!-- Facultatif : dialecte de marque #tenant (tenant-04) -->
@@ -114,8 +118,13 @@ Cas réel : `APP-28-Your360` (pack 0.5.0, socle 5.9.4 — encore sur la lignée 
 </dependencies>
 ```
 
+**App qui garde son propre parent.** Elle importe `eu.lmvi:socle-v005-bom:5.11.0` (`<type>pom</type>`,
+`<scope>import</scope>` dans `<dependencyManagement>`) et surcharge les cinq propriétés que Spring Boot
+gère en direct : `h2.version` 2.5.252, `jedis.version` 8.0.2, `kafka.version` 4.4.0, `mysql.version`
+26.10.0, `mariadb.version` 4.0.0. Elle n'hérite pas de la règle enforcer : la voie recommandée reste le parent.
+
 Depuis 0.6.0 le pack n'apporte **aucune** dépendance de portée `compile` : son client HTTP est
-**`com.squareup.okhttp3:okhttp-jvm` 5.5.1, celui que pose déjà le socle 5.10.0** (`provided` côté
+**`com.squareup.okhttp3:okhttp-jvm` 5.5.1, celui que pose déjà le socle 5.10.0 et 5.11.0** (`provided` côté
 pack). En 0.5.0, le pack embarquait `okhttp` 4.12.0. L'application ne déclare ni `okhttp` ni
 `HttpClient` pour parler au Hub : leur présence dans le pom d'une app consommatrice est le signal
 qu'un client parallèle a été réécrit.
@@ -125,14 +134,21 @@ Le pack n'est publié ni sur Maven Central ni sur `maven.thesocle.net`. Le const
 
 ```bash
 cd /opt/2026-TheHub4TheSocle/socle-pack-tenant
-git checkout v0.6.0                    # ou bcddf0e (0.5.0, sans tag) pour une app en socle 5.8/5.9
-mvn clean install -DskipTests          # pose 0.6.0 dans ~/.m2
+git checkout v0.7.0                    # v0.6.0 reste valide en 5.10 ; bcddf0e (0.5.0, sans tag) pour une app en socle 5.8/5.9
+mvn clean install -DskipTests          # pose 0.7.0 dans ~/.m2
 
 APP=/opt/2026-TheHub4TheSocle/APP-XX-MonApp/monapp
-DEST=$APP/mvn-repo/eu/lmvi/socle-pack-tenant/0.6.0
+DEST=$APP/mvn-repo/eu/lmvi/socle-pack-tenant/0.7.0
 mkdir -p "$DEST"
-cp target/socle-pack-tenant-0.6.0.jar "$DEST/"
-cp pom.xml "$DEST/socle-pack-tenant-0.6.0.pom"
+cp target/socle-pack-tenant-0.7.0.jar "$DEST/"
+cp pom.xml "$DEST/socle-pack-tenant-0.7.0.pom"
+
+# 0.7.0 : le pom du pack a pour parent socle-v005-parent 5.11.0, qui importe socle-v005-bom 5.11.0 ;
+# Maven lit ces deux poms pour lire celui du pack : ils se vendorisent avec lui
+for A in socle-v005-parent socle-v005-bom; do
+  mkdir -p "$APP/mvn-repo/eu/lmvi/$A/5.11.0"
+  cp ~/.m2/repository/eu/lmvi/$A/5.11.0/$A-5.11.0.pom "$APP/mvn-repo/eu/lmvi/$A/5.11.0/"
+done
 ```
 
 Le `@SpringBootApplication` doit balayer `eu.lmvi.socle` : les beans du pack vivent sous
@@ -156,7 +172,7 @@ public class Application {
 
 ## 4. Étape 2 — Configuration `socle.tenant.*`
 
-Toutes les propriétés, avec les **défauts du code** (`TenantProperties`, inchangés de 0.5.0 à 0.6.0) :
+Toutes les propriétés, avec les **défauts du code** (`TenantProperties`, inchangés de 0.5.0 à 0.7.0) :
 
 ```yaml
 socle:
@@ -188,16 +204,18 @@ SOCLE_TENANT_CLE_APIM=<clé APIM de l'app, forme apim_prod_ suivie de 40 caract�
 **Fournir la clé en clair, par l'environnement.** Le pack accepte aussi
 `cle-apim: vault:<chemin>#<champ>`, mais `CleApimResolver` cherche alors dans le contexte Spring un
 bean dont le nom de classe contient `Vault` **et** `Worker`, doté de `getSecret(String, String)`.
-Le socle (5.10.0 compris) n'en fournit aucun : dans une app V005 ordinaire, cette forme journalise
+Le socle (5.11.0 compris) n'en fournit aucun : dans une app V005 ordinaire, cette forme journalise
 `aucun VaultWorker dans le contexte — aucune fiche ne sera lue`.
 
 ---
 
 ## 5. Étape 3 — Poser le tenant dans le MDC
 
-Le pack lit le tenant par `TenantContext.fromMdc()` (clé `tenant_id`). **Aucune classe du socle ne
-pose cette clé.** Sans le filtre décrit en [[howto-tenant-02-poser-le-tenant-courant|tenant-02]],
-`profil.fiche()` lève `TenantSansFiche: aucun tenant résolu` et la route rend 500.
+Le pack lit le tenant par `TenantContext.fromMdc()` (clé `tenant_id`). Depuis le socle **5.10.1**, le
+socle pose cette clé pendant chaque action MCP/REST ; en socle ≤ 5.10.0, jamais. **Hors action** —
+contrôleur HTTP, page Thymeleaf, worker, tâche — l'application la pose toujours elle-même : sans le
+filtre décrit en [[howto-tenant-02-poser-le-tenant-courant|tenant-02]], `profil.fiche()` lève
+`TenantSansFiche: aucun tenant résolu` et la route rend 500.
 
 ---
 
@@ -287,7 +305,7 @@ Attendu : `"configure": true`, `"fiches_en_cache" ≥ 1`, `"revalidation":"PT30S
 
 | # | Test | Attendu |
 |---|---|---|
-| 1 | `mvn dependency:tree \| grep -i okhttp` | 0.6.0 : une seule occurrence, `okhttp-jvm:5.5.1`, tirée par `socle-v005` ; jamais `okhttp:4.12.0` à côté |
+| 1 | `mvn dependency:tree \| grep -i okhttp` | 0.6.0 et 0.7.0 : une seule occurrence, `okhttp-jvm:5.5.1`, tirée par `socle-v005` ; jamais `okhttp:4.12.0` à côté |
 | 2 | Clone frais, `mvn -o package` | compile : l'artefact est vendorisé |
 | 3 | `GET /api/societe` avec `X-SSO-Tenant` posé par le proxy | 200, `mention_legale` non vide |
 | 4 | Même appel sans tenant | 503 « aucun tenant résolu » |
@@ -300,13 +318,14 @@ Attendu : `"configure": true`, `"fiches_en_cache" ≥ 1`, `"revalidation":"PT30S
 
 | Piège | Symptôme | Correction |
 |---|---|---|
-| Tenant jamais posé dans le MDC | `TenantSansFiche: aucun tenant résolu` → 500, alors que l'en-tête `X-SSO-Tenant` est là | filtre de [[howto-tenant-02-poser-le-tenant-courant\|tenant-02]] |
+| Tenant jamais posé dans le MDC hors action | `TenantSansFiche: aucun tenant résolu` → 500 sur une route HTTP, alors que l'en-tête `X-SSO-Tenant` est là | filtre de [[howto-tenant-02-poser-le-tenant-courant\|tenant-02]] |
 | `cle-apim: vault:…#…` dans une app V005 | `aucun VaultWorker dans le contexte` ; aucune fiche | clé en clair par variable d'environnement, remplie par le Hub |
 | Clé tenant UUID au lieu d'une clé APIM | WARN au démarrage, puis 401 `auth_missing` traité en mode dégradé | clé `apim_<env>_<40hex>` |
-| Pack seulement dans `~/.m2` | compile sur le poste, échoue en CI / clone frais | vendoriser `mvn-repo/eu/lmvi/socle-pack-tenant/0.6.0/` |
-| Pack 0.6.0 dans une app en socle 5.8/5.9 (ou 0.5.0 en 5.10) | compile, puis casse au démarrage (Boot 4.1 contre 4.0) ; en 5.10 avec 0.5.0, deux artefacts `okhttp3` sur le classpath | appairer : socle 5.10 ↔ pack 0.6.0, socle 5.8/5.9 ↔ pack 0.5.0 |
-| `@Qualifier("ficheService")` (ou autre nom de bean générique) | 0.6.0 : `NoSuchBeanDefinitionException` | injecter par type, ou le nouveau nom préfixé (`tenantFicheService`, liste dans le README du pack) |
+| Pack seulement dans `~/.m2` | compile sur le poste, échoue en CI / clone frais | vendoriser `mvn-repo/eu/lmvi/socle-pack-tenant/0.7.0/`, avec les poms `socle-v005-parent` et `socle-v005-bom` 5.11.0 |
+| Pack 0.6.0 ou 0.7.0 dans une app en socle 5.8/5.9 (ou 0.5.0 en 5.10/5.11) | compile, puis casse au démarrage (Boot 4.1 contre 4.0) ; en 5.10 avec 0.5.0, deux artefacts `okhttp3` sur le classpath | appairer : socle 5.10/5.11 ↔ pack 0.7.0 (ou 0.6.0), socle 5.8/5.9 ↔ pack 0.5.0 |
+| `@Qualifier("ficheService")` (ou autre nom de bean générique) | depuis 0.6.0 : `NoSuchBeanDefinitionException` | injecter par type, ou le nouveau nom préfixé (`tenantFicheService`, liste dans le README du pack) |
 | `lecture-double.enabled=true` avec un pack ≤ 0.5.0 | l'app refuse de démarrer : `MigrationEcarts.<init>()` introuvable | pack 0.6.0 (constructeur `@Autowired`) |
+| `<configuration>` déclarée sur `maven-enforcer-plugin` dans le pom de l'app | aucun message : une liste `bannedDependencies/excludes` redéclarée **remplace** celle du parent ; `combine.self="override"` ou `<skip>true</skip>` coupent tout — les bornes de `socle-versions-testees` ne s'appliquent plus (mesuré le 2026-10-28) | ne jamais configurer le plugin dans l'app ; une règle de plus = une autre `<execution>` avec son propre `<id>` |
 | `scanBasePackages` sans `eu.lmvi.socle` | aucun bean `TenantProfile` à injecter | `{"eu.lmvi.socle", "eu.lmvi"}` |
 | Se fier au README ≤ 0.5.0 pour les défauts | `fraicheur-max` attendu à 24 h, réel 1 h ; `revalidation` ignorée | corrigé dans le README et le manifeste 0.6.0 ; la référence reste `TenantProperties` (tableau §4) |
 | App multi-tenant avec la configuration par défaut | 3 tenants sur 4 servent « Hub muet » sans erreur | [[howto-tenant-06-servir-plusieurs-tenants\|tenant-06]] |

@@ -1,7 +1,7 @@
 # HOWTO AI-02 — Générer du texte avec des prompts versionnés
 
 **Niveau :** Confirmé
-**Pack :** `eu.lmvi:socle-pack-ai:2.8.0` — tag `v2.8.0`, code au commit `f8d7dac` (socle-v005 5.10.0 / Spring Boot 4.1.2) — vérifié au code le 2026-10-28 ; aucune action ni comportement ne change depuis 2.7.14 (`a357a95`)
+**Pack :** `eu.lmvi:socle-pack-ai:2.9.0` — tag `v2.9.0`, commit `8c771e8`, code identique à 2.8.0 (commit de code `f8d7dac`) (socle-v005 5.11.0, minimum 5.10.0 / Spring Boot 4.1.2) — vérifié au code le 2026-10-28 ; aucune action ni comportement ne change depuis 2.7.14 (`a357a95`)
 **Composants :** `GenerationWorker` (`generation_worker`), `PromptResolverService` (bean `aiPromptResolverService` depuis 2.8.0), `PromptRenderer`, `AgentIaLlmProvider`, `LlmCascadeSource`, `HardCapChecker`, table `z_config_ia`
 **Prérequis :** [[howto-ai-01-integrer-le-pack|AI-01]] fait ; clé APIM `api:agentia:*` ([[howto-39-provisionner-une-cle-apim-pour-une-app|HOWTO 39]])
 **Temps estimé :** 30 min

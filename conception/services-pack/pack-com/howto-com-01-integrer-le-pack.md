@@ -1,10 +1,10 @@
 # HOWTO COM-01 — Intégrer socle-pack-comm dans une application V005
 
 **Niveau :** Confirmé
-**Cible :** `eu.lmvi:socle-pack-comm` **2.1.0** (dépôt `socle-pack-com`, branche `main`, commit `ba69578`, tag `v2.1.0`) · compilé contre `socle-v005` **5.10.0** (`provided`) · parent Spring Boot **4.1.2**
-**Autres lignes :** socle 5.8.6-5.9.x / Boot 4.0.6 → **2.0.0** (tag `v2.0.0`, commit `ffbfd75`) ; Boot 3.2.1 / socle ≤ 5.7.x → **1.1.0** (commit `6abb702`), dernière version Boot 3 — même comportement, mêmes propriétés
+**Cible :** `eu.lmvi:socle-pack-comm` **2.2.0** (dépôt `socle-pack-com`, branche `main`, commit `227fe5e`, tag `v2.2.0` ; code identique à 2.1.0, commit `ba69578`) · construit contre `socle-v005` **5.11.0** (`provided`, minimum **5.10.0**) · parent `eu.lmvi:socle-v005-parent` 5.11.0, fils de Spring Boot **4.1.2**
+**Autres lignes :** 2.1.0 (tag `v2.1.0`) reste valide en socle 5.10.x et 5.11.x ; socle 5.8.6-5.9.x / Boot 4.0.6 → **2.0.0** (tag `v2.0.0`, commit `ffbfd75`) ; Boot 3.2.1 / socle ≤ 5.7.x → **1.1.0** (commit `6abb702`), dernière version Boot 3 — même comportement, mêmes propriétés
 **Vérifié au code le :** 2026-10-28
-**Prérequis :** application V005 **Spring Boot 4.1.2, socle ≥ 5.10.0** sur PostgreSQL (le pack n'a pas de variante H2) ; Java 21 GraalVM CE ; accès à `~/.m2` de la box de build
+**Prérequis :** application V005 **Spring Boot 4.1.2, socle ≥ 5.10.0** (5.11.0 recommandé) sur PostgreSQL (le pack n'a pas de variante H2) ; Java 21 GraalVM CE ; accès à `~/.m2` de la box de build
 **Temps estimé :** 30 min
 
 > Suite du pack : [[howto-com-02-envoyer-une-notification-multicanal|COM-02 — Envoyer une notification]] ·
@@ -45,7 +45,7 @@ Apps de référence :
 │  code métier ──► NotifyWorker.sendNotification(...)   (appel Java direct)     │
 │  agent / Hub ──► POST /mcp  tools/call notify_worker__send_notification       │
 │                                                                               │
-│  socle-pack-comm 2.1.0  (package eu.lmvi.socle.pack.comm, beans comm*)        │
+│  socle-pack-comm 2.2.0  (package eu.lmvi.socle.pack.comm, beans comm*)        │
 │   ├─ CommProperties          @ConfigurationProperties("socle.comm")           │
 │   ├─ PackMigrationRunner     @PostConstruct → db/comm/V*.sql                  │
 │   ├─ NotifyWorker            PASSIVE, 8 actions, poller de rejeu              │
@@ -66,18 +66,18 @@ Apps de référence :
 
 ## 3. Étape 1 — Résoudre l'artefact
 
-Les versions 2.1.0 (socle 5.10 / Boot 4.1.2), 2.0.0 (socle 5.8.6-5.9.x / Boot 4.0.6) et 1.1.0 (Boot 3) sont **installées dans le `~/.m2` de la box de build**
+Les versions 2.2.0 et 2.1.0 (socle 5.10-5.11 / Boot 4.1.2), 2.0.0 (socle 5.8.6-5.9.x / Boot 4.0.6) et 1.1.0 (Boot 3) sont **installées dans le `~/.m2` de la box de build**
 (`_remote.repositories` vide : elles ne viennent d'aucun dépôt distant) ; aucune app consommatrice ne
 les vendorise dans un `mvn-repo/`. Un clone frais sur une autre machine doit d'abord construire :
 
 ```bash
 cd /opt/2026-TheHub4TheSocle/socle-pack-com
-git checkout v2.1.0                              # ba69578 (2.1.0) — v2.0.0 = Boot 4.0.6 ; 1.1.0 = commit 6abb702 (Boot 3)
-mvn clean install -DskipTests                    # → ~/.m2/repository/eu/lmvi/socle-pack-comm/2.1.0/
+git checkout v2.2.0                              # 227fe5e (2.2.0) — v2.1.0 = même code ; v2.0.0 = Boot 4.0.6 ; 1.1.0 = commit 6abb702 (Boot 3)
+mvn clean install -DskipTests                    # → ~/.m2/repository/eu/lmvi/socle-pack-comm/2.2.0/
 ```
 
 Pour qu'une CI compile sans cette étape, déposer le `.jar` et le `.pom` dans le `mvn-repo/` vendorisé
-de l'app (`mvn-repo/eu/lmvi/socle-pack-comm/2.1.0/`), comme pour le framework.
+de l'app (`mvn-repo/eu/lmvi/socle-pack-comm/2.2.0/`), comme pour le framework.
 
 ---
 
@@ -85,12 +85,30 @@ de l'app (`mvn-repo/eu/lmvi/socle-pack-comm/2.1.0/`), comme pour le framework.
 
 L'artifactId est **`socle-pack-comm`** (deux *m*), même si le dépôt git s'appelle `socle-pack-com`.
 
+Parent recommandé : `eu.lmvi:socle-v005-parent`. Fils de `spring-boot-starter-parent` 4.1.2, il fournit
+`${socle.version}`, importe `eu.lmvi:socle-v005-bom` (gRPC 1.85.1, Testcontainers 1.21.4, H2, Jedis,
+Kafka, pilotes MySQL / MariaDB aux versions testées par le socle) et porte la règle
+`maven-enforcer-plugin` `socle-versions-testees`. L'app ne déclare ni `<socle.version>`, ni
+`grpc-bom`, ni `testcontainers-bom`.
+
 ```xml
 <!-- pom.xml de l'application -->
+<parent>
+    <groupId>eu.lmvi</groupId>
+    <artifactId>socle-v005-parent</artifactId>
+    <version>5.11.0</version>   <!-- fils de spring-boot-starter-parent 4.1.2 -->
+    <relativePath/>
+</parent>
+
+<dependency>
+    <groupId>eu.lmvi</groupId>
+    <artifactId>socle-v005</artifactId>
+    <version>${socle.version}</version>   <!-- fourni par le parent -->
+</dependency>
 <dependency>
     <groupId>eu.lmvi</groupId>
     <artifactId>socle-pack-comm</artifactId>
-    <version>2.1.0</version>   <!-- socle 5.10 / Boot 4.1.2 ; 2.0.0 pour socle 5.8.6-5.9.x ; 1.1.0 pour Boot 3.2.1 -->
+    <version>2.2.0</version>   <!-- socle 5.10-5.11 / Boot 4.1.2 (2.1.0 accepté) ; 2.0.0 pour socle 5.8.6-5.9.x ; 1.1.0 pour Boot 3.2.1 -->
 </dependency>
 
 <!-- Le pack déclare en provided : l'app doit les fournir -->
@@ -107,21 +125,48 @@ L'artifactId est **`socle-pack-comm`** (deux *m*), même si le dépôt git s'app
 
 Le pack n'apporte en `compile` que `com.sun.mail:jakarta.mail 2.0.1` (comme socle-pack-mail). Le
 reste (socle, Spring Web, JDBC, Jackson, Log4j2, **OkHttp**) est `provided`. Disruptor n'est plus
-déclaré par le pack : c'est celui du socle (4.0.0 en 5.10.0).
+déclaré par le pack : c'est celui du socle (4.0.0).
 
-**OkHttp 5 (2.1.0).** Le socle 5.10.0 passe à OkHttp **5.5.1**, dont l'artefact JVM s'appelle
+**App qui garde son propre parent.** Voie supportée : importer le BOM du socle et surcharger les
+cinq propriétés que `spring-boot-dependencies` gère en direct (un BOM importé ne bat pas ces entrées) :
+
+```xml
+<properties>
+    <socle.version>5.11.0</socle.version>
+    <h2.version>2.5.252</h2.version>
+    <jedis.version>8.0.2</jedis.version>
+    <kafka.version>4.4.0</kafka.version>
+    <mysql.version>26.10.0</mysql.version>
+    <mariadb.version>4.0.0</mariadb.version>
+</properties>
+
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>eu.lmvi</groupId>
+            <artifactId>socle-v005-bom</artifactId>
+            <version>5.11.0</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+```
+
+**OkHttp 5 (depuis 2.1.0).** Le socle 5.10.0 passe à OkHttp **5.5.1** (inchangé en 5.11.0), dont l'artefact JVM s'appelle
 `com.squareup.okhttp3:okhttp-jvm` (`okhttp` 5.x n'est plus qu'un module multiplateforme). Le pack
-2.1.0 déclare `okhttp-jvm` en `provided` et utilise donc celle du socle. Le 2.0.0 embarquait
+(≥ 2.1.0) déclare `okhttp-jvm` en `provided` et utilise donc celle du socle. Le 2.0.0 embarquait
 `okhttp:4.12.0` en `compile` : coordonnées différentes, Maven ne dédoublonne pas, et une app socle 5.10
-recevrait **deux copies** de `okhttp3.*`/okio (le premier jar sur le classpath gagne). Ne jamais
+recevrait **deux copies** de `okhttp3.*`/okio (le premier jar sur le classpath gagne). En 2.2.0,
+l'artefact `okhttp` n'apparaît que comme **exclusion** de `mockwebserver` (test). Ne jamais
 ajouter `okhttp` 4.x dans l'app : `mvn dependency:tree -Dincludes=com.squareup.okhttp3` doit ne montrer
 que `okhttp-jvm`.
 
-**Version de Boot.** Le pack doit tourner sur le Boot de son socle : 2.1.0 est construit sur Spring
-Boot 4.1.2, celui de `socle-v005` 5.10.0 ; 2.0.0 sur Boot 4.0.6 (socle 5.8.6-5.9.x). Une app qui
+**Version de Boot.** Le pack doit tourner sur le Boot de son socle : 2.2.0 et 2.1.0 sont construits sur
+Spring Boot 4.1.2, celui de `socle-v005` 5.10.0 et 5.11.0 ; 2.0.0 sur Boot 4.0.6 (socle 5.8.6-5.9.x). Une app qui
 garde une version du pack bâtie sur une autre ligne de Spring compile, puis casse à l'exécution.
 
-**Noms de beans (2.1.0).** Tous les beans du pack ont un nom explicite préfixé `comm`
+**Noms de beans (depuis 2.1.0).** Tous les beans du pack ont un nom explicite préfixé `comm`
 (`commPackMigrationRunner`, `commTenantResolver`, `commVaultCredentialResolver`,
 `commResilienceFactory`, `commProperties`, `commNotifyWorker`… — liste complète dans le README du
 kit). Plusieurs packs (ai, Editorial, Connectors, Mail, pipeline) déclarent une classe de même nom
@@ -316,12 +361,12 @@ s'affichent « stopped » sur un socle ≤ 5.9.4 : leur `getStats()` n'écrit pa
 | 5 | Sans `SOCLE_COMM_SMS_PROVIDER` | `sms_worker` désactivé, aucun redémarrage en boucle au journal |
 
 Tests du pack correspondants : `RegistreScopeParSchemaTest`, `XPartitionDefaultTriggerTest`,
-`DemarrageContexteSpringTest` (2.1.0 : vraie `SpringApplication` Boot 4.1 avec le socle 5.10.0
-entier, MOP `RUNNING`, workers et actions comparés au manifeste `socle-pack.json`, registre
+`DemarrageContexteSpringTest` (depuis 2.1.0 : vraie `SpringApplication` Boot 4.1 avec le socle
+entier — 5.11.0 en 2.2.0, 5.10.0 en 2.1.0 — MOP `RUNNING`, workers et actions comparés au manifeste `socle-pack.json`, registre
 d'actions du socle, tables et registre de migrations dans un schéma neuf, beans préfixés `comm*`) —
-Testcontainers PostgreSQL ; 35 tests verts, aucun sauté (2.1.0).
+Testcontainers PostgreSQL ; 35 tests verts, aucun sauté (2.2.0 comme 2.1.0) ; enforcer passé.
 
-Pour démarrer le socle 5.10 hors conteneur (test, poste local) : `MCP_API_KEY` **et** `ADMIN_API_KEY`
+Pour démarrer le socle 5.10 / 5.11 hors conteneur (test, poste local) : `MCP_API_KEY` **et** `ADMIN_API_KEY`
 non vides (sinon refus de démarrer, fail-closed), et `TECHDB_PATH` **absolu** (H2 refuse un chemin
 relatif implicite).
 
@@ -339,10 +384,13 @@ relatif implicite).
 | `artifactId socle-pack-com` | dépendance introuvable | l'artifactId est `socle-pack-comm` |
 | Suivre HOWTO 28 à la lettre | `soclehub-pack.com.schema`, `${pack_schema}`, chemins Vault : rien n'est lu | propriétés `socle.comm.*`, placeholder `${comm_schema}` |
 | README du pack | annonce deux fournisseurs email, `POST /api/actions/notify_worker__…` | trois fournisseurs ; une app s'invoque par `POST /mcp` (la version, le socle minimal et Boot sont justes depuis 2.0.0) |
-| Mauvaise ligne de Boot | pack bâti sur un autre Boot que le socle de l'app | socle 5.10 / Boot 4.1.2 → **2.1.0** ; socle 5.8.6-5.9.x / Boot 4.0.6 → 2.0.0 ; Boot 3.2.1 → 1.1.0. Tester l'envoi réel après chaque montée de socle |
+| Mauvaise ligne de Boot | pack bâti sur un autre Boot que le socle de l'app | socle 5.10-5.11 / Boot 4.1.2 → **2.2.0** (2.1.0 accepté) ; socle 5.8.6-5.9.x / Boot 4.0.6 → 2.0.0 ; Boot 3.2.1 → 1.1.0. Tester l'envoi réel après chaque montée de socle |
 | Deux OkHttp dans l'app (pack 2.0.0 sur socle 5.10) | `okhttp` 4.12 du pack + `okhttp-jvm` 5.5.1 du socle : deux copies de `okhttp3.*`, comportement selon l'ordre du classpath | **corrigé en 2.1.0** (OkHttp du socle, `provided`) ; ne pas déclarer `okhttp` 4.x dans l'app |
+| `<configuration>` déclarée sur `maven-enforcer-plugin` dans le pom de l'app | les bornes du parent disparaissent **sans message** : une liste `bannedDependencies/excludes` redéclarée remplace celle du parent ; `combine.self="override"` ou `<skip>true</skip>` coupent tout | ne jamais configurer le plugin ; une règle de plus = une autre `<execution>` avec son propre `<id>` |
+| `h2.version`, `jedis.version`, `kafka.version`… redéclarées sous la version testée | build en échec à `validate` (exécution `socle-versions-testees`) | voulu : retirer la surcharge et garder la version du parent |
+| Versions du socle perdues dans l'app (gRPC 1.84.1, H2 2.4.240, Jedis 7.4.1 au lieu de celles du socle) | Boot 4.1.2 gère ces bibliothèques plus bas que le socle et l'emporte dans une app au parent Boot | **corrigé côté socle** : parent `socle-v005-parent` 5.11.0, ou `socle-v005-bom` ≥ 5.10.1 importé + les cinq propriétés (§4) ; une app restée en socle 5.10.0 sans BOM importe encore `io.grpc:grpc-bom:1.85.1` |
 | Collision de noms de beans entre packs | `ConflictingBeanDefinitionException` sur `packMigrationRunner`, `tenantResolver`, `vaultCredentialResolver`, `resilienceFactory` quand deux packs sont dans la même app | **corrigé en 2.1.0** : beans `comm*` ; un `@Qualifier` sur un ancien nom par défaut doit être renommé |
-| Caches vides au premier démarrage | sur un schéma neuf : `[notify-config] reload failed: bad SQL grammar` et `[notify-template] reload failed` **avant** `pack-migration … applying V000` ; `send_notification` → « no config for type » jusqu'au premier rechargement (vu en 2.0.0 et 2.1.0) | appeler `NotificationConfigService.reload()` et `TemplateService.reload()` depuis un `ApplicationRunner` de l'app (patron COM-03), ou redémarrer l'app une fois les tables posées |
+| Caches vides au premier démarrage | sur un schéma neuf : `[notify-config] reload failed: bad SQL grammar` et `[notify-template] reload failed` **avant** `pack-migration … applying V000` ; `send_notification` → « no config for type » jusqu'au premier rechargement (vu en 2.0.0 et 2.1.0 ; code identique en 2.2.0) | appeler `NotificationConfigService.reload()` et `TemplateService.reload()` depuis un `ApplicationRunner` de l'app (patron COM-03), ou redémarrer l'app une fois les tables posées |
 | Schéma absent | `schema "…" does not exist` à V000, l'app ne démarre pas | le pack ne crée pas le schéma : c'est le Hub (`db_worker/create_app_schema`) qui le pose |
 | Worker affiché « stopped » | tableau de bord ≤ 5.9.4 | lire `notify_worker__get_stats` ou `tr_notification_log` |
 

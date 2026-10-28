@@ -1,7 +1,7 @@
 # HOWTO tenant-03 — Lire la fiche société du tenant
 
 **Niveau :** Débutant
-**Cible :** `socle-pack-tenant` 0.6.0 (API identique à 0.5.0) — `TenantProfile`, `model.Fiche`
+**Cible :** `socle-pack-tenant` 0.7.0 (tag `v0.7.0`, commit `7235f83`, socle 5.11.0 — minimum 5.10.0 — / Boot 4.1.2 ; code identique à 0.6.0 `c3b70e3` ; API identique à 0.5.0) — `TenantProfile`, `model.Fiche`
 **Hub :** ≥ 3.63.0 (`GET /api/iam/tenant/{slug}/fiche`, `mention_legale` composée par le Hub)
 **Vérifié au code :** 2026-10-28
 **Prérequis :** [[howto-tenant-01-integrer-le-pack|tenant-01]], [[howto-tenant-02-poser-le-tenant-courant|tenant-02]] ; fiche saisie au Hub (`iam_worker.upsert_tenant_fiche` ou `import_tenant`)
@@ -172,7 +172,7 @@ Attendu : `401`, puis `200` avec un en-tête `ETag` et `raison_sociale` dans le 
 | Attraper `TenantSansFiche` pour mettre des valeurs par défaut | un document émis au nom d'une société inventée | laisser remonter, ou afficher l'absence |
 | `ficheDe(autre)` avec une clé ordinaire | `Optional.empty()` sans erreur | tenant-06 |
 | Traiter `null` et `""` différemment | champ « vide » affiché | le pack lit les deux comme « non renseigné » |
-| Attendre `fiche()` dans une action ou un cron sans MDC | `TenantSansFiche: aucun tenant résolu` | tenant-02 §4-§5 |
+| Attendre `fiche()` dans un cron sans MDC, ou dans une action en socle ≤ 5.10.0 | `TenantSansFiche: aucun tenant résolu` | tenant-02 §4-§5 (en socle ≥ 5.10.1, le socle pose le tenant pendant l'action) |
 | Lire `effectif` / `capitalEuros` comme `int` | `NullPointerException` à l'unboxing | ce sont des `Integer`, souvent `null` |
 
 ---

@@ -2,7 +2,7 @@
 
 **Niveau :** Confirmé
 **Cible :** application V005 sur PostgreSQL
-**Versions vérifiées au code et à l'exécution (2026-10-28) :** `eu.lmvi:socle-pack-mail` **1.5.0** (commit `a396ada`, tag `v1.5.0`) · `socle-v005` **5.10.0** · `socle-pack-ai` **2.8.0** (`provided`) · Spring Boot **4.1.2** · `jakarta.mail-api` 2.1.5 + `angus-mail` 2.0.5 (versions de Boot) · jsoup 1.17.2 · OkHttp `okhttp-jvm` 5.5.1 (du socle). Lignée **1.4.0** (tag `v1.4.0`) : socle 5.8.x-5.9.x, Boot 4.0.6, pack-ai 2.7.x — voir §4 et Pièges.
+**Versions vérifiées au code et à l'exécution (2026-10-28) :** `eu.lmvi:socle-pack-mail` **1.6.0** (commit `932cf29`, tag `v1.6.0` ; code identique à 1.5.0 `a396ada`) · `socle-v005` **5.11.0** (parent `eu.lmvi:socle-v005-parent` 5.11.0 ; minimum 5.10.0) · `socle-pack-ai` **2.9.0** (`provided` ; 2.8.0 accepté) · Spring Boot **4.1.2** · `jakarta.mail-api` 2.1.5 + `angus-mail` 2.0.5 (versions de Boot) · jsoup 1.17.2 · OkHttp `okhttp-jvm` 5.5.1 (du socle). **1.5.0** (tag `v1.5.0`) reste valide sur socle 5.10.x-5.11.x. Lignée **1.4.0** (tag `v1.4.0`) : socle 5.8.x-5.9.x, Boot 4.0.6, pack-ai 2.7.x — voir §4 et Pièges.
 **Prérequis :** Java 21 GraalVM CE, PostgreSQL ≥ 14, `socle-pack-ai` intégré ([[howto-ai-01-integrer-le-pack|HOWTO AI-01]])
 **Temps estimé :** 45 min
 
@@ -55,7 +55,7 @@ Le pack ne scanne aucune pièce jointe et n'en transmet aucune : le scan reste a
 ┌────────────────────────── Application hôte (V005) ─────────────────────────────┐
 │  @SpringBootApplication(scanBasePackages = "eu.lmvi.socle", "eu.lmvi")          │
 │                                                                                │
-│  socle-pack-ai (provided → à déclarer)     socle-pack-mail 1.5.0               │
+│  socle-pack-ai (provided → à déclarer)     socle-pack-mail 1.6.0               │
 │   GenerationWorker ◄──────────────────────  mail_generation_worker             │
 │                                             mail_import_worker   (passif)      │
 │                                             mail_send_worker     (passif)      │
@@ -83,26 +83,31 @@ Le pack ne fournit **aucune auto-configuration Spring Boot** (pas de
 Le pack déclare `socle-v005`, `socle-pack-ai`, `spring-boot-starter-web`, `spring-boot-starter-jdbc`,
 Jackson, OkHttp (`okhttp-jvm`, celui du socle) et le pilote PostgreSQL en **`provided`** : l'application
 hôte les apporte. Il amène lui-même `jakarta.mail-api` + `angus-mail` (versions gérées par Boot 4.1.2,
-celles de `spring-boot-starter-mail`) et jsoup. Le parent de l'app doit être le **Boot du socle**
-(4.1.2 pour socle 5.10.0) : un pack bâti sur un autre Boot que son socle compile, puis casse à
-l'exécution.
+celles de `spring-boot-starter-mail`) et jsoup. Le parent recommandé de l'app est
+**`eu.lmvi:socle-v005-parent`** 5.11.0, lui-même fils de `spring-boot-starter-parent` 4.1.2 : il fournit
+`${socle.version}` (5.11.0), importe `eu.lmvi:socle-v005-bom` (gRPC 1.85.1, Testcontainers 1.21.4, H2
+2.5.252, Jedis 8.0.2, kafka-clients 4.4.0, mysql-connector-j 26.10.0, mariadb-java-client 4.0.0) et
+pose la règle enforcer `socle-versions-testees`, qui fait échouer le build si une de ces bibliothèques
+retombe sous la version testée par le socle. Un pack bâti sur un autre Boot que son socle compile, puis
+casse à l'exécution.
 
 | Pack mail | Socle | Spring Boot | pack-ai |
 |---|---|---|---|
-| **1.5.0** | 5.10.0 et + | 4.1.2 | 2.8.0 |
+| **1.6.0** | 5.10.0 et + (construit contre 5.11.0) | 4.1.2 | 2.9.0 (2.8.0 accepté) |
+| 1.5.0 | 5.10.0 et + | 4.1.2 | 2.8.0 |
 | 1.4.0 | 5.8.x-5.9.x | 4.0.6 | 2.7.x |
 
 ```xml
 <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.1.2</version> <!-- = parent de socle-v005-5.10.0.pom -->
+    <groupId>eu.lmvi</groupId>
+    <artifactId>socle-v005-parent</artifactId>
+    <version>5.11.0</version> <!-- fils de spring-boot-starter-parent 4.1.2 ; fournit ${socle.version} -->
     <relativePath/>
 </parent>
 
 <properties>
     <java.version>21</java.version>
-    <socle.version>5.10.0</socle.version>
+    <!-- pas de <socle.version> : le parent la fournit (5.11.0) -->
 </properties>
 
 <repositories>
@@ -125,12 +130,12 @@ l'exécution.
     <dependency>
         <groupId>eu.lmvi</groupId>
         <artifactId>socle-pack-ai</artifactId>
-        <version>2.8.0</version>
+        <version>2.9.0</version> <!-- 2.8.0 accepté -->
     </dependency>
     <dependency>
         <groupId>eu.lmvi</groupId>
         <artifactId>socle-pack-mail</artifactId>
-        <version>1.5.0</version>
+        <version>1.6.0</version> <!-- 1.5.0 : même code, même lignée -->
     </dependency>
     <dependency>
         <groupId>org.springframework.boot</groupId>
@@ -149,10 +154,43 @@ l'exécution.
 </dependencies>
 ```
 
+Le parent `socle-v005-parent` et `socle-v005-bom` se vendorisent comme le jar du socle (`.pom` sous
+`mvn-repo/eu/lmvi/socle-v005-parent/5.11.0/` et `mvn-repo/eu/lmvi/socle-v005-bom/5.11.0/`) : sans eux,
+un clone frais ne résout pas le parent.
+
+**App qui garde son propre parent** (`spring-boot-starter-parent` 4.1.2 ou un parent maison) : voie
+supportée, mais deux gestes au lieu d'un. Importer le BOM du socle **et** surcharger cinq propriétés —
+un BOM importé ne bat pas les entrées directes de `spring-boot-dependencies`.
+
+```xml
+<properties>
+    <socle.version>5.11.0</socle.version>
+    <h2.version>2.5.252</h2.version>
+    <jedis.version>8.0.2</jedis.version>
+    <kafka.version>4.4.0</kafka.version>
+    <mysql.version>26.10.0</mysql.version>
+    <mariadb.version>4.0.0</mariadb.version>
+</properties>
+
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>eu.lmvi</groupId>
+            <artifactId>socle-v005-bom</artifactId>
+            <version>5.11.0</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+```
+
+Cette voie n'a pas la règle enforcer du parent : rien ne signale une version retombée.
+
 Vendoriser l'artefact construit localement :
 
 ```bash
-V=1.5.0
+V=1.6.0
 D=mvn-repo/eu/lmvi/socle-pack-mail/$V
 mkdir -p $D
 cp ~/.m2/repository/eu/lmvi/socle-pack-mail/$V/socle-pack-mail-$V.jar $D/
@@ -188,7 +226,7 @@ L'exclure de la dépendance pack-comm :
 **Depuis la 1.5.0, rien à faire** : tous les beans du pack portent un nom préfixé `mail`, ceux de
 pack-ai 2.8.0 un nom préfixé `ai`. Les deux packs se balaient ensemble sans conflit — c'est ce que
 prouve le test de démarrage du pack (`DemarrageContexteSpringTest` : `SpringApplication` complète,
-socle 5.10.0 + pack-ai 2.8.0).
+socle 5.11.0 + pack-ai 2.9.0 en 1.6.0 ; socle 5.10.0 + pack-ai 2.8.0 en 1.5.0).
 
 | Classe | Bean 1.4.0 | Bean 1.5.0 |
 |---|---|---|
@@ -399,7 +437,7 @@ WHERE n.nspname = 'schema_monapp' AND c.relkind = 'r' ORDER BY 1;
 | 3 | Lister les beans (`/actuator/beans` ou journal DEBUG) | `mailPackMigrationRunner` et `aiPackMigrationRunner` côte à côte, aucun `packMigrationRunner` |
 | 4 | Retirer `socle-pack-ai` du pom | échec au chargement de `MailGenerationWorker` |
 | 5 | Démarrer sans `SOCLE_MAIL_BOITE_HOTE` ni `SOCLE_MAIL_ACTIVATION_ENABLED` | ni `boite_applicative_worker`, ni `hub_iam_gateway_worker`, ni route `/activation` |
-| 6 | `mvn clean verify` sur le pack | 145 tests, 0 échec, 0 sauté (Docker pour le test de démarrage pgvector ; PostgreSQL 17 sur `127.0.0.1:55461` pour les autres) |
+| 6 | `mvn clean verify` sur le pack | 145 tests, 0 échec, 0 sauté, règle enforcer `socle-versions-testees` passée (Docker pour le test de démarrage pgvector ; PostgreSQL 17 sur `127.0.0.1:55461` pour les autres) |
 
 ---
 
@@ -407,7 +445,7 @@ WHERE n.nspname = 'schema_monapp' AND c.relkind = 'r' ORDER BY 1;
 
 | Piège | Symptôme | Correction |
 |---|---|---|
-| Mélanger les lignées : pack-mail 1.5.0 avec pack-ai 2.7.x ou socle 5.9 / Boot 4.0.6 (ou l'inverse) | compile, puis `NoSuchMethodError` / `ClassNotFoundException` (OkHttp 4 ↔ 5) à l'exécution | 1.5.0 = socle 5.10.0 + Boot 4.1.2 + pack-ai 2.8.0 ; 1.4.0 = socle 5.9 + Boot 4.0.6 + pack-ai 2.7.x |
+| Mélanger les lignées : pack-mail 1.5.0 / 1.6.0 avec pack-ai 2.7.x ou socle 5.9 / Boot 4.0.6 (ou l'inverse) | compile, puis `NoSuchMethodError` / `ClassNotFoundException` (OkHttp 4 ↔ 5) à l'exécution | 1.6.0 et 1.5.0 = socle 5.10.x-5.11.x + Boot 4.1.2 + pack-ai 2.8.0/2.9.0 ; 1.4.0 = socle 5.9 + Boot 4.0.6 + pack-ai 2.7.x |
 | Pack-mail **1.4.0** avec pack-ai 2.7.x : deux beans `packMigrationRunner` / `vaultCredentialResolver` | `ConflictingBeanDefinitionException`, l'app ne démarre pas | Corrigé en 1.5.0 (beans `mail*`) ; en 1.4.0, générateur de noms qualifiés (§4) |
 | Pack-mail **1.4.0** dans une vraie app | `NoUniqueBeanDefinitionException … type 'java.lang.Object'` sur `vaultCredentialResolver`, démarrage refusé | Corrigé en 1.5.0 (le worker Vault n'est plus injecté par `Object`) |
 | Pack-mail **1.4.0**, `SOCLE_MAIL_ACTIVATION_ENABLED=true` | `No default constructor found` sur `ActivationController`, démarrage refusé | Corrigé en 1.5.0 (constructeur `@Autowired`) |
@@ -418,11 +456,14 @@ WHERE n.nspname = 'schema_monapp' AND c.relkind = 'r' ORDER BY 1;
 | Deux schémas de la même base reçoivent le pack | le second ne reçoit aucune migration | `z_pack_migrations` est tenue **par pack**, pas par schéma : une base par app |
 | Base où l'ancienne `V999` aurait été jouée | `checksum mismatch on V999__seed_prompt.sql — skipping` (WARN) | Sans conséquence : la 1.4.0 corrige le quotage `$$` → `$prompt$` |
 | `V999` qui ne pose pas le prompt | `mail_generation_worker` échoue faute de prompt `contextual_mail` | `V999` teste `information_schema.tables`, **filtré par les droits**, et écrit dans `public.z_config_ia` : vérifier où pack-ai range ses prompts (MAIL-04). Si pack-mail migre avant pack-ai (cas observé au démarrage 1.5.0), V999 ne pose rien |
-| Ajouter pack-mail à une app dont pack-ai a **déjà** créé `z_config_ia` dans un schéma ≠ `public` | `Migration V999__seed_prompt.sql failed`, démarrage refusé | Défaut ouvert (1.5.0) : créer `public.z_config_ia` vide de même structure, ou poser le prompt à la main et inscrire `V999` dans `public.z_pack_migrations` |
+| Ajouter pack-mail à une app dont pack-ai a **déjà** créé `z_config_ia` dans un schéma ≠ `public` | `Migration V999__seed_prompt.sql failed`, démarrage refusé | Défaut ouvert (1.5.0, 1.6.0) : créer `public.z_config_ia` vide de même structure, ou poser le prompt à la main et inscrire `V999` dans `public.z_pack_migrations` |
 | Appeler `/api/actions/<worker>/<action>` sur l'app | 404 | C'est la porte **du Hub** ; une app s'appelle par `POST /mcp` |
 | `POST /mcp` sans `Accept: application/json, text/event-stream` | 400 / -32601 | Ajouter l'en-tête (SDK MCP embarqué depuis 5.8.5) |
 | `MCP_API_KEY` ou `ADMIN_API_KEY` vide | refus de démarrer (socle 5.9 et +) | Poser les deux clés depuis Vault |
-| Chercher le pack sur `maven.thesocle.net` | 404 | 1.4.0 et 1.5.0 n'existent que dans `~/.m2` de la box de build (et en tags git) : les vendoriser |
+| Chercher le pack sur `maven.thesocle.net` | 404 | 1.4.0, 1.5.0 et 1.6.0 n'existent que dans `~/.m2` de la box de build (et en tags git) : les vendoriser |
+| Déclarer une `<configuration>` sur `maven-enforcer-plugin` dans le pom de l'app (liste `bannedDependencies/excludes`, `combine.self="override"`, `<skip>true</skip>`) | aucun message : la liste redéclarée **remplace** celle du parent, ou la règle est coupée — les bornes de `socle-versions-testees` disparaissent | Ne jamais configurer le plugin dans l'app. Une règle de plus = une autre `<execution>` avec son propre `<id>` |
+| Redéclarer `h2.version`, `jedis.version`, `kafka.version`, `mysql.version` ou `mariadb.version` sous la version du socle dans une app au parent `socle-v005-parent` | build en échec à `validate` (règle `socle-versions-testees`) | Voulu : retirer la surcharge, la version vient du parent |
+| App au parent `spring-boot-starter-parent` sans `socle-v005-bom` (ou avec le BOM sans les cinq propriétés) | l'app reçoit gRPC 1.84.1, H2 2.4.240, Jedis 7.4.1 de Boot au lieu des versions du socle | Parent `socle-v005-parent` 5.11.0 ; sinon BOM + cinq propriétés (§3) — corrigé côté socle en 5.10.1 (BOM étendu) et 5.11.0 (parent) |
 
 ---
 

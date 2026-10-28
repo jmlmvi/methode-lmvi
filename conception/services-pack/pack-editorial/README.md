@@ -14,17 +14,18 @@ remplace pas.
 
 | | |
 |---|---|
-| Artefact | `eu.lmvi:socle-pack-editorial:**2.1.0**` (`socle-pack.json` : `2.1.0`, 31 actions, `minSocleVersion` 5.10.0) |
+| Artefact | `eu.lmvi:socle-pack-editorial:**2.2.0**` (`socle-pack.json` : `2.2.0`, 31 actions, `builtAgainstSocleVersion` 5.11.0, `minSocleVersion` 5.10.0) |
 | Dépôt | `/opt/2026-TheHub4TheSocle/socle-pack-Editorial` — `github.com/jmlmvi/socle-pack-Editorial` |
-| Référence git | **`main`** @ **`1fb6c6a`**, tag **`v2.1.0`** (2026-10-28), poussé |
-| Compilé contre | Spring Boot **4.1.2**, `socle-v005:5.10.0` (`provided`), `socle-pack-ai:2.8.0`, `socle-pack-comm:2.1.0` (tous deux `provided`) ; OkHttp = `okhttp-jvm` 5.5.1 du socle (`provided`), `grpc-bom` 1.85.1 |
-| Version précédente | **2.0.0** — tag `v2.0.0` (`main` @ `8879bf7`) : Boot 4.0.6, socle 5.8.8-5.9.x, ai 2.7.x, comm 2.0.0 |
+| Référence git | **`main`** @ **`1dbb5c4`**, tag **`v2.2.0`** (2026-10-28), poussé ; **code identique à 2.1.0** (`1fb6c6a`, tag `v2.1.0`) : seul le build change |
+| Construit contre | parent **`eu.lmvi:socle-v005-parent` 5.11.0** (fils de Spring Boot **4.1.2** ; fournit `${socle.version}`, importe `socle-v005-bom` — gRPC 1.85.1, Testcontainers 1.21.4 — et la règle enforcer `socle-versions-testees`), `socle-v005:5.11.0` (`provided`), `socle-pack-ai:2.9.0`, `socle-pack-comm:2.2.0` (tous deux `provided` ; ai 2.8.0 et comm 2.1.0 restent acceptés côté app) ; OkHttp = `okhttp-jvm` 5.5.1 du socle (`provided`) |
+| Compatibilité | **2.2.0** et **2.1.0** → socle 5.10.x et 5.11.x / Boot 4.1.2 (lignée « Socle 5.10-5.11 · Boot 4.1.2 ») ; 2.1.0 = tag `v2.1.0`, construite contre socle 5.10.0, ai 2.8.0, comm 2.1.0 |
+| Version précédente (Boot 4.0) | **2.0.0** — tag `v2.0.0` (`main` @ `8879bf7`) : Boot 4.0.6, socle 5.8.8-5.9.x, ai 2.7.x, comm 2.0.0 |
 | Dernière version Boot 3 | **`1.0.0-SNAPSHOT`** — `main` @ `fffd6f9` (2026-10-10) : socle 5.7.4, Boot 3.2.1, ai 2.3.3, comm 1.0.0-SNAPSHOT. Les apps Boot 3 (RssArchiver) y restent |
-| Tests | 18 classes, **67 tests verts, 0 sauté** (`mvn clean verify`, Testcontainers pgvector) dont `DemarrageContexteSpringTest` : vraie `SpringApplication` Boot 4.1 + socle 5.10.0 + ai 2.8.0 + comm 2.1.0, générateur de noms par défaut, MOP `RUNNING` ; `HitlWorker`, `RssCollectWorker`, `NewsletterRenderer` sans test unitaire |
+| Tests | 18 classes, **67 tests verts, 0 sauté** (`mvn clean verify`, Testcontainers pgvector ; enforcer passé) dont `DemarrageContexteSpringTest` : vraie `SpringApplication` Boot 4.1 + socle 5.11.0 + ai 2.9.0 + comm 2.2.0 (en 2.1.0 : socle 5.10.0 + ai 2.8.0 + comm 2.1.0), générateur de noms par défaut, MOP `RUNNING` ; `HitlWorker`, `RssCollectWorker`, `NewsletterRenderer` sans test unitaire |
 | Vérifié au code | 2026-10-28 |
 
 **Comment une application l'obtient.** Aucune version n'est publiée (ni `maven.thesocle.net`, ni
-`mvn-repo/` vendorisé). L'application construit le pack depuis le tag voulu — `v2.1.0` (socle 5.10,
+`mvn-repo/` vendorisé). L'application construit le pack depuis le tag voulu — `v2.2.0` ou `v2.1.0` (socle 5.10-5.11,
 Boot 4.1.2), `v2.0.0` (socle 5.8.8-5.9.x, Boot 4.0.6) ou le commit `fffd6f9` (1.0.0-SNAPSHOT, Boot 3)
 — (`mvn install`) puis vendorise
 le jar et le pom dans son propre `mvn-repo/` — [[howto-editorial-01-integrer-le-pack|EDITORIAL-01 §3]].
@@ -63,8 +64,8 @@ Une branche `master` diverge de `main` (28 commits propres) : ne pas construire 
 
 | Pack | Ce qu'Editorial utilise | Présence |
 |---|---|---|
-| `socle-pack-ai` **2.8.0** (socle 5.10 ; 2.7.x pour Boot 4.0.6 ; 2.4.x pour Boot 3) — [[howto-ai-01-integrer-le-pack\|AI-01]] | `GenerationWorker.generateOne` (score, résumé, intro), `FiveW1HService`, `TranslationService`, `WebWorker.fetch_smart`, `RagWorker.ingest_document` ; prompts `classify_generic`, `generate_summary` | jar **obligatoire** ; `GenerationWorker` requis si `curation_worker` actif ; le reste facultatif |
-| `socle-pack-comm` **2.1.0** (socle 5.10 ; 2.0.0 pour Boot 4.0.6 ; 1.x pour Boot 3) — [[howto-com-01-integrer-le-pack\|COM-01]] | `NotifyWorker.sendNotification` ; types `HITL_REMINDER`, `NEWSLETTER` | jar **obligatoire** ; bean facultatif (sans lui : ni relance, ni envoi) |
+| `socle-pack-ai` **2.9.0** (socle 5.10-5.11, 2.8.0 accepté ; 2.7.x pour Boot 4.0.6 ; 2.4.x pour Boot 3) — [[howto-ai-01-integrer-le-pack\|AI-01]] | `GenerationWorker.generateOne` (score, résumé, intro), `FiveW1HService`, `TranslationService`, `WebWorker.fetch_smart`, `RagWorker.ingest_document` ; prompts `classify_generic`, `generate_summary` | jar **obligatoire** ; `GenerationWorker` requis si `curation_worker` actif ; le reste facultatif |
+| `socle-pack-comm` **2.2.0** (socle 5.10-5.11, 2.1.0 accepté ; 2.0.0 pour Boot 4.0.6 ; 1.x pour Boot 3) — [[howto-com-01-integrer-le-pack\|COM-01]] | `NotifyWorker.sendNotification` ; types `HITL_REMINDER`, `NEWSLETTER` | jar **obligatoire** ; bean facultatif (sans lui : ni relance, ni envoi) |
 | Service Hub **KEW** (APIM `api.thesocle.net`) | extraction mots-clés / Wikidata | facultatif, clé APIM — [[howto-39-provisionner-une-cle-apim-pour-une-app\|HOWTO 39]] |
 
 ---
@@ -95,6 +96,18 @@ Le code fait foi ; chaque écart est repris dans les « Pièges courants » du H
 
 ---
 
+## Construction socle 5.11.0 (2.2.0) — ce qu'elle change pour l'app
+
+- **Rien au code ni à l'API** : 2.2.0 = code de 2.1.0, construit contre socle 5.11.0, ai 2.9.0, comm 2.2.0 ;
+  socle minimum toujours **5.10.0**. 2.1.0 reste valide en socle 5.10.x et 5.11.x.
+- **Parent `eu.lmvi:socle-v005-parent` 5.11.0** recommandé pour l'app : il aligne gRPC, H2, Jedis, Kafka et
+  les pilotes sur les versions du socle — plus d'import `grpc-bom` ni `testcontainers-bom`, plus de
+  `<socle.version>` local. App qui garde son parent : `socle-v005-bom` 5.11.0 importé + `h2.version`,
+  `jedis.version`, `kafka.version`, `mysql.version`, `mariadb.version` surchargées
+  ([[howto-editorial-01-integrer-le-pack|EDITORIAL-01 §4]]).
+- **Enforcer** : ne déclarer aucune `<configuration>` de `maven-enforcer-plugin` dans le pom de l'app
+  (elle effacerait sans message les bornes du parent) ; une règle de plus = une autre `<execution>`.
+
 ## Montée socle 5.10 / Boot 4.1.2 (2.1.0) — ce qu'elle change pour l'app
 
 - **Trois packs à monter ensemble** : editorial 2.1.0 + ai 2.8.0 + comm 2.1.0, socle ≥ 5.10.0, Boot 4.1.2.
@@ -106,7 +119,7 @@ Le code fait foi ; chaque écart est repris dans les « Pièges courants » du H
   (vérifié par `DemarrageContexteSpringTest`, générateur par défaut). Une app qui injecte par nom
   (`@Qualifier("curationWorker")`, `getBean("kewClient")`) doit prendre le nouveau nom ; par type :
   rien à changer. Noms de workers MCP et d'actions inchangés.
-- **gRPC** : `grpc-bom` 1.85.1 (Boot 4.1.2 gère 1.84.1) ; **disruptor** : celui du socle (4.0.0).
+- **gRPC** : `grpc-bom` 1.85.1 (Boot 4.1.2 gère 1.84.1) — depuis 2.2.0, apporté par le parent `socle-v005-parent` ; **disruptor** : celui du socle (4.0.0).
 - **Inchangés** : actions MCP, propriétés `socle.editorial.*`, variables d'environnement, migrations SQL,
   code fonctionnel. Les défauts listés plus haut (HITL `sendReminders` NPE, `update_curation_config`…)
   ne sont **pas** corrigés par la 2.1.0.

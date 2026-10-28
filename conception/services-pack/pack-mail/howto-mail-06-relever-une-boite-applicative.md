@@ -2,7 +2,7 @@
 
 **Niveau :** Confirmé
 **Cible :** application V005 qui reçoit des demandes par courriel (idées, tickets, candidatures…)
-**Versions vérifiées au code (2026-10-28) :** `socle-pack-mail` **1.5.0** (commit `a396ada`, tag `v1.5.0`) — fonction **nouvelle en 1.4.0** · socle **5.10.0** · Spring Boot 4.1.2 · `jakarta.mail-api` 2.1.5 + `angus-mail` 2.0.5 (Angus vérifie le nom du serveur par défaut ; le pack pose `mail.imaps.ssl.checkserveridentity` selon `SOCLE_MAIL_BOITE_VERIFIER_NOM_SERVEUR`) · tests GreenMail 2.1.8
+**Versions vérifiées au code (2026-10-28) :** `socle-pack-mail` **1.6.0** (commit `932cf29`, tag `v1.6.0` ; code identique à 1.5.0 `a396ada`) — fonction **nouvelle en 1.4.0** · socle **5.11.0** (minimum 5.10.0) · Spring Boot 4.1.2 · `jakarta.mail-api` 2.1.5 + `angus-mail` 2.0.5 (Angus vérifie le nom du serveur par défaut ; le pack pose `mail.imaps.ssl.checkserveridentity` selon `SOCLE_MAIL_BOITE_VERIFIER_NOM_SERVEUR`) · tests GreenMail 2.1.8
 **Prérequis :** [[howto-mail-01-integrer-le-pack|MAIL-01]] ; une boîte pour l'application sur le James du Hub ([[howto-11-configurer-james-mail|HOWTO 11]])
 **Temps estimé :** 40 min
 

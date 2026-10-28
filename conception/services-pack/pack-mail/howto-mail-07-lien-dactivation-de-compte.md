@@ -2,7 +2,7 @@
 
 **Niveau :** Senior
 **Cible :** application V005 derrière le proxy du Hub, qui ouvre des comptes à des personnes extérieures
-**Versions vérifiées au code (2026-10-28) :** `socle-pack-mail` **1.5.0** (commit `a396ada`, tag `v1.5.0`) — fonction **nouvelle en 1.4.0**, extraite de Your360 · socle **5.10.0** · Spring Boot 4.1.2. ⚠️ En 1.4.0, `SOCLE_MAIL_ACTIVATION_ENABLED=true` faisait échouer le démarrage (`ActivationController` sans constructeur désigné) : corrigé en 1.5.0 · Hub : porte `POST /api/actions/iam_worker/*`
+**Versions vérifiées au code (2026-10-28) :** `socle-pack-mail` **1.6.0** (commit `932cf29`, tag `v1.6.0` ; code identique à 1.5.0 `a396ada`) — fonction **nouvelle en 1.4.0**, extraite de Your360 · socle **5.11.0** (minimum 5.10.0) · Spring Boot 4.1.2. ⚠️ En 1.4.0, `SOCLE_MAIL_ACTIVATION_ENABLED=true` faisait échouer le démarrage (`ActivationController` sans constructeur désigné) : corrigé en 1.5.0 · Hub : porte `POST /api/actions/iam_worker/*`
 **Prérequis :** [[howto-mail-01-integrer-le-pack|MAIL-01]] ; un compte de service IAM pour l'application et sa clé ([[howto-08-creer-utilisateur-iam|HOWTO 08]]) ; SSO de l'app ([[howto-09-configurer-sso-multi-app|HOWTO 09]])
 **Temps estimé :** 45 min
 

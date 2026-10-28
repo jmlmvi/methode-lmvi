@@ -1,7 +1,7 @@
 # HOWTO AI-07 — Lire le web : récupérer une page, un document, chercher, piloter un navigateur
 
 **Niveau :** Intermédiaire
-**Pack :** `eu.lmvi:socle-pack-ai:2.8.0` — tag `v2.8.0`, code au commit `f8d7dac` (socle-v005 5.10.0 / Spring Boot 4.1.2) — vérifié au code le 2026-10-28 ; aucune action ni comportement ne change depuis 2.7.14 (`a357a95`)
+**Pack :** `eu.lmvi:socle-pack-ai:2.9.0` — tag `v2.9.0`, commit `8c771e8`, code identique à 2.8.0 (commit de code `f8d7dac`) (socle-v005 5.11.0, minimum 5.10.0 / Spring Boot 4.1.2) — vérifié au code le 2026-10-28 ; aucune action ni comportement ne change depuis 2.7.14 (`a357a95`)
 **Composants :** `WebWorker` (`web_worker`), `FetchService`, `CascadeFetcher`, `BrowserlessFetcher`, `PlaywrightFetcher`, `FlaresolverrFetcher`, `DocsParserClient` (bean `aiDocsParserClient` depuis 2.8.0), `SearchService`, `UrlPreflightFilter`, `BrowserWorker` (`browser_worker`), `BrowserContextPool` ; tables `tr_web_fetch_cache`, `tr_web_search_cache`, `tr_browser_session_log`
 **Prérequis :** [[howto-ai-01-integrer-le-pack|AI-01]] ; services mutualisés du Hub `playwright`, `browserless`, `flaresolverr`, `hub-docs-parser`, et une instance SearXNG ou une clé de moteur de recherche
 **Temps estimé :** 30 min

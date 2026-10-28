@@ -4,6 +4,29 @@
 > (procédure : README racine, « Resync d'une instance »). Ce fichier est auto-versionné par ses
 > entrées (pas de marqueur `KIT-VERSION`, cf. charte U-DOCS §3).
 
+## 1.16.0 — 2026-10-28
+
+**Les huit packs reconstruits contre le socle 5.11.0, sur son nouveau parent Maven.** Lignée renommée
+« Socle 5.10-5.11 · Boot 4.1.2 » : `minSocleVersion` reste 5.10.0 (aucune API 5.11), les versions 1.15.0
+(ai 2.8.0…) restent valides dans la lignée.
+- Versions (tags sur `main`, jars dans `~/.m2`) : ai **2.9.0**, comm **2.2.0**, connectors **3.2.0**,
+  editorial **2.2.0**, egress **3.1.0**, mail **1.6.0**, pipeline **0.4.0**, tenant **0.7.0**. Aucun
+  changement de code fonctionnel ; `00-index.md`, `CATALOGUE-PACKS.md`, README et en-têtes des howtos à jour.
+- **Pom d'app** : parent `eu.lmvi:socle-v005-parent` 5.11.0 recommandé — Boot 4.1.2 hérité, `${socle.version}`,
+  `socle-v005-bom` importé (gRPC 1.85.1, Testcontainers 1.21.4, h2/jedis/kafka/mysql/mariadb testés) : plus
+  d'import `grpc-bom` ni `testcontainers-bom`. Voie alternative pour une app qui garde son parent : BOM +
+  cinq propriétés. Les howtos -01 de chaque pack montrent les deux. Vendoriser aussi les poms du parent et du BOM.
+- **Piège enforcer** (piège n°3 de `00-index.md`, `00-creer-ou-amender-un-pack.md`, howtos -01) : jamais de
+  `<configuration>` sur `maven-enforcer-plugin` — mesuré : une liste `bannedDependencies/excludes` redéclarée
+  remplace celle du parent, `combine.self="override"` ou `skip` coupent tout, sans message.
+- Défauts du socle 5.10.0 relevés en 1.15.0 et **corrigés côté socle** : gRPC/H2/Jedis écrasés par Boot
+  (BOM 5.10.1, parent 5.11.0) ; `log4j2.xml` bruyant ; `tenant_id` désormais posé dans le MDC **pendant les
+  actions MCP/REST** (5.10.1) — `howto-tenant-02` réécrit : hors action, l'app le pose toujours.
+- Défaut de pack corrigé : pipeline ≤ 0.3.0 déclarait `disruptor` 3.4.4 en compile, qui battait la 4.0.0 du
+  socle dans l'app (corrigé en 0.4.0) ; connectors 3.2.0 retire sa copie provided.
+- `00-creer-ou-amender-un-pack.md` : modèle `socle-pack-ZZ-TEMPLATE` **v1.1.0** (squelette sur le parent,
+  `AlignementSocleTest` adapté, pack généré : 16 tests verts, enforcer passé).
+
 ## 1.15.0 — 2026-10-28
 
 **Les huit packs alignés sur le socle 5.10.0 / Spring Boot 4.1.2, et un modèle pour en créer.**

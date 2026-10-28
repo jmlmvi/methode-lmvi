@@ -1,10 +1,10 @@
 # HOWTO EDITORIAL-03 — Curer et router les articles avec `curation_worker`
 
 **Niveau :** Confirmé
-**Cible :** application V005 embarquant le pack — 2.1.0 sur Spring Boot 4.1.2 / socle 5.10 (2.0.0 sur Boot 4.0.6, 1.0.0-SNAPSHOT sur Boot 3.2.1 : contenu identique)
-**Versions vérifiées au code (2026-10-28) :** `socle-pack-editorial:2.1.0`, `main` @ `1fb6c6a`, tag `v2.1.0` (fonctionnellement identique à 2.0.0 — tag `v2.0.0` — et à `1.0.0-SNAPSHOT`, commit `fffd6f9`) —
+**Cible :** application V005 embarquant le pack — 2.2.0 sur Spring Boot 4.1.2 / socle 5.10-5.11 (2.1.0 idem ; 2.0.0 sur Boot 4.0.6, 1.0.0-SNAPSHOT sur Boot 3.2.1 : contenu identique)
+**Versions vérifiées au code (2026-10-28) :** `socle-pack-editorial:2.2.0`, `main` @ `1dbb5c4`, tag `v2.2.0`, construit contre socle 5.11.0 (minimum 5.10.0) (code identique à 2.1.0 — `1fb6c6a`, tag `v2.1.0` — et fonctionnellement identique à 2.0.0 — tag `v2.0.0` — et à `1.0.0-SNAPSHOT`, commit `fffd6f9`) —
 classes `CurationWorker`, `CurationConfigService` ; migrations `V004`, `V006`, `V999`, `V999z` ;
-prompts `classify_generic` / `generate_summary` seedés par `socle-pack-ai` (`db/ai/V999__seed_default_prompts.sql`, toujours présent en 2.7.13 et 2.8.0)
+prompts `classify_generic` / `generate_summary` seedés par `socle-pack-ai` (`db/ai/V999__seed_default_prompts.sql`, toujours présent en 2.7.13, 2.8.0 et 2.9.0)
 **Prérequis :** [[howto-editorial-02-collecter-des-flux-rss|EDITORIAL-02]] alimente `tr_raw_item` ;
 [[howto-ai-01-integrer-le-pack|pack-ai]] configuré avec un fournisseur LLM
 **Temps estimé :** 40 min

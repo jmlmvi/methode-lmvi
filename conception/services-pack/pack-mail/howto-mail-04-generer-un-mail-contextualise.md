@@ -2,7 +2,7 @@
 
 **Niveau :** Confirmé
 **Cible :** application V005 qui embarque `socle-pack-mail` et `socle-pack-ai`
-**Versions vérifiées au code (2026-10-28) :** `socle-pack-mail` **1.5.0** (commit `a396ada`, tag `v1.5.0`) · `socle-pack-ai` **2.8.0** · socle **5.10.0** · Spring Boot 4.1.2 — comportement inchangé depuis 1.4.0
+**Versions vérifiées au code (2026-10-28) :** `socle-pack-mail` **1.6.0** (commit `932cf29`, tag `v1.6.0` ; code identique à 1.5.0 `a396ada`) · `socle-pack-ai` **2.9.0** (2.8.0 accepté) · socle **5.11.0** (minimum 5.10.0) · Spring Boot 4.1.2 — comportement inchangé depuis 1.4.0
 **Prérequis :** [[howto-mail-01-integrer-le-pack|MAIL-01]], [[howto-ai-01-integrer-le-pack|HOWTO AI-01]] (un fournisseur LLM configuré), un référentiel contacts ([[howto-mail-02-importer-une-boite-utilisateur|MAIL-02]])
 **Temps estimé :** 30 min
 

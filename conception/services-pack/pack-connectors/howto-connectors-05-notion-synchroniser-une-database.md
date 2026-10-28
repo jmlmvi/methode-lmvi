@@ -2,7 +2,7 @@
 
 **Niveau :** Confirmé
 **Cible :** app qui importe une database Notion dans ses tables, ou y pousse ses propres lignes
-**Versions vérifiées au code (2026-10-28) :** `socle-pack-connectors:3.1.0` (Boot 4.1.2, socle 5.10.0 ; code de ce périmètre identique depuis 2.0.0 hors noms de beans préfixés `connectors*` ; 3.0.0 = Boot 4.0.6, 2.0.0 = dernière Boot 3) — `NotionDatabaseService`
+**Versions vérifiées au code (2026-10-28) :** `socle-pack-connectors:3.2.0` (tag `v3.2.0`, commit `edac18b`, code identique à 3.1.0 `69da4ab` ; Boot 4.1.2, socle 5.11.0, minimum 5.10.0 ; code de ce périmètre identique depuis 2.0.0 hors noms de beans préfixés `connectors*` ; 3.0.0 = Boot 4.0.6, 2.0.0 = dernière Boot 3) — `NotionDatabaseService`
 (`getDatabaseFull`, `createDatabase`, `upsertDatabaseRow`), `PropertyConverter`, `NotionClient`
 **Temps estimé :** 45 min
 

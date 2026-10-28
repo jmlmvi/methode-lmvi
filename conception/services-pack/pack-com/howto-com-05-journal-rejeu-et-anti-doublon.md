@@ -1,7 +1,7 @@
 # HOWTO COM-05 — Journal des envois, rejeu, anti-doublon et multi-tenant
 
 **Niveau :** Confirmé
-**Cible :** `eu.lmvi:socle-pack-comm` **2.1.0** (branche `main`, commit `ba69578`, tag `v2.1.0` ; Spring Boot 4.1.2, socle 5.10.0) — comportement identique à 2.0.0 (socle 5.8.6-5.9.x, Boot 4.0.6) et à 1.1.0, dernière version Boot 3
+**Cible :** `eu.lmvi:socle-pack-comm` **2.2.0** (branche `main`, commit `227fe5e`, tag `v2.2.0`, code identique à 2.1.0 — commit `ba69578` ; Spring Boot 4.1.2, socle 5.11.0, minimum 5.10.0) — comportement identique à 2.1.0, à 2.0.0 (socle 5.8.6-5.9.x, Boot 4.0.6) et à 1.1.0, dernière version Boot 3
 **Vérifié au code le :** 2026-10-28 (requête d'anti-doublon rejouée en JDBC sur PostgreSQL 17 le même jour)
 **Prérequis :** [[howto-com-02-envoyer-une-notification-multicanal|COM-02]]
 **Temps estimé :** 30 min
