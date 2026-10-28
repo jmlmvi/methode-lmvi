@@ -171,7 +171,7 @@ de l'app au `install_app` / `update_app`, cf. `UC-SEC-12` et `UC-INT-08`) :
 
 ```bash
 SOCLE_TENANT_HUB_URL=https://admin.thesocle.net
-SOCLE_TENANT_CLE_APIM=apim_prod_0123456789abcdef0123456789abcdef01234567
+SOCLE_TENANT_CLE_APIM=<clé APIM de l'app, forme apim_prod_ suivie de 40 caractères hexadécimaux>
 ```
 
 **Fournir la clé en clair, par l'environnement.** Le pack accepte aussi

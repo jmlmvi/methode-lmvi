@@ -4,6 +4,12 @@
 > (procédure : README racine, « Resync d'une instance »). Ce fichier est auto-versionné par ses
 > entrées (pas de marqueur `KIT-VERSION`, cf. charte U-DOCS §3).
 
+## 1.13.1 — 2026-10-28
+
+**Un exemple reformulé pour passer le contrôle anti-secret de la publication de la skill.**
+`howto-tenant-01` montrait une clé APIM factice de forme réelle (`apim_prod_…`) : `publish.sh` la
+refuse comme un vrai secret. Elle devient un gabarit `<clé APIM de l'app…>`.
+
 ## 1.13.0 — 2026-10-28
 
 **Les packs du socle documentés : `conception/services-pack/`.** 61 howtos, un par grande
