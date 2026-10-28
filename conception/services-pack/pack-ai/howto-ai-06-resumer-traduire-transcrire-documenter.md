@@ -1,7 +1,7 @@
 # HOWTO AI-06 — Résumer en 5W1H, traduire, transcrire un audio, rédiger une documentation
 
 **Niveau :** Intermédiaire
-**Pack :** `eu.lmvi:socle-pack-ai:2.7.14` — branche `main`, code au commit `a357a95` — vérifié au code le 2026-10-28
+**Pack :** `eu.lmvi:socle-pack-ai:2.8.0` — tag `v2.8.0`, code au commit `f8d7dac` (socle-v005 5.10.0 / Spring Boot 4.1.2) — vérifié au code le 2026-10-28 ; aucune action ni comportement ne change depuis 2.7.14 (`a357a95`)
 **Composants :** `FiveW1HService`, `TranslationService`, `HttpTranscriptionProvider` (`TranscriptionProvider`), `DocumentationGenerator` — services Java, **sans action MCP**
 **Prérequis :** [[howto-ai-02-generer-du-texte-avec-des-prompts-versionnes|AI-02]] ; pour la transcription, une clé APIM `api:transcription:*`
 **Temps estimé :** 30 min

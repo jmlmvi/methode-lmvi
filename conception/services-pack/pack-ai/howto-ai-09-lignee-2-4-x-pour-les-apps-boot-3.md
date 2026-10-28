@@ -1,7 +1,7 @@
 # HOWTO AI-09 — La lignée 2.4.x : socle-pack-ai pour les apps restées en Spring Boot 3.2.1
 
 **Niveau :** Confirmé
-**Pack :** lignée `2.4.x`, dernière version **2.4.8** — branche `fix/cache-embeddings-2.4.x`, commit `819a8a7` — comparée à `main` 2.7.14 (`a357a95`) le 2026-10-28
+**Pack :** lignée `2.4.x`, dernière version **2.4.8** — branche `fix/cache-embeddings-2.4.x`, commit `819a8a7` — comparée à `main` 2.7.14 (`a357a95`) le 2026-10-28 ; `main` est passée en 2.8.0 (socle 5.10.0 / Boot 4.1.2, tag `v2.8.0`) — la lignée Boot 4.0.6 s'arrête à 2.7.14
 **Socle :** 2.4.8 est compilée contre Spring Boot **3.2.1** et `socle-v005` **5.7.4** (`provided`)
 **Prérequis :** app dont le `pom.xml` déclare `spring-boot-starter-parent` 3.2.1
 **Temps estimé :** 20 min (choisir et épingler) ; 1 h (porter un correctif)

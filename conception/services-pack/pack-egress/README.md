@@ -1,8 +1,18 @@
 # socle-pack-egress — sortir sur internet par un mmh du Hub
 
-> **Version documentée :** `eu.lmvi:socle-pack-egress:2.0.0` — dépôt `/opt/2026-TheHub4TheSocle/socle-pack-egress`,
-> branche `feat/boot4` (non fusionnée dans `main` au 2026-10-28), commit `36be667` — **Spring Boot 4.0.6,
-> socle 5.9.0** (minimum 5.8.4), gRPC 1.81.0 / protobuf 3.25.9 alignés sur le socle.
+> **Version documentée :** `eu.lmvi:socle-pack-egress:3.0.0` — dépôt `/opt/2026-TheHub4TheSocle/socle-pack-egress`,
+> branche `main`, tag `v3.0.0`, commit `aa521dc` — **Spring Boot 4.1.2, socle 5.10.0** (minimum 5.10.0),
+> gRPC 1.85.1 / protobuf 4.36.2 alignés sur le socle.
+>
+> | Pack | Spring Boot | socle-v005 | gRPC / protobuf |
+> |---|---|---|---|
+> | **3.0.0** | 4.1.2 | 5.10.0 et suivants | 1.85.1 / 4.36.2 |
+> | 2.0.0 (tag `v2.0.0`, commit `36be667`) | 4.0.6 | 5.8.4 → 5.9.x | 1.81.0 / 3.25.9 |
+> | 1.0.0 | 3.2.1 | 5.7.x | 1.60.0 / 3.25.1 |
+>
+> 3.0.0 est une **majeure** : protobuf 4 change les classes générées publiques
+> (`eu.lmvi.socle.pack.egress.proto`) et le code généré refuse un protobuf-java < 4.36.2 — elle ne se
+> charge pas sur un socle ≤ 5.9. L'API du pack (`EgressTunnelProxy`, `socle.egress-client.*`) est inchangée.
 > **Dernière version Boot 3 = 1.0.0** (`main`, commit `8c8544e`, Spring Boot 3.2.1, gRPC 1.60, socle 5.7.x) :
 > c'est celle qu'utilisent encore les consommateurs en socle 5.7.4.
 > **Côté Hub, lu au code :** `soclehub` 3.73.0 (commit `35fdcd0`). **Vérifié le :** 2026-10-28.
@@ -13,7 +23,7 @@
 2. Chaque `CONNECT hôte:port` reçu devient un flux gRPC `EgressTunnel.Open` vers le Hub (`egress.thesocle.net:443`, TLS + ALPN h2).
 3. Le Hub choisit la sortie désignée par le **sélecteur** (`pool`, `pool-FR`, `mmh-prod-001`, `+tor`, `~affinité`) et relaie les octets par ce **mmh** : le site voit l'IP du mmh, le TLS reste de bout en bout.
 4. Il sert aux apps qui **ne joignent pas** `soclehub:3128` — celles des minihubs (KEW sur mini001, spark, mini-m4, nas4). Une app du réseau Docker du Hub se contente du proxy `soclehub:3128`, sans pack.
-5. Aucun worker, aucune table, aucune action MCP : une auto-configuration conditionnelle (`socle.egress-client.enabled=true`), un bean, des compteurs en mémoire.
+5. Aucun worker, aucune table, aucune action MCP : une auto-configuration conditionnelle (`socle.egress-client.enabled=true`), un bean (`egressTunnelProxy`, préfixé `egress` selon la convention des packs), des compteurs en mémoire.
 
 ## Besoin → howto
 
@@ -40,21 +50,26 @@ Le tunnel gRPC qu'emploie le pack accepte une clé API IAM ou un JWT Bearer — 
 
 | Dépendance | Portée | Fournie par |
 |---|---|---|
-| `io.grpc:grpc-api`, `grpc-stub`, `grpc-protobuf` (**1.81.0**, la version du socle) | `provided` | le socle V005 de l'app |
-| `com.google.protobuf:protobuf-java` (**3.25.9**, la version du socle) | `provided` | le socle |
-| un transport gRPC à l'exécution (`grpc-netty-shaded`) | — | le socle (5.8.0 → 5.9.5 : gRPC 1.81.0) |
+| `io.grpc:grpc-api`, `grpc-stub`, `grpc-protobuf` (**1.85.1**, la version du socle 5.10.0) | `provided` | le socle V005 de l'app |
+| `com.google.protobuf:protobuf-java` (**4.36.2**, la version du socle 5.10.0) | `provided` | le socle |
+| un transport gRPC à l'exécution (`grpc-netty-shaded`) | — | le socle (5.10.0 : déclaré 1.85.1, résolu 1.84.1 dans une app — voir plus bas) |
 | `spring-boot-autoconfigure`, `slf4j-api` | `provided` | l'app |
+| OkHttp | — (aucune) | le socle (5.10 : `okhttp-jvm` 5.5.1), si l'app s'en sert |
 
-Le pack **ne dépend pas** de `socle-v005` (il n'en utilise aucune classe) : `<socle.version>5.9.0</socle.version>`
+Le pack **ne dépend pas** de `socle-v005` (il n'en utilise aucune classe) : `<socle.version>5.10.0</socle.version>`
 ne sert qu'au test `GrpcAlignementSocleTest`, qui lit le pom embarqué dans le jar du socle et échoue si le gRPC
-ou le protobuf du pack divergent de ceux du socle (passe en 5.9.0 et 5.8.8, échoue en 5.7.4).
+ou le protobuf du pack divergent de ceux du socle (passe en 5.10.0, échoue en 5.9.0). Le pack surcharge
+`grpc-java.version` : sans cela, le `grpc-bom` 1.84.1 importé par Boot 4.1.2 mêlerait deux gRPC (voir les
+pièges d'[[howto-egress-01-integrer-le-pack|EGRESS-01]] : une app en socle 5.10.0 reçoit gRPC 1.84.1).
 
-`socle-pack.json` (2.0.0) : `minSocleVersion` **5.8.4**, `springBootVersion` 4.0.6, `grpcVersion` 1.81.0,
-`protobufVersion` 3.25.9, aucun pack requis. Parent Maven du pack : Spring Boot **4.0.6**.
+`socle-pack.json` (3.0.0) : `minSocleVersion` **5.10.0**, `springBootVersion` 4.1.2, `grpcVersion` 1.85.1,
+`protobufVersion` 4.36.2, `beans` `["egressTunnelProxy"]`, aucun pack requis — comparé au pom par
+`SoclePackManifestTest`. Parent Maven du pack : Spring Boot **4.1.2**.
 
 | Pack | Boot | Socle | gRPC / protobuf |
 |---|---|---|---|
-| **2.0.0** | 4.0.6 | ≥ 5.8.4 (testé 5.9.0 et 5.8.8) | 1.81.0 / 3.25.9 |
+| **3.0.0** | 4.1.2 | ≥ 5.10.0 | 1.85.1 / 4.36.2 |
+| 2.0.0 | 4.0.6 | 5.8.4 → 5.9.x (testé 5.9.0 et 5.8.8) | 1.81.0 / 3.25.9 |
 | 1.0.0 — dernière Boot 3 | 3.2.1 | 5.7.x | 1.60.0 / 3.25.1 |
 
 ## Apps consommatrices (2026-10-28)

@@ -2,7 +2,7 @@
 
 **Niveau :** Confirmé
 **Cible :** application V005 hors du réseau Docker du Hub (minihub, NUC, VPS tiers)
-**Versions vérifiées au code (2026-10-28) :** `socle-pack-egress` **2.0.0** (branche `feat/boot4`, commit `36be667`) — Spring Boot 4.0.6, socle V005 ≥ **5.8.4** (construit contre 5.9.0), gRPC 1.81.0 · Hub `soclehub` **3.73.0** (tunnel gRPC depuis 3.48.1, vhost `egress.thesocle.net` depuis 3.48.2)
+**Versions vérifiées au code (2026-10-28) :** `socle-pack-egress` **3.0.0** (`main`, tag `v3.0.0`, commit `aa521dc`) — Spring Boot 4.1.2, socle V005 ≥ **5.10.0**, gRPC 1.85.1 / protobuf 4.36.2 · socle 5.8.4 → 5.9.x : **2.0.0** (commit `36be667`) · Hub `soclehub` **3.73.0** (tunnel gRPC depuis 3.48.1, vhost `egress.thesocle.net` depuis 3.48.2)
 **App en Spring Boot 3 / socle 5.7.x :** rester en `socle-pack-egress` **1.0.0** (dernière version Boot 3, commit `8c8544e`) — c'est le cas des consommateurs réels, en 5.7.4
 **Prérequis :** une clé API IAM du Hub `.net` dont le propriétaire est membre du tenant `lmvi`
 **Temps estimé :** 20 min
@@ -81,22 +81,31 @@ sous `soclehub/kew/egress` (clés `mini001`, `spark`, `mini-m4`).
 <dependency>
     <groupId>eu.lmvi</groupId>
     <artifactId>socle-pack-egress</artifactId>
-    <version>2.0.0</version>   <!-- socle ≥ 5.8.4 / Boot 4 ; 1.0.0 pour un socle 5.7.x / Boot 3 -->
+    <version>3.0.0</version>   <!-- socle ≥ 5.10.0 / Boot 4.1 ; 2.0.0 pour 5.8.4 → 5.9.x ; 1.0.0 pour 5.7.x / Boot 3 -->
 </dependency>
 ```
 
 gRPC et protobuf sont en portée `provided` : le pack s'appuie sur ceux du socle V005, transport
 `grpc-netty-shaded` compris. Rien d'autre à déclarer — **et surtout pas de version gRPC propre à l'app** :
-le pack 2.0.0 est compilé avec le gRPC du socle (1.81.0 / protobuf 3.25.9), une seconde version
-sur le classpath ne ferait que créer l'écart que l'alignement évite.
+le pack 3.0.0 est compilé avec le gRPC du socle (1.85.1 / protobuf 4.36.2), une seconde version
+sur le classpath ne ferait que créer l'écart que l'alignement évite. Le pack n'embarque pas non plus
+d'OkHttp : en socle 5.10, c'est `com.squareup.okhttp3:okhttp-jvm` 5.5.1, fourni par le socle.
+
+> ⚠️ **gRPC réellement résolu dans une app en socle 5.10.0 : 1.84.1.** Le parent Boot 4.1.2 importe
+> `grpc-bom` à `${grpc-java.version}` = 1.84.1 et le pom du socle 5.10.0 ne surcharge pas cette
+> propriété : tous les `io.grpc:*` de l'app tombent en 1.84.1 (relevé le 2026-10-28 avec
+> `mvn dependency:list` sur une app minimale). Le tunnel du pack passe ses tests sur ce runtime-là
+> aussi. Pour avoir le gRPC annoncé par le socle, l'app pose
+> `<grpc-java.version>1.85.1</grpc-java.version>` dans ses `<properties>` — c'est la **seule** déclaration
+> gRPC admise, car elle aligne tout le BOM au lieu d'ajouter une seconde version.
 
 **Rendre l'artefact disponible au build.** Le pack se construit depuis son dépôt :
 
 ```bash
 cd /opt/2026-TheHub4TheSocle/socle-pack-egress
-mvn clean install          # 13 tests réels : tunnel (serveur gRPC Netty + sockets), auto-configuration Boot 4,
-                           # alignement gRPC sur le socle — ~5 s
-mvn verify -Dsocle.version=5.8.8   # vérifier l'alignement gRPC sur un autre socle
+mvn clean install          # 17 tests réels : tunnel (serveur gRPC Netty + sockets), auto-configuration Boot 4.1
+                           # et noms de beans, alignement gRPC/protobuf sur le socle, manifeste — ~10 s
+mvn verify -Dsocle.version=5.9.0   # échoue, comme attendu : 5.9.x = gRPC 1.81 / protobuf 3.25 → pack 2.0.0
 ```
 
 Pour qu'un clone frais ou une CI compile, vendoriser le `.jar` et le `.pom` dans le `mvn-repo/`
@@ -104,7 +113,7 @@ de l'application, comme le framework :
 
 ```bash
 APP=/opt/2026-TheHub4TheSocle/APP-09-KEW
-V=2.0.0   # 1.0.0 pour une app restée en Boot 3
+V=3.0.0   # 2.0.0 pour un socle 5.8.4 → 5.9.x ; 1.0.0 pour une app restée en Boot 3
 mkdir -p $APP/mvn-repo/eu/lmvi/socle-pack-egress/$V
 cp ~/.m2/repository/eu/lmvi/socle-pack-egress/$V/socle-pack-egress-$V.{jar,pom} \
    $APP/mvn-repo/eu/lmvi/socle-pack-egress/$V/
@@ -174,7 +183,7 @@ L'auto-configuration `EgressClientAutoConfiguration` (déclarée dans
 `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`) :
 
 1. valide `endpoint` (`hôte:port`) et `api-key` (non vide) — sinon **le contexte Spring échoue** ;
-2. ouvre le canal gRPC (TLS, keep-alive 60 s, user-agent `socle-pack-egress/2.0.0`) ;
+2. ouvre le canal gRPC (TLS, keep-alive 60 s, user-agent `socle-pack-egress/3.0.0`) ;
 3. lie le `ServerSocket` sur `127.0.0.1:<local-port>` et lance la boucle d'acceptation sur un
    thread virtuel ;
 4. enregistre `close()` comme méthode de destruction : à l'arrêt, `channel.shutdownNow()` annule
@@ -216,7 +225,7 @@ connexion gardée ; `last_exit=mmh-prod-001`, `last_exit_ip=152.228.141.0`.
 | 2 | `enabled: true`, `api-key` vide | démarrage refusé : « socle.egress-client.api-key est vide : le Hub refuserait toute sortie (407) » |
 | 3 | `enabled: true`, `endpoint: egress.thesocle.net` (sans port) | démarrage refusé : « attendu hôte:port » |
 | 4 | clé valide, sélecteur `mmh-prod-001` | log `[egress-client] proxy local …` puis `stats().last_exit_ip = 152.228.141.0` au premier appel |
-| 5 | `mvn verify` dans le pack (2.0.0) | 13 tests, 0 échec : `EgressTunnelProxyTest` 6, `EgressClientAutoConfigurationTest` 4, `GrpcAlignementSocleTest` 3 (relevé le 2026-10-28, socle 5.9.0 et `-Dsocle.version=5.8.8`) |
+| 5 | `mvn verify` dans le pack (3.0.0) | 17 tests, 0 échec, 0 sauté : `EgressTunnelProxyTest` 6, `EgressClientAutoConfigurationTest` 5, `GrpcAlignementSocleTest` 3, `SoclePackManifestTest` 3 (relevé le 2026-10-28, socle 5.10.0) ; `EgressLiveIT` hors suite (clé IAM requise) |
 
 ---
 
@@ -227,14 +236,18 @@ connexion gardée ; `last_exit=mmh-prod-001`, `last_exit_ip=152.228.141.0`.
 | `enabled: true` sans clé | l'app ne démarre pas (`IllegalArgumentException` à la création du bean) | garder `enabled: false` tant que la clé n'est pas au Vault — c'est le choix de RssArchiver |
 | Clé d'un compte hors tenant `lmvi` | chaque connexion reçoit `403 tenant … non autorisé` | compte de service membre de `lmvi` sur `.net` |
 | Clé IAM `.io` | `407` : `egress.thesocle.net` est le Hub `.net` | clé IAM du Hub `.net` |
-| Pack absent de `maven.thesocle.net` | `Could not find artifact eu.lmvi:socle-pack-egress:jar:2.0.0` (ou `1.0.0`) sur une autre machine | `mvn install` depuis le dépôt du pack, puis vendoriser dans `mvn-repo/` (KEW et RssArchiver dépendent aujourd'hui du `~/.m2` de la box de build) |
+| Pack absent de `maven.thesocle.net` | `Could not find artifact eu.lmvi:socle-pack-egress:jar:3.0.0` (ou `2.0.0`, `1.0.0`) sur une autre machine | `mvn install` depuis le dépôt du pack, puis vendoriser dans `mvn-repo/` (KEW et RssArchiver dépendent aujourd'hui du `~/.m2` de la box de build) |
 | `endpoint` vers `soclehub:80` ou `:80` | flux en échec : le gRPC du Hub n'écoute pas en h2c | `egress.thesocle.net:443`, TLS + ALPN h2 |
 | Embarquer aussi `grpc-contracts` | conflit de classes redouté | aucun : le pack génère ses classes sous `eu.lmvi.socle.pack.egress.proto` |
 | App du réseau Docker du Hub | pack inutile, un saut de plus | proxy `soclehub:3128` (HOWTO Hub) |
 | Pack 2.0.0 dans une app en socle 5.7.x / Boot 3 | classes générées par grpc-java 1.81 sur un gRPC 1.60 (erreurs de liaison à l'exécution), auto-configuration bâtie pour Boot 4 | rester en **1.0.0** jusqu'à la montée de socle de l'app ; passer en 2.0.0 en même temps que le socle ≥ 5.8.4 |
 | Pack 1.0.0 dans une app en socle ≥ 5.8.4 (Boot 4) | combinaison jamais éprouvée (pack compilé en gRPC 1.60 / Boot 3.2.1) | pack **2.0.0** (corrigé : gRPC aligné sur le socle, auto-configuration testée en Boot 4) |
-| App qui déclare sa propre version de gRPC | deux gRPC sur le classpath, ou un gRPC différent de celui pour lequel le pack est compilé | ne rien déclarer : le gRPC vient du socle, et le pack 2.0.0 est compilé avec exactement celui-là |
-| Première mise en service en Boot 4 | le tunnel est prouvé par les tests (vrai serveur gRPC 1.81), pas encore contre le Hub réel avec la 2.0.0 | faire passer `EgressLiveIT` (clé IAM requise) avant la mise en service |
+| Pack 3.0.0 dans une app en socle 5.8.4 → 5.9.x | au chargement des classes `eu.lmvi.socle.pack.egress.proto` : `NoClassDefFoundError` (`com.google.protobuf.RuntimeVersion`, `GeneratedFile`) — le code généré par protobuf 4.36.2 exige protobuf-java ≥ 4.36.2 | rester en **2.0.0** ; passer en 3.0.0 en même temps que le socle 5.10 |
+| Pack 2.0.0 gardé après la montée en socle 5.10 | fonctionne (protobuf 4.36.2 garde `GeneratedMessageV3` ; tests tunnel et auto-configuration verts, vérifié le 2026-10-28), mais code généré 3.25 sur un runtime 4.36 et Boot 4.0.6 sous Boot 4.1.2 | filet de transition seulement : prendre **3.0.0** |
+| App qui manipule les classes générées (`ClientFrame`, `OpenRequest`…) | en 3.0.0 : `GeneratedMessageV3` → `GeneratedMessage`, plus de `Builder.clone()`/`setField()` covariants | n'utiliser que `EgressTunnelProxy` ; le package `…egress.proto` est interne au pack |
+| App qui déclare sa propre version de gRPC | deux gRPC sur le classpath, ou un gRPC différent de celui pour lequel le pack est compilé | ne déclarer aucune dépendance `io.grpc` ; au plus `<grpc-java.version>1.85.1</grpc-java.version>` (aligne le BOM de Boot 4.1.2, qui imposerait sinon 1.84.1 à tout gRPC) |
+| Un second OkHttp | deux copies de `okhttp3.*` (socle 5.10 = `okhttp-jvm` 5.5.1, l'ancien artefact `okhttp` 4.12) | ne pas déclarer `com.squareup.okhttp3:okhttp` ; le pack n'en embarque aucun |
+| Première mise en service en socle 5.10 | le tunnel est prouvé par les tests (vrai serveur gRPC 1.85.1, et runtime 1.84.1), pas encore contre le Hub réel avec la 3.0.0 | faire passer `EgressLiveIT` (clé IAM requise) avant la mise en service |
 
 ---
 

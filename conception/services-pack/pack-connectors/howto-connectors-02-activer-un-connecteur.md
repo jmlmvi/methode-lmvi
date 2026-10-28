@@ -2,7 +2,7 @@
 
 **Niveau :** Débutant
 **Cible :** une app qui embarque déjà le pack ([[howto-connectors-01-integrer-le-pack|CONNECTORS-01]])
-**Versions vérifiées au code (2026-10-28) :** `socle-pack-connectors:3.0.0` (Boot 4.0.6 ; code de ce périmètre identique à 2.0.0, dernière version Boot 3), commit `f3a3e08`
+**Versions vérifiées au code (2026-10-28) :** `socle-pack-connectors:3.1.0` (Boot 4.1.2, socle 5.10.0 ; code de ce périmètre identique depuis 2.0.0 hors noms de beans préfixés `connectors*` ; 3.0.0 = Boot 4.0.6, 2.0.0 = dernière Boot 3), commit `f3a3e08`
 (« chaque connecteur s'active à la demande »), fusionné dans `main` (`9e6d106`)
 **Temps estimé :** 5 min par connecteur
 

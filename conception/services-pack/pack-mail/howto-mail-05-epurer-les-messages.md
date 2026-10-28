@@ -2,7 +2,7 @@
 
 **Niveau :** Confirmé
 **Cible :** application V005 qui stocke le corps de courriels en PostgreSQL
-**Versions vérifiées au code (2026-10-28) :** `socle-pack-mail` **1.4.0** (copie de travail, base `24bc50a`) · règles d'épuration **version 1** (`LecteurMessage.VERSION`) · jsoup 1.17.2 · socle **5.9.5**
+**Versions vérifiées au code (2026-10-28) :** `socle-pack-mail` **1.5.0** (commit `a396ada`, tag `v1.5.0`) · règles d'épuration **version 1** (`LecteurMessage.VERSION`) · jsoup 1.17.2 · socle **5.10.0** · Spring Boot 4.1.2. ⚠️ En 1.4.0, `mail_epuration_worker` n'était jamais créé dans une app (condition évaluée avant le DataSource) : corrigé en 1.5.0
 **Prérequis :** [[howto-mail-01-integrer-le-pack|MAIL-01]] ; une table de messages dont l'app remplit le corps texte et/ou HTML
 **Temps estimé :** 30 min
 

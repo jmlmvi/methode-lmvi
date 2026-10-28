@@ -4,6 +4,28 @@
 > (procédure : README racine, « Resync d'une instance »). Ce fichier est auto-versionné par ses
 > entrées (pas de marqueur `KIT-VERSION`, cf. charte U-DOCS §3).
 
+## 1.15.0 — 2026-10-28
+
+**Les huit packs alignés sur le socle 5.10.0 / Spring Boot 4.1.2, et un modèle pour en créer.**
+- Versions (tags sur `main`, jars dans `~/.m2`) : ai 2.8.0, comm 2.1.0, connectors 3.1.0,
+  editorial 2.1.0, egress 3.0.0 (protobuf 4), mail 1.5.0, pipeline 0.3.0, tenant 0.6.0.
+  `00-index.md` donne, pack par pack, la version pour le socle 5.10, pour 5.8.4-5.9.x (Boot 4.0.6)
+  et pour Boot 3 ; `CATALOGUE-PACKS.md` idem.
+- Conventions communes appliquées partout : **beans préfixés** par l'identifiant du pack (plus de
+  qualification manuelle dans une app multi-packs), **test de démarrage** d'un vrai contexte Spring
+  par pack, **manifeste exact** (`minSocleVersion` 5.10.0), OkHttp du socle (`okhttp-jvm` 5.5.1,
+  plus d'`okhttp` 4.x embarqué), Logback exclu.
+- Défauts corrigés en route parce que la migration les révélait : lecture double de tenant qui
+  empêchait le démarrage ; trois défauts de démarrage de mail (dont `mail_epuration_worker` jamais
+  créé) ; manifestes faux (ai, tenant, pipeline).
+- **Nouveau : `services-pack/00-creer-ou-amender-un-pack.md`** (EXTENSION / PACK NEUF, conventions)
+  et le modèle **`socle-pack-ZZ-TEMPLATE`** v1.0.0 (`bootstrap.sh <id>`, squelette validé : 16
+  tests verts sur un pack généré). Il donne une procédure au « PACK NEUF » de la règle
+  service-pack first.
+- Défauts du **socle 5.10** relevés (hors périmètre, à transmettre) : versions annoncées par son pom
+  et non livrées aux apps (gRPC 1.85.1 → 1.84.1, H2, Jedis, écrasés par Boot 4.1.2) ; `log4j2.xml`
+  bruyant ; `tenant_id` toujours pas posé dans le MDC.
+
 ## 1.14.0 — 2026-10-28
 
 **Les huit packs ont une version Spring Boot 4.0.6.** Montées faites ce jour, chacune sur une

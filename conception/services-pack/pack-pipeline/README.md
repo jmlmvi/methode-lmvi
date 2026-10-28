@@ -14,22 +14,33 @@
 
 | Élément | Valeur |
 |---|---|
-| Artefact | `eu.lmvi:socle-pack-pipeline:`**`0.2.0`** (première release, plus de SNAPSHOT) |
+| Artefact | `eu.lmvi:socle-pack-pipeline:`**`0.3.0`** |
 | Dépôt | `/opt/2026-TheHub4TheSocle/socle-pack-pipeline` (git autonome, `github.com/jmlmvi/socle-pack-pipeline`) |
-| Réf. documentée | branche **`feat/boot4` @ `4cb5aa6`** (2026-10-28), issue de `feat/p1-p4-dag-engine` @ `5fa8f05` ; **non fusionnée dans `main`, pas de tag** |
-| Compilé contre | parent Spring Boot **4.0.6**, `socle-v005` **5.9.0** (`provided`, propriété `socle.version`) ; compile aussi contre 5.8.4 et 5.8.8. `jnats` 2.19.1 (`provided`) |
-| Manifeste | `META-INF/socle-pack.json`, `minSocleVersion` **5.8.4** (premier socle Boot 4), `springBootVersion` 4.0.6 |
+| Réf. documentée | **`main` @ `fef144d`** (2026-10-28), tag **`v0.3.0`** (posé sur `db7881f` ; `fef144d` n'y ajoute que le manifeste et le pom de test). Précédente : `v0.2.0` @ `cd47a4d` |
+| Compilé contre | parent Spring Boot **4.1.2**, `socle-v005` **5.10.0** (`provided`, propriété `socle.version`). `jnats` 2.19.1 (`provided`, non géré par Boot 4.1.2) |
+| Manifeste | `META-INF/socle-pack.json`, `minSocleVersion` **5.10.0**, `springBootVersion` 4.1.2, **24 actions** listées |
+| Journalisation | Log4j2 seul : depuis 0.3.0 le pack n'apporte plus Logback (`spring-boot-starter-logging` venait par `spring-boot-starter-jdbc`, en portée compile) |
 | Jackson | Jackson 2 (`com.fasterxml`, `provided`), comme le socle et les packs tenant/mail/ai. Le pack n'a aucun contrôleur HTTP : le Jackson 3 de Boot 4 ne voit jamais ses `JsonNode` |
 | Où trouver le JAR | **uniquement `~/.m2` de la box de build** (`mvn install` du 2026-10-28). Aucun `mvn-repo/` vendorisé, et le dépôt `maven.thesocle.net` ne le sert pas |
 
+| Version pack | Spring Boot | socle-v005 |
+|---|---|---|
+| **0.3.0** | **4.1.2** | **5.10.0** et suivants |
+| 0.2.0 (dernière Boot 4.0.6) | 4.0.6 | 5.8.4 → 5.9.x |
+| 0.1.0-SNAPSHOT (dernière Boot 3) | 3.2.1 | 5.7.4 → 5.8.0 |
+
 **Dernière version Boot 3 = `0.1.0-SNAPSHOT`** (branche `feat/p1-p4-dag-engine` @ `5fa8f05`, Spring Boot 3.2.1,
 socle 5.8.0) — pour les apps restées en Boot 3.2.1 (RssArchiver, REGIES, BilanSocle). Elle n'est plus
-modifiée ; les apps Boot 4 passent en 0.2.0.
+modifiée. Une app Boot 4.0.6 (socle 5.8.4 → 5.9.x) prend 0.2.0 ; une app montée en socle 5.10.0 prend 0.3.0.
+
+**0.3.0 ne change aucun code** : l'API Pipeline V2 du socle (`eu.lmvi.socle.pipeline.*`) et
+`eu.lmvi.socle.config.PipelineProperties` sont identiques en 5.9.0 et 5.10.0 (signatures comparées au bytecode),
+et les classes nouvelles du socle 5.10.0 ne croisent aucun nom `pipelinePack*`.
 
 **0.2.0 corrige la collision `pipelineProperties`** avec le socle ≥ 5.8.6 : tous les beans du pack portent un
 nom explicite `pipelinePack*` (`pipelinePackProperties`, `pipelinePackWorker`, `pipelinePackRepository`,
 `pipelinePackDagBuilder`, `pipelinePackRuntimeManager`, …). Plus besoin de générateur de noms dans l'app.
-Prouvé par `PackContexteSocleTest` (contexte Spring socle 5.9.0 + pack, vrai PostgreSQL).
+Prouvé par `PackContexteSocleTest` (contexte Spring socle + pack, vrai PostgreSQL ; socle 5.10.0 / Boot 4.1.2 en 0.3.0).
 
 Le contenu fonctionnel est celui de `feat/p1-p4-dag-engine` : `V002__run_key_unique.sql` (index unique partiel
 `NULLS NOT DISTINCT`, PostgreSQL ≥ 15) et `instantiate` **idempotent sur `run_key`** sont inclus.
@@ -52,9 +63,10 @@ Le contenu fonctionnel est celui de `feat/p1-p4-dag-engine` : `V002__run_key_uni
 
 | Dépendance | Nature |
 |---|---|
-| `socle-v005` ≥ 5.8.4 (Boot 4) en 0.2.0 ; 5.7.4 → 5.8.0 en 0.1.0-SNAPSHOT (Boot 3) | **fournie par l'app** (`provided`) ; Pipeline V2, Worker, ActionProvider, TechDB |
+| `socle-v005` ≥ 5.10.0 (Boot 4.1.2) en 0.3.0 ; 5.8.4 → 5.9.x en 0.2.0 ; 5.7.4 → 5.8.0 en 0.1.0-SNAPSHOT (Boot 3) | **fournie par l'app** (`provided`) ; Pipeline V2, Worker, ActionProvider, TechDB |
 | PostgreSQL ≥ **15** | **obligatoire** : 6 tables `db_/tr_pipeline_*` + registre `z_pack_migrations`, dans `socle.pipeline.schema`. `V002` exige `NULLS NOT DISTINCT` |
-| `spring-boot-starter-jdbc` | tirée par le pack (`JdbcTemplate`, `DataSource` de l'app) |
+| `spring-boot-starter-jdbc` | tirée par le pack (`JdbcTemplate`, `DataSource` de l'app), **sans** `spring-boot-starter-logging` depuis 0.3.0 |
+| OkHttp | **aucune** : le pack n'en dépend pas. Le socle 5.10.0 apporte `com.squareup.okhttp3:okhttp-jvm` 5.5.1 |
 | TechDB H2 du framework | seulement si `queue-backend=techdb` (défaut) |
 | client NATS `io.nats:jnats` 2.19.1 | **toujours requis à l'exécution**, même sans NATS : `DagPipelineBuilder` le référence dans ses signatures et le pack le déclare `provided`. Un serveur JetStream n'est nécessaire que si `queue-backend=nats` |
 | Autres packs | aucune |
@@ -73,7 +85,7 @@ Le contenu fonctionnel est celui de `feat/p1-p4-dag-engine` : `V002__run_key_uni
 
 Le code fait foi. Le détail figure dans chaque HOWTO.
 
-- **24 actions** dans `PipelineWorker`. Le README et `socle-pack.json` en listent 21 : `catalogue_set_category`, `get_graph` et `list_handlers` y manquent.
+- **24 actions** dans `PipelineWorker`. Jusqu'en 0.2.0, le README et `socle-pack.json` n'en listaient que 21 (`catalogue_set_category`, `get_graph`, `list_handlers` manquaient) — **corrigé en 0.3.0**.
 - **Contrats E/S** : le README parle de contrats validés. Le code vérifie à l'exécution des **JSON Pointers obligatoires** (`params.requiredIn`) et compare à la validation des **noms** de contrat. La validation JSON Schema prévue par la SPEC n'existe pas.
 - La SPEC prévoit `triggers` et `phases` dans le DAG, et des boucles bornées. Aucun des trois n'est modélisé : les deux premiers champs sont **ignorés en silence** et un cycle est refusé (V1).
 - Les actions MCP s'appellent `pipeline_worker__<action>`, pas `pipeline_<action>` comme dans la SPEC.
@@ -96,3 +108,4 @@ Le code fait foi. Le détail figure dans chaque HOWTO.
 | Aucune purge des tables `tr_pipeline_*` ni des streams NATS | croissance sans borne | 07, [[howto-pipeline-09-backend-nats-jetstream\|09]] |
 | `context_params` stocké mais transmis à aucun handler | donnée inutilisable par les étapes | 04 |
 | Le nom de bean `pipelineProperties` entre en collision avec le socle ≥ 5.8.6 — **corrigé en 0.2.0** (beans `pipelinePack*`) ; reste vrai pour 0.1.0-SNAPSHOT | une app Boot 3 n'est pas concernée (socle ≤ 5.8.0) | [[howto-pipeline-01-integrer-le-pack\|01]] §6 |
+| Le pom du socle 5.10.0 annonce gRPC 1.85.1, H2 2.5.252, Jedis 8.0.2 ; une app au parent Boot 4.1.2 reçoit **gRPC 1.84.1, H2 2.4.240, Jedis 7.4.1** (la nomenclature Boot l'emporte sur les versions transitives) | sans effet sur le pack ; à fixer dans l'app si elle en dépend | [[howto-pipeline-01-integrer-le-pack\|01]] §4 |

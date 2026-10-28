@@ -1,8 +1,8 @@
 # HOWTO tenant-02 — Poser le tenant courant pour le pack (MDC `tenant_id`)
 
 **Niveau :** Intermédiaire
-**Cible :** `socle-pack-tenant` 0.5.0 · socle-v005 5.8.9 → 5.9.5
-**Vérifié au code :** 2026-10-28 (pack `FicheService.slugCourant()` ; JAR socle 5.9.5 inspecté)
+**Cible :** `socle-pack-tenant` 0.6.0 (socle-v005 5.10.x) et 0.5.0 (socle 5.8.9 → 5.9.x) — même contrat MDC
+**Vérifié au code :** 2026-10-28 (pack `FicheService.slugCourant()` ; JAR socle 5.9.5 **et 5.10.0** inspectés)
 **Prérequis :** [[howto-tenant-01-integrer-le-pack|tenant-01]] ; l'app est derrière le proxy du Hub (SSO) et `TRUSTED_PROXIES` est réglé (`UC-SEC-06`)
 **Temps estimé :** 20 min
 
@@ -21,9 +21,10 @@ return (ctx != null && ctx.isPresent()) ? ctx.tenantId() : null;
 Le pack lit donc le tenant **dans le MDC SLF4J, clé `tenant_id`** (`TenantContext.MDC_KEY`). Il ne
 lit ni l'en-tête `X-SSO-Tenant`, ni le JWT, ni l'`ActionContext`.
 
-Et **aucune classe du socle ne pose cette clé**. Vérifié dans le JAR 5.9.5 : seules
-`TenantContext` (la constante) et `MultiTenantCore` mentionnent `tenant_id`. Les classes
-`TenantContextFilter` / `TenantContextHolder` citées par le `CLAUDE.md` du pack n'existent pas. Le
+Et **aucune classe du socle ne pose cette clé** — **toujours pas en 5.10.0**. Vérifié dans les JAR
+5.9.5 et 5.10.0 : aucun `MDC.put` du socle ne porte sur `tenant_id` ; seule `TenantContext` (la
+constante `MDC_KEY` et `fromMdc()`) la lit. Les classes `TenantContextFilter` /
+`TenantContextHolder`, longtemps citées par le `CLAUDE.md` du pack (corrigé en 0.6.0), n'existent pas. Le
 socle définit le contrat MDC ; **c'est à l'application de le remplir**, à chaque point d'entrée.
 
 C'est le point de couture avec les fiches `UC-SEC-05` (le tenant arrive par l'identité, jamais par

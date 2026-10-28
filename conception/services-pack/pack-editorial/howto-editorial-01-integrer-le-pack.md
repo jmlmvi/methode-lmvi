@@ -1,12 +1,12 @@
 # HOWTO EDITORIAL-01 — Intégrer `socle-pack-editorial` dans une application
 
 **Niveau :** Confirmé
-**Cible :** application V005 sur **Spring Boot 4.0.6** (socle ≥ 5.8.8). Une app restée en Boot 3.2.1
-garde la dernière version Boot 3 du pack, `1.0.0-SNAPSHOT` (`main` @ `fffd6f9`) — voir §12.
-**Versions vérifiées au code (2026-10-28) :** `eu.lmvi:socle-pack-editorial:2.0.0`, dépôt
-`socle-pack-Editorial`, branche `feat/boot4` @ `8879bf7` (non fusionnée, non taguée) — compilé contre
-`socle-v005:5.9.0` (compile aussi contre 5.8.8), `socle-pack-ai:2.7.13`, `socle-pack-comm:2.0.0`,
-Spring Boot 4.0.6
+**Cible :** application V005 sur **Spring Boot 4.1.2** (socle ≥ 5.10.0). Une app en Boot 4.0.6
+(socle 5.8.8-5.9.x) garde la **2.0.0** (tag `v2.0.0`) ; une app restée en Boot 3.2.1 garde
+`1.0.0-SNAPSHOT` (commit `fffd6f9`) — voir §12.
+**Versions vérifiées au code (2026-10-28) :** `eu.lmvi:socle-pack-editorial:2.1.0`, dépôt
+`socle-pack-Editorial`, `main` @ `1fb6c6a`, tag `v2.1.0` — compilé contre `socle-v005:5.10.0`,
+`socle-pack-ai:2.8.0`, `socle-pack-comm:2.1.0`, Spring Boot 4.1.2
 **Prérequis :** PostgreSQL ≥ 14 ; [[howto-ai-01-integrer-le-pack|pack-ai intégré]] ;
 [[howto-com-01-integrer-le-pack|pack-comm intégré]]
 **Temps estimé :** 45 min
@@ -35,21 +35,21 @@ Soit **31 actions** (le README du pack en annonçait 35 jusqu'à la 2.0.0, qui l
 `WebWorker`) et de `socle-pack-comm` (`NotifyWorker`). Les deux jars doivent donc être **présents sur
 le classpath** ; seuls certains beans sont facultatifs (§9).
 
-**Statut : 2.0.0, non publiée.** Aucune version n'est publiée sur `maven.thesocle.net` ni vendorisée
+**Statut : 2.1.0, non publiée.** Aucune version n'est publiée sur `maven.thesocle.net` ni vendorisée
 dans un `mvn-repo/`. Une application l'obtient en construisant le pack elle-même (§3).
 
 Application de référence : **APP-12-RssArchiver** (`APP-12-RssArchiver/rssarchiver/pom.xml`), qui
 l'embarque avec la collecte, l'enrichissement et la configuration de curation — mais coupe
 `curation_worker` au profit de son propre pipeline DAG. **RssArchiver est en Boot 3.2.1** : elle reste
-sur `1.0.0-SNAPSHOT` ; aucune app ne consomme encore la 2.0.0.
+sur `1.0.0-SNAPSHOT` ; aucune app ne consomme encore la 2.0.0 ni la 2.1.0.
 
 ---
 
 ## 2. Architecture
 
 ```
-┌──────────────────────── Application hôte (Boot 4.0.6, socle ≥ 5.8.8) ──────────────────────┐
-│  @ComponentScan("eu.lmvi.socle","eu.lmvi") + FullyQualifiedAnnotationBeanNameGenerator      │
+┌──────────────────────── Application hôte (Boot 4.1.2, socle ≥ 5.10.0) ─────────────────────┐
+│  @ComponentScan("eu.lmvi.socle","eu.lmvi") — générateur de noms par défaut (beans préfixés) │
 │                                                                                             │
 │  socle-pack-editorial                 socle-pack-ai                 socle-pack-comm         │
 │  ├ rss_collect_worker ──────────────┐ ├ GenerationWorker ◄─ requis  ├ NotifyWorker ◄─ opt.  │
@@ -69,23 +69,22 @@ sur `1.0.0-SNAPSHOT` ; aucune app ne consomme encore la 2.0.0.
 
 ## 3. Étape 1 — Construire les trois packs
 
-Le pack est compilé contre `socle-pack-ai:2.7.13` et `socle-pack-comm:2.0.0` en scope `provided`
-(propriétés `socle-pack-ai.version`, `socle-pack-comm.version`), et contre le socle en `provided`
-piloté par `socle.version` (5.9.0). L'application déclare elle-même ai et comm (§4).
+Le pack est compilé contre `socle-pack-ai:2.8.0` et `socle-pack-comm:2.1.0` en scope `provided`
+(propriétés `socle-pack-ai.version`, `socle-pack-comm.version`), et contre le socle 5.10.0 en
+`provided` (propriété `socle.version`). L'application déclare elle-même ai et comm (§4).
 
 ```bash
-# Prérequis dans ~/.m2 : socle-v005 5.9.0 (ou ≥ 5.8.8), socle-pack-ai 2.7.x, socle-pack-comm 2.0.0
-#   pack-comm 2.0.0 : socle-pack-com, branche feat/boot4, mvn install -DskipTests
+# Prérequis dans ~/.m2 : socle-v005 5.10.0, socle-pack-ai 2.8.0, socle-pack-comm 2.1.0
+#   (socle-pack-ai : tag v2.8.0 ; socle-pack-com : tag v2.1.0 ; mvn -DskipTests install)
 
-# Editorial 2.0.0, depuis la branche feat/boot4 (pas encore fusionnée dans main)
+# Editorial 2.1.0, depuis le tag
 cd /opt/2026-TheHub4TheSocle/socle-pack-Editorial
-git checkout feat/boot4 && git pull
-mvn clean verify                 # 67 tests, dont Testcontainers (Docker requis)
+git fetch --tags && git checkout v2.1.0
+mvn clean verify                 # 67 tests, 0 sauté, dont Testcontainers (Docker requis)
 mvn -DskipTests install
-# → ~/.m2/repository/eu/lmvi/socle-pack-editorial/2.0.0/socle-pack-editorial-2.0.0.jar
+# → ~/.m2/repository/eu/lmvi/socle-pack-editorial/2.1.0/socle-pack-editorial-2.1.0.jar
 
-# Contre un autre socle de la lignée Boot 4 :
-mvn -Dsocle.version=5.8.8 -DskipTests package
+# App en Boot 4.0.6 / socle 5.8.8-5.9.x : git checkout v2.0.0 (ai 2.7.x, comm 2.0.0)
 ```
 
 Pour que l'application compile sur une autre machine (CI, poste neuf), **vendoriser** le jar et le
@@ -93,7 +92,7 @@ pom dans le dépôt de l'application, comme le framework :
 
 ```bash
 APP=/opt/2026-TheHub4TheSocle/APP-XX-MonApp/monapp
-V=2.0.0
+V=2.1.0
 mkdir -p $APP/mvn-repo/eu/lmvi/socle-pack-editorial/$V
 cp ~/.m2/repository/eu/lmvi/socle-pack-editorial/$V/socle-pack-editorial-$V.jar \
    ~/.m2/repository/eu/lmvi/socle-pack-editorial/$V/socle-pack-editorial-$V.pom \
@@ -108,13 +107,13 @@ cp ~/.m2/repository/eu/lmvi/socle-pack-editorial/$V/socle-pack-editorial-$V.jar 
 <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.0.6</version>   <!-- = parent de socle-v005 5.8.4+ -->
+    <version>4.1.2</version>   <!-- = parent de socle-v005 5.10.0 -->
     <relativePath/>
 </parent>
 
 <properties>
     <java.version>21</java.version>
-    <socle.version>5.9.0</socle.version>
+    <socle.version>5.10.0</socle.version>
 </properties>
 
 <repositories>
@@ -138,17 +137,17 @@ cp ~/.m2/repository/eu/lmvi/socle-pack-editorial/$V/socle-pack-editorial-$V.jar 
     <dependency>
         <groupId>eu.lmvi</groupId>
         <artifactId>socle-pack-ai</artifactId>
-        <version>2.7.13</version>   <!-- lignée 2.7.x = Boot 4 ; 2.4.x = Boot 3.2.1 -->
+        <version>2.8.0</version>    <!-- socle 5.10 ; 2.7.x = Boot 4.0.6 ; 2.4.x = Boot 3.2.1 -->
     </dependency>
     <dependency>
         <groupId>eu.lmvi</groupId>
         <artifactId>socle-pack-comm</artifactId>
-        <version>2.0.0</version>    <!-- Boot 4 ; 1.1.0 = dernière Boot 3 -->
+        <version>2.1.0</version>    <!-- socle 5.10 ; 2.0.0 = Boot 4.0.6 ; 1.1.0 = dernière Boot 3 -->
     </dependency>
     <dependency>
         <groupId>eu.lmvi</groupId>
         <artifactId>socle-pack-editorial</artifactId>
-        <version>2.0.0</version>
+        <version>2.1.0</version>
     </dependency>
 
     <!-- Fournis par l'app (le pack les déclare en provided) -->
@@ -182,17 +181,22 @@ cp ~/.m2/repository/eu/lmvi/socle-pack-editorial/$V/socle-pack-editorial-$V.jar 
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
     </dependency>
-    <dependency>
-        <groupId>com.lmax</groupId>
-        <artifactId>disruptor</artifactId>
-        <version>3.4.4</version>
-    </dependency>
+    <!-- Disruptor et OkHttp : NE PAS les déclarer. Le socle 5.10.0 fournit disruptor 4.0.0 et
+         okhttp-jvm 5.5.1 ; un okhttp 4.x déclaré ici ferait deux copies de okhttp3.* -->
 </dependencies>
 ```
 
-`okhttp 4.12.0`, `jsoup 1.17.2` et `rome 2.1.0` arrivent transitivement avec le pack (scope compile).
+`jsoup 1.17.2` et `rome 2.1.0` arrivent transitivement avec le pack (scope compile). Depuis la 2.1.0,
+**OkHttp n'arrive plus avec le pack** : il utilise `okhttp-jvm` 5.5.1 du socle (`provided`). La 2.0.0
+embarquait `okhttp 4.12.0`.
 
-> Versions de ai/comm : la 2.0.0 est compilée contre ai **2.7.13** et comm **2.0.0**. Entre ai 2.3.3 et
+> gRPC : le socle 5.10.0 et pack-ai 2.8.0 sont en gRPC **1.85.1**, Boot 4.1.2 gère **1.84.1**. Une app
+> qui déclare un artefact `io.grpc` doit importer `io.grpc:grpc-bom:1.85.1` dans son
+> `dependencyManagement` (le pack le fait pour ses tests).
+
+> Versions de ai/comm : la 2.1.0 est compilée contre ai **2.8.0** et comm **2.1.0** (la 2.0.0 contre
+> ai 2.7.13 et comm 2.0.0). Entre ai 2.7.13 et 2.8.0, l'API utilisée par le pack n'a pas changé : le
+> code principal de la 2.1.0 compile sans retouche. Entre ai 2.3.3 et
 > 2.7.13, l'API publique qu'utilise le pack est **inchangée** (comparée par `javap`) :
 > `GenerationWorker.generateOne(partition, promptId, context, options)`, `ClassificationWorker`,
 > `RagWorker` action `ingest_document` (`source_type`, `title`, `content`, `source_ref`, `language` →
@@ -207,9 +211,9 @@ cp ~/.m2/repository/eu/lmvi/socle-pack-editorial/$V/socle-pack-editorial-$V.jar 
 
 ## 5. Étape 3 — `Application.java` : balayage et nommage des beans
 
-Les packs ai, comm et editorial déclarent chacun des `@Component` **de même nom simple**
-(`TenantResolver`, `PackMigrationRunner`, …). Sans générateur de noms qualifiés, le démarrage échoue
-en `ConflictingBeanDefinitionException`.
+Les packs ai, comm et editorial déclarent chacun une classe `TenantResolver`, `PackMigrationRunner`…
+**de même nom simple**. Depuis editorial 2.1.0 + ai 2.8.0 + comm 2.1.0, chaque pack donne à ses beans
+un nom préfixé (`editorial*`, `ai*`, `comm*`) : **le générateur de noms par défaut suffit**.
 
 ```java
 package eu.lmvi;
@@ -217,7 +221,6 @@ package eu.lmvi;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FullyQualifiedAnnotationBeanNameGenerator;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {
@@ -226,24 +229,40 @@ import org.springframework.context.annotation.FullyQualifiedAnnotationBeanNameGe
 })
 public class Application {
     public static void main(String[] args) {
-        SpringApplication app = new SpringApplication(Application.class);
-        app.setBeanNameGenerator(new FullyQualifiedAnnotationBeanNameGenerator());
-        app.run(args);
+        SpringApplication.run(Application.class, args);
     }
 }
 ```
 
-C'est la configuration de `APP-12-RssArchiver/rssarchiver/src/main/java/eu/lmvi/Application.java`
-(qui exclut en plus `eu.lmvi.socle.pack.ai.agent.*`, la plateforme agent dont elle n'a pas l'usage).
+En **2.0.0** (ai 2.7.x, comm 2.0.0), il fallait en plus
+`app.setBeanNameGenerator(new FullyQualifiedAnnotationBeanNameGenerator())`, sous peine de
+`ConflictingBeanDefinitionException` — c'est encore la configuration de
+`APP-12-RssArchiver/rssarchiver/src/main/java/eu/lmvi/Application.java` (Boot 3, qui exclut en plus
+`eu.lmvi.socle.pack.ai.agent.*`). Le garder en 2.1.0 est inoffensif, mais les beans prennent alors
+leur nom qualifié complet et non les noms ci-dessous.
 
-**Boot 4 : balayer `eu.lmvi.socle` n'est pas seulement nécessaire au MOP.** Le web de pack-ai 2.7.x
+**Noms des beans editorial (2.1.0)** — à utiliser si l'app injecte **par nom** (par type : rien ne change ;
+les noms de workers MCP et d'actions ne changent pas) :
+
+| Classe | Nom du bean |
+|---|---|
+| `RssCollectWorker` / `CurationWorker` / `HitlWorker` / `NewsletterWorker` | `editorialRssCollectWorker` / `editorialCurationWorker` / `editorialHitlWorker` / `editorialNewsletterWorker` |
+| `EditorialProperties` | `editorialProperties` |
+| `PackMigrationRunner` / `TenantResolver` | `editorialPackMigrationRunner` / `editorialTenantResolver` |
+| `KewClient` / `BibliographicExtractor` / `WebWorkerBodyFetcher` | `editorialKewClient` / `editorialBibliographicExtractor` / `editorialWebWorkerBodyFetcher` |
+| `CurationConfigService` / `HitlConfigService` | `editorialCurationConfigService` / `editorialHitlConfigService` |
+| `RssFetcher` / `RssParser` / `RssCollectionService` | `editorialRssFetcher` / `editorialRssParser` / `editorialRssCollectionService` |
+| `UrlNormalizer` / `LanguageDetector` / `NewsletterRenderer` | `editorialUrlNormalizer` / `editorialLanguageDetector` / `editorialNewsletterRenderer` |
+
+**Boot 4 : balayer `eu.lmvi.socle` n'est pas seulement nécessaire au MOP.** Le web de pack-ai (2.7.x, 2.8.0)
 (`FetchService`, `SearchService`, `WebWorker`, `BrowserWorker`…) injecte un `ObjectMapper` **Jackson 2**
 (`com.fasterxml`). Boot 4 n'en auto-configure plus — il ne fournit que Jackson 3 (`tools.jackson`) ; c'est
-le socle qui le déclare (`eu.lmvi.socle.config.SocleJacksonConfiguration`, présent en 5.8.8 et 5.9.0).
+le socle qui le déclare (`eu.lmvi.socle.config.SocleJacksonConfiguration`, présent en 5.8.8, 5.9.0 et 5.10.0).
 Sans lui : `UnsatisfiedDependencyException … No qualifying bean of type
 'com.fasterxml.jackson.databind.ObjectMapper'` sur `FetchService`, remontée par `WebWorkerBodyFetcher`
-puis `CurationWorker`. Le test `DemarrageContexteSpringTest` du pack reproduit ce câblage
-(trois packs + `SocleJacksonConfiguration` + générateur qualifié) et le démarre à chaque build.
+puis `CurationWorker`. Le test `DemarrageContexteSpringTest` du pack reproduit ce câblage à chaque build : une vraie
+`SpringApplication` Boot 4.1 qui balaie tout `eu.lmvi.socle` (socle 5.10.0 + trois packs) avec le
+générateur de noms **par défaut**, MOP `RUNNING`, 4 workers et 31 actions au registre du socle.
 
 ---
 
@@ -460,14 +479,16 @@ editorial rss_collect_worker__get_status '{}'
 
 | Piège | Symptôme | Correction |
 |---|---|---|
-| Mélanger les lignées Boot | app Boot 3.2.1 avec editorial 2.0.0 (ou l'inverse) : compile, puis casse au démarrage | Boot 4.0.6 → editorial **2.0.0** + ai 2.7.x + comm 2.0.0 ; Boot 3.2.1 → editorial **1.0.0-SNAPSHOT** (`main` @ `fffd6f9`) + ai 2.4.x + comm 1.x |
+| Mélanger les lignées Boot | app Boot 3.2.1 avec editorial 2.x, ou Boot 4.0.6 avec 2.1.0 (ou l'inverse) : compile, puis casse au démarrage | Boot 4.1.2 / socle 5.10 → editorial **2.1.0** + ai 2.8.0 + comm 2.1.0 ; Boot 4.0.6 / socle 5.8.8-5.9.x → editorial **2.0.0** + ai 2.7.x + comm 2.0.0 ; Boot 3.2.1 → editorial **1.0.0-SNAPSHOT** (`main` @ `fffd6f9`) + ai 2.4.x + comm 1.x |
 | `log4j-slf4j2-impl cannot be present with log4j-to-slf4j` (Boot 4) | `ExceptionInInitializerError` au premier logger, contexte qui ne démarre pas | exclure `spring-boot-starter-logging` aussi de `spring-boot-starter-jdbc` (§4) : sous Boot 4, starter-web ne tire plus `spring-boot-starter` |
 | `No qualifying bean of type 'com.fasterxml.jackson.databind.ObjectMapper'` (Boot 4) | `FetchService` de pack-ai, puis `CurationWorker` ne se créent pas | balayer `eu.lmvi.socle` (fournit `SocleJacksonConfiguration`) ou déclarer un `ObjectMapper` Jackson 2 (§5) |
 | Rendre un `JsonNode` Jackson 2 depuis un contrôleur de l'app (Boot 4) | 500 / JSON mal écrit : le convertisseur HTTP est Jackson 3 | convertir en `Map`/`List` ; le pack lui-même ne rend que des Map/List/scalaires |
-| Chercher le pack sur `maven.thesocle.net` | `Could not find artifact eu.lmvi:socle-pack-editorial:2.0.0` | `mvn install` depuis `feat/boot4`, puis vendoriser dans `mvn-repo/` (§3) |
-| Branche `master` du dépôt | code différent : `master` porte 28 commits absents de `main` | construire depuis `feat/boot4` (2.0.0) ou `main` (1.0.0-SNAPSHOT, Boot 3) |
+| Chercher le pack sur `maven.thesocle.net` | `Could not find artifact eu.lmvi:socle-pack-editorial:2.1.0` | `mvn install` depuis le tag `v2.1.0`, puis vendoriser dans `mvn-repo/` (§3) |
+| Branche `master` du dépôt | code différent : `master` porte 28 commits absents de `main` | construire depuis un tag de `main` : `v2.1.0`, `v2.0.0`, ou le commit `fffd6f9` (1.0.0-SNAPSHOT, Boot 3) |
+| `okhttp:4.12.0` encore déclaré par l'app (habitude 2.0.0) avec socle 5.10 | deux copies de `okhttp3.*` sur le classpath ; `NoSuchMethodError` / comportements selon l'ordre du classpath | retirer la déclaration : le socle fournit `okhttp-jvm` 5.5.1 (§4) — **depuis 2.1.0** le pack n'embarque plus OkHttp |
+| `@Qualifier("curationWorker")`, `getBean("kewClient")`… dans l'app | `NoSuchBeanDefinitionException` après passage en 2.1.0 | prendre le nom préfixé `editorial*` (§5) ou injecter par type |
 | Homonyme `APP-RAG-INDEPENDANT/02-sources/domain-pack-editorial` | **mêmes coordonnées Maven**, code plus ancien (socle 5.2.0) : un `mvn install` depuis ce dossier écrase le bon jar dans `~/.m2` | n'installer que depuis `socle-pack-Editorial` |
-| Pas de `FullyQualifiedAnnotationBeanNameGenerator` | `ConflictingBeanDefinitionException` sur `tenantResolver` / `packMigrationRunner` | §5 |
+| Pas de `FullyQualifiedAnnotationBeanNameGenerator` **avec editorial 2.0.0** (ai 2.7.x, comm 2.0.0) | `ConflictingBeanDefinitionException` sur `tenantResolver` / `packMigrationRunner` | le poser (§5) — **corrigé en 2.1.0** : beans préfixés, générateur par défaut suffisant |
 | Schéma absent | `Migration V001__create_source_and_raw_item.sql failed` | `CREATE SCHEMA` avant le démarrage |
 | Pas de droit sur `pgcrypto` ou sur `public` | échec de `V000__init.sql` | §6 |
 | `GenerationWorker` non instancié (pack-ai mal configuré) | `UnsatisfiedDependencyException` sur `CurationWorker` | configurer pack-ai, ou `curation-worker.enabled=false` |

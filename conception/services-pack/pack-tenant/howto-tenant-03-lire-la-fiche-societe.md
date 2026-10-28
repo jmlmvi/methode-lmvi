@@ -1,7 +1,7 @@
 # HOWTO tenant-03 — Lire la fiche société du tenant
 
 **Niveau :** Débutant
-**Cible :** `socle-pack-tenant` 0.5.0 — `TenantProfile`, `model.Fiche`
+**Cible :** `socle-pack-tenant` 0.6.0 (API identique à 0.5.0) — `TenantProfile`, `model.Fiche`
 **Hub :** ≥ 3.63.0 (`GET /api/iam/tenant/{slug}/fiche`, `mention_legale` composée par le Hub)
 **Vérifié au code :** 2026-10-28
 **Prérequis :** [[howto-tenant-01-integrer-le-pack|tenant-01]], [[howto-tenant-02-poser-le-tenant-courant|tenant-02]] ; fiche saisie au Hub (`iam_worker.upsert_tenant_fiche` ou `import_tenant`)

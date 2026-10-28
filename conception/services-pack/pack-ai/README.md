@@ -1,11 +1,39 @@
 # socle-pack-ai — HOWTOs par fonctionnalité
 
-> **Version documentée :** `eu.lmvi:socle-pack-ai:2.7.14` — branche `main` du dépôt
-> `/opt/2026-TheHub4TheSocle/socle-pack-ai`. Dernier commit de code : `a357a95` (2026-10-16,
-> « AgentToolBridge résout le registre à l'usage — 2.7.14 ») ; `main` locale est à `8249cd3`
-> (2026-10-23, deux commits de documentation en plus, aucun changement de code).
-> **Socle :** compilé contre `socle-v005` **5.8.8**, Spring Boot **4.0.6** (scope `provided`).
-> **Vérifié au code le 2026-10-28.**
+> **Version documentée :** `eu.lmvi:socle-pack-ai:2.8.0` — tag `v2.8.0` du dépôt
+> `/opt/2026-TheHub4TheSocle/socle-pack-ai`, branche `main`. Commit de code : `f8d7dac`
+> (2026-10-28, « Spring Boot 4.1.2 et socle 5.10.0 — version 2.8.0 ») ; `main` est à `ac1cfa5`
+> (README et CHANGELOG du pack). Installée dans le `~/.m2` de la box de build, non publiée sur
+> `maven.thesocle.net`.
+> **Socle :** compilé contre `socle-v005` **5.10.0**, Spring Boot **4.1.2** (scope `provided`).
+> **Vérifié au code et par démarrage le 2026-10-28** (`PackContexteSocleTest` : contexte Boot 4.1,
+> 10 workers, 51 actions au registre du socle, 27 migrations ; 336 tests passés, 0 sauté).
+
+## Compatibilité
+
+| Version du pack | Socle V005 | Spring Boot | Statut |
+|---|---|---|---|
+| **2.8.0** | **5.10.0 et +** | **4.1.2** | courante — OkHttp 5, gRPC 1.85.1 / protobuf 4.36.2, beans `ai*` |
+| 2.7.14 | 5.8.x – 5.9.x | 4.0.6 | dernière Boot 4.0 (commit `a357a95`) ; aucune différence fonctionnelle avec 2.8.0 |
+| 2.4.8 | 5.7.x | 3.2.1 | dernière Boot 3 — [[howto-ai-09-lignee-2-4-x-pour-les-apps-boot-3\|AI-09]] |
+
+## Noms de beans (depuis 2.8.0)
+
+Les beans dont le nom par défaut existait aussi dans un autre pack sont nommés `ai*` ; injection par
+type inchangée, noms de workers et d'actions inchangés.
+
+| Classe | Bean |
+|---|---|
+| `config.AiProperties` | `aiProperties` |
+| `service.PackMigrationRunner` | `aiPackMigrationRunner` |
+| `tenant.TenantResolver` | `aiTenantResolver` |
+| `service.VaultCredentialResolver` | `aiVaultCredentialResolver` |
+| `service.resilience.ResilienceFactory` | `aiResilienceFactory` |
+| `service.ConfigReloadService` | `aiConfigReloadService` |
+| `llm.PromptResolverService` | `aiPromptResolverService` |
+| `web.DocsParserClient` | `aiDocsParserClient` |
+| `agent.session.OrphanSessionResolver` | `aiOrphanSessionResolver` |
+| `agent.worker.skill.NoopSkillLoader` / son `@Bean SkillLoader` | `aiNoopSkillLoader` / `aiSkillLoader` |
 
 ## Le pack en cinq lignes
 
@@ -36,7 +64,7 @@ démarrage par `PackMigrationRunner`.
 | Construire un agent qui appelle des outils MCP en boucle | [[howto-ai-08-construire-un-agent-llm-gateway-et-sessions\|AI-08 — Agents]] |
 | Mon app est en Spring Boot 3.2.1 | [[howto-ai-09-lignee-2-4-x-pour-les-apps-boot-3\|AI-09 — Lignée 2.4.x]] |
 
-## Workers embarqués (2.7.14)
+## Workers embarqués (2.8.0)
 
 | Worker | Type | Actions MCP | HOWTO |
 |---|---|---|---|
@@ -78,13 +106,14 @@ Les services Java sans worker (`FiveW1HService`, `TranslationService`, `HttpTran
 
 ## Écarts documentation ↔ code (le code fait foi)
 
-| Source | Ce qu'elle dit | Ce que fait le code 2.7.14 |
+Corrigés en **2.8.0** : `socle-pack.json` (resté en 1.1.0 avec 7 workers, « 12 providers + 5 APIs »)
+est refait et vérifié contre le code par un test ; le `README.md` du pack annonce la bonne version,
+les 10 workers et la compatibilité (sa partie « exemples » reste celle de la v1).
+
+| Source | Ce qu'elle dit | Ce que fait le code 2.8.0 |
 |---|---|---|
-| `README.md` du pack | v1.0.0, 4 workers, 23 actions, 8 tables | 10 workers, 51 actions MCP, 27 migrations |
 | `README.md` du pack | `curl …/api/actions/rag_worker__search` | une app s'invoque par `POST /mcp` (`tools/call`) ; `/api/actions` est une porte du Hub |
-| `CLAUDE.md` du pack | Spring Boot 3.2, socle 5.7.1 | Spring Boot 4.0.6, socle 5.8.8 |
-| `socle-pack.json` | version 1.1.0, 7 workers | `web_worker`, `browser_worker`, `agent_toolset` absents du manifeste |
-| `socle-pack.json` | « 12 providers + 5 APIs streaming » | 13 fournisseurs (dont `socle_gateway`) ; 4 décodeurs de flux, l'API OpenAI Responses n'en a pas |
+| `CLAUDE.md` du pack | Spring Boot 3.2, socle 5.7.1 | Spring Boot 4.1.2, socle 5.10.0 |
 | `contexte.md` | « socle 5.0.0, 182 erreurs de compilation » | obsolète (mai 2026) |
 | `CascadeFetcher` (javadoc) | seuil de texte exploitable 250 | défaut réel `100` (`socle.ai.web.cascade-min-text-len`) |
 

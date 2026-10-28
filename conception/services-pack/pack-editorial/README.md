@@ -14,17 +14,19 @@ remplace pas.
 
 | | |
 |---|---|
-| Artefact | `eu.lmvi:socle-pack-editorial:**2.0.0**` (`socle-pack.json` : `2.0.0`, 31 actions, socle min. 5.8.8) |
+| Artefact | `eu.lmvi:socle-pack-editorial:**2.1.0**` (`socle-pack.json` : `2.1.0`, 31 actions, `minSocleVersion` 5.10.0) |
 | Dépôt | `/opt/2026-TheHub4TheSocle/socle-pack-Editorial` — `github.com/jmlmvi/socle-pack-Editorial` |
-| Référence git | branche **`feat/boot4`** @ **`8879bf7`** (2026-10-28) — poussée, **ni fusionnée dans `main`, ni taguée** |
-| Compilé contre | Spring Boot **4.0.6**, `socle-v005:5.9.0` (`provided`, propriété `socle.version` ; compile aussi contre **5.8.8**), `socle-pack-ai:2.7.13`, `socle-pack-comm:2.0.0` (tous deux `provided`) |
+| Référence git | **`main`** @ **`1fb6c6a`**, tag **`v2.1.0`** (2026-10-28), poussé |
+| Compilé contre | Spring Boot **4.1.2**, `socle-v005:5.10.0` (`provided`), `socle-pack-ai:2.8.0`, `socle-pack-comm:2.1.0` (tous deux `provided`) ; OkHttp = `okhttp-jvm` 5.5.1 du socle (`provided`), `grpc-bom` 1.85.1 |
+| Version précédente | **2.0.0** — tag `v2.0.0` (`main` @ `8879bf7`) : Boot 4.0.6, socle 5.8.8-5.9.x, ai 2.7.x, comm 2.0.0 |
 | Dernière version Boot 3 | **`1.0.0-SNAPSHOT`** — `main` @ `fffd6f9` (2026-10-10) : socle 5.7.4, Boot 3.2.1, ai 2.3.3, comm 1.0.0-SNAPSHOT. Les apps Boot 3 (RssArchiver) y restent |
-| Tests | 18 classes, **67 tests verts** (`mvn clean verify`, Testcontainers pgvector) dont `DemarrageContexteSpringTest` : vrai contexte Boot 4 avec ai + comm ; `HitlWorker`, `RssCollectWorker`, `NewsletterRenderer` sans test unitaire |
+| Tests | 18 classes, **67 tests verts, 0 sauté** (`mvn clean verify`, Testcontainers pgvector) dont `DemarrageContexteSpringTest` : vraie `SpringApplication` Boot 4.1 + socle 5.10.0 + ai 2.8.0 + comm 2.1.0, générateur de noms par défaut, MOP `RUNNING` ; `HitlWorker`, `RssCollectWorker`, `NewsletterRenderer` sans test unitaire |
 | Vérifié au code | 2026-10-28 |
 
 **Comment une application l'obtient.** Aucune version n'est publiée (ni `maven.thesocle.net`, ni
-`mvn-repo/` vendorisé). L'application construit le pack depuis `feat/boot4` (2.0.0, Boot 4) ou `main`
-(1.0.0-SNAPSHOT, Boot 3) (`mvn install`) puis vendorise
+`mvn-repo/` vendorisé). L'application construit le pack depuis le tag voulu — `v2.1.0` (socle 5.10,
+Boot 4.1.2), `v2.0.0` (socle 5.8.8-5.9.x, Boot 4.0.6) ou le commit `fffd6f9` (1.0.0-SNAPSHOT, Boot 3)
+— (`mvn install`) puis vendorise
 le jar et le pom dans son propre `mvn-repo/` — [[howto-editorial-01-integrer-le-pack|EDITORIAL-01 §3]].
 Une branche `master` diverge de `main` (28 commits propres) : ne pas construire depuis elle.
 
@@ -61,8 +63,8 @@ Une branche `master` diverge de `main` (28 commits propres) : ne pas construire 
 
 | Pack | Ce qu'Editorial utilise | Présence |
 |---|---|---|
-| `socle-pack-ai` **2.7.x** (Boot 4 ; 2.4.x pour Boot 3) — [[howto-ai-01-integrer-le-pack\|AI-01]] | `GenerationWorker.generateOne` (score, résumé, intro), `FiveW1HService`, `TranslationService`, `WebWorker.fetch_smart`, `RagWorker.ingest_document` ; prompts `classify_generic`, `generate_summary` | jar **obligatoire** ; `GenerationWorker` requis si `curation_worker` actif ; le reste facultatif |
-| `socle-pack-comm` **2.0.0** (Boot 4 ; 1.x pour Boot 3) — [[howto-com-01-integrer-le-pack\|COM-01]] | `NotifyWorker.sendNotification` ; types `HITL_REMINDER`, `NEWSLETTER` | jar **obligatoire** ; bean facultatif (sans lui : ni relance, ni envoi) |
+| `socle-pack-ai` **2.8.0** (socle 5.10 ; 2.7.x pour Boot 4.0.6 ; 2.4.x pour Boot 3) — [[howto-ai-01-integrer-le-pack\|AI-01]] | `GenerationWorker.generateOne` (score, résumé, intro), `FiveW1HService`, `TranslationService`, `WebWorker.fetch_smart`, `RagWorker.ingest_document` ; prompts `classify_generic`, `generate_summary` | jar **obligatoire** ; `GenerationWorker` requis si `curation_worker` actif ; le reste facultatif |
+| `socle-pack-comm` **2.1.0** (socle 5.10 ; 2.0.0 pour Boot 4.0.6 ; 1.x pour Boot 3) — [[howto-com-01-integrer-le-pack\|COM-01]] | `NotifyWorker.sendNotification` ; types `HITL_REMINDER`, `NEWSLETTER` | jar **obligatoire** ; bean facultatif (sans lui : ni relance, ni envoi) |
 | Service Hub **KEW** (APIM `api.thesocle.net`) | extraction mots-clés / Wikidata | facultatif, clé APIM — [[howto-39-provisionner-une-cle-apim-pour-une-app\|HOWTO 39]] |
 
 ---
@@ -92,6 +94,22 @@ Le code fait foi ; chaque écart est repris dans les « Pièges courants » du H
   `rss.min-content-chars-for-fetch|always-fetch-body`.
 
 ---
+
+## Montée socle 5.10 / Boot 4.1.2 (2.1.0) — ce qu'elle change pour l'app
+
+- **Trois packs à monter ensemble** : editorial 2.1.0 + ai 2.8.0 + comm 2.1.0, socle ≥ 5.10.0, Boot 4.1.2.
+- **OkHttp** : le pack n'embarque plus `okhttp:4.12.0` ; il prend `okhttp-jvm` 5.5.1 du socle
+  (`provided`). Une app qui déclare encore `okhttp` 4.x a deux copies de `okhttp3.*` : la retirer.
+- **Noms de beans préfixés** `editorial*` (`editorialPackMigrationRunner`, `editorialTenantResolver`,
+  `editorialKewClient`, `editorialCurationWorker`…, table complète dans le README du pack). Avec ai
+  `ai*` et comm `comm*`, le **`FullyQualifiedAnnotationBeanNameGenerator` n'est plus nécessaire**
+  (vérifié par `DemarrageContexteSpringTest`, générateur par défaut). Une app qui injecte par nom
+  (`@Qualifier("curationWorker")`, `getBean("kewClient")`) doit prendre le nouveau nom ; par type :
+  rien à changer. Noms de workers MCP et d'actions inchangés.
+- **gRPC** : `grpc-bom` 1.85.1 (Boot 4.1.2 gère 1.84.1) ; **disruptor** : celui du socle (4.0.0).
+- **Inchangés** : actions MCP, propriétés `socle.editorial.*`, variables d'environnement, migrations SQL,
+  code fonctionnel. Les défauts listés plus haut (HITL `sendReminders` NPE, `update_curation_config`…)
+  ne sont **pas** corrigés par la 2.1.0.
 
 ## Migration Boot 4 (2.0.0) — ce qu'elle a résolu, ce qu'elle impose
 

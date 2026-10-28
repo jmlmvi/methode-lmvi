@@ -2,7 +2,7 @@
 
 **Niveau :** Confirmé
 **Cible :** application V005 qui embarque `socle-pack-mail`
-**Versions vérifiées au code (2026-10-28) :** `socle-pack-mail` **1.4.0** (copie de travail, base `24bc50a`) · socle **5.9.5** · `jakarta.mail` 2.0.1 · OkHttp 4.12.0
+**Versions vérifiées au code (2026-10-28) :** `socle-pack-mail` **1.5.0** (commit `a396ada`, tag `v1.5.0`) · socle **5.10.0** · Spring Boot 4.1.2 · `jakarta.mail-api` 2.1.5 + `angus-mail` 2.0.5 · OkHttp `okhttp-jvm` 5.5.1 (du socle) — comportement inchangé depuis 1.4.0
 **Prérequis :** [[howto-mail-01-integrer-le-pack|MAIL-01]] fait ; accès IMAP de l'utilisateur, ou jeton OAuth2 Gmail, ou export CSV Outlook
 **Temps estimé :** 30 min
 
@@ -163,12 +163,12 @@ public class ContactsDepot {
 ## 7. Identifiants : inline aujourd'hui, Vault plus tard
 
 Le code prévoit une lecture Vault (`VaultCredentialResolver`) sur
-`soclehub/apps/{appId}/users/{user_id}/imap|gmail`. En 1.4.0 elle **ne s'active pas** :
+`soclehub/apps/{appId}/users/{user_id}/imap|gmail`. En 1.4.0 comme en 1.5.0 elle **ne s'active pas** :
 
 - `appId` est la « partition » de l'appel, et `safePartition()` rend **toujours `null`** depuis le
   socle 5.6.0 (commentaire du code) ; `readCredentials` rend alors `null` sans chercher ;
 - le résolveur attend en plus un bean dont le nom de classe contient « Vault » et qui offre
-  `getSecret(String)` : le socle 5.9.5 n'en publie aucun dans une app.
+  `getSecret(String)` (cherché au premier usage depuis la 1.5.0 ; en 1.4.0 l'injection par `Object` empêchait même l'app de démarrer) : le socle (5.9.5 comme 5.10.0) n'en publie aucun dans une app.
 
 Conséquence pratique : **passer `source_config` à chaque import.** L'application garde le secret
 (Vault → variable d'environnement, ou son propre coffre) et le transmet à l'appel ; le pack le retire

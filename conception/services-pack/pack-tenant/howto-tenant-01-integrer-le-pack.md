@@ -1,7 +1,8 @@
 # HOWTO tenant-01 — Intégrer socle-pack-tenant dans une application
 
 **Niveau :** Intermédiaire
-**Cible :** `eu.lmvi:socle-pack-tenant:0.5.0` (commit `bcddf0e`) · socle-v005 5.8.9 → 5.9.5 · Spring Boot 4.0.6
+**Cible :** `eu.lmvi:socle-pack-tenant:0.6.0` (tag `v0.6.0`, commit `c3b70e3`) · socle-v005 **5.10.x** · Spring Boot **4.1.2**
+**Lignée précédente :** `0.5.0` (commit `bcddf0e`) pour une app en socle 5.8.9 → 5.9.x / Boot 4.0.6 — même mode d'emploi, OkHttp 4.12.0 embarqué
 **Hub :** ≥ 3.63.0 (routes `/api/iam/tenant/{slug}/…`)
 **Vérifié au code :** 2026-10-28
 **Prérequis :** une app V005 qui démarre ; une clé APIM d'application ([[howto-39-provisionner-une-cle-apim-pour-une-app|HOWTO 39]]) ; le tenant et sa fiche existent au Hub ([[howto-34-gerer-les-tenants-iam|HOWTO 34]])
@@ -26,7 +27,14 @@ Ce que le pack **ne fait pas** : gérer les tenants (c'est l'IAM du Hub), écrir
 d'administration `iam_worker`), ni résoudre lui-même le tenant de la requête (c'est l'app qui le
 pose dans le MDC, cf. tenant-02).
 
-Cas réel : `APP-28-Your360` (pack 0.5.0, socle 5.9.4).
+Cas réel : `APP-28-Your360` (pack 0.5.0, socle 5.9.4 — encore sur la lignée Boot 4.0.6 au 2026-10-28).
+
+**Choisir la version** : le pack suit le Boot de son socle.
+
+| App en socle | Boot | Pack |
+|---|---|---|
+| 5.10.x | 4.1.2 | **0.6.0** |
+| 5.8.x – 5.9.x | 4.0.6 | 0.5.0 |
 
 ---
 
@@ -44,7 +52,7 @@ Cas réel : `APP-28-Your360` (pack 0.5.0, socle 5.9.4).
 │  ┌───────▼──────────── socle-pack-tenant ─────────────────────────┐  │
 │  │ TenantProfileService · TenantBrandingService · TenantMembres…  │  │
 │  │ FicheService ── FicheCache (LRU, cache-max, ETag)              │  │
-│  │ HubTenantClient (OkHttp, X-API-Key, read-timeout)              │  │
+│  │ HubTenantClient (OkHttp du socle, X-API-Key, read-timeout)     │  │
 │  │ tenant_fiche_worker (PASSIVE : get_status, refresh_fiche…)     │  │
 │  │ TenantBrandingDialect (si Thymeleaf)                           │  │
 │  └───────┬────────────────────────────────────────────────────────┘  │
@@ -66,7 +74,7 @@ Cas réel : `APP-28-Your360` (pack 0.5.0, socle 5.9.4).
 ```xml
 <properties>
     <java.version>21</java.version>
-    <socle.version>5.9.4</socle.version>
+    <socle.version>5.10.0</socle.version>
 </properties>
 
 <repositories>
@@ -89,7 +97,7 @@ Cas réel : `APP-28-Your360` (pack 0.5.0, socle 5.9.4).
     <dependency>
         <groupId>eu.lmvi</groupId>
         <artifactId>socle-pack-tenant</artifactId>
-        <version>0.5.0</version>
+        <version>0.6.0</version>
     </dependency>
 
     <!-- Facultatif : dialecte de marque #tenant (tenant-04) -->
@@ -106,7 +114,9 @@ Cas réel : `APP-28-Your360` (pack 0.5.0, socle 5.9.4).
 </dependencies>
 ```
 
-Le pack apporte **OkHttp 4.12.0** en `compile`. L'application ne déclare ni `okhttp` ni
+Depuis 0.6.0 le pack n'apporte **aucune** dépendance de portée `compile` : son client HTTP est
+**`com.squareup.okhttp3:okhttp-jvm` 5.5.1, celui que pose déjà le socle 5.10.0** (`provided` côté
+pack). En 0.5.0, le pack embarquait `okhttp` 4.12.0. L'application ne déclare ni `okhttp` ni
 `HttpClient` pour parler au Hub : leur présence dans le pom d'une app consommatrice est le signal
 qu'un client parallèle a été réécrit.
 
@@ -115,13 +125,14 @@ Le pack n'est publié ni sur Maven Central ni sur `maven.thesocle.net`. Le const
 
 ```bash
 cd /opt/2026-TheHub4TheSocle/socle-pack-tenant
-mvn clean install -DskipTests          # pose 0.5.0 dans ~/.m2
+git checkout v0.6.0                    # ou bcddf0e (0.5.0, sans tag) pour une app en socle 5.8/5.9
+mvn clean install -DskipTests          # pose 0.6.0 dans ~/.m2
 
 APP=/opt/2026-TheHub4TheSocle/APP-XX-MonApp/monapp
-DEST=$APP/mvn-repo/eu/lmvi/socle-pack-tenant/0.5.0
+DEST=$APP/mvn-repo/eu/lmvi/socle-pack-tenant/0.6.0
 mkdir -p "$DEST"
-cp target/socle-pack-tenant-0.5.0.jar "$DEST/"
-cp pom.xml "$DEST/socle-pack-tenant-0.5.0.pom"
+cp target/socle-pack-tenant-0.6.0.jar "$DEST/"
+cp pom.xml "$DEST/socle-pack-tenant-0.6.0.pom"
 ```
 
 Le `@SpringBootApplication` doit balayer `eu.lmvi.socle` : les beans du pack vivent sous
@@ -145,7 +156,7 @@ public class Application {
 
 ## 4. Étape 2 — Configuration `socle.tenant.*`
 
-Toutes les propriétés, avec les **défauts du code** (`TenantProperties`, 0.5.0) :
+Toutes les propriétés, avec les **défauts du code** (`TenantProperties`, inchangés de 0.5.0 à 0.6.0) :
 
 ```yaml
 socle:
@@ -177,7 +188,7 @@ SOCLE_TENANT_CLE_APIM=<clé APIM de l'app, forme apim_prod_ suivie de 40 caract�
 **Fournir la clé en clair, par l'environnement.** Le pack accepte aussi
 `cle-apim: vault:<chemin>#<champ>`, mais `CleApimResolver` cherche alors dans le contexte Spring un
 bean dont le nom de classe contient `Vault` **et** `Worker`, doté de `getSecret(String, String)`.
-Le socle 5.9.5 n'en fournit aucun : dans une app V005 ordinaire, cette forme journalise
+Le socle (5.10.0 compris) n'en fournit aucun : dans une app V005 ordinaire, cette forme journalise
 `aucun VaultWorker dans le contexte — aucune fiche ne sera lue`.
 
 ---
@@ -276,7 +287,7 @@ Attendu : `"configure": true`, `"fiches_en_cache" ≥ 1`, `"revalidation":"PT30S
 
 | # | Test | Attendu |
 |---|---|---|
-| 1 | `mvn dependency:tree \| grep -i okhttp` | une seule occurrence, tirée par `socle-pack-tenant` |
+| 1 | `mvn dependency:tree \| grep -i okhttp` | 0.6.0 : une seule occurrence, `okhttp-jvm:5.5.1`, tirée par `socle-v005` ; jamais `okhttp:4.12.0` à côté |
 | 2 | Clone frais, `mvn -o package` | compile : l'artefact est vendorisé |
 | 3 | `GET /api/societe` avec `X-SSO-Tenant` posé par le proxy | 200, `mention_legale` non vide |
 | 4 | Même appel sans tenant | 503 « aucun tenant résolu » |
@@ -292,9 +303,12 @@ Attendu : `"configure": true`, `"fiches_en_cache" ≥ 1`, `"revalidation":"PT30S
 | Tenant jamais posé dans le MDC | `TenantSansFiche: aucun tenant résolu` → 500, alors que l'en-tête `X-SSO-Tenant` est là | filtre de [[howto-tenant-02-poser-le-tenant-courant\|tenant-02]] |
 | `cle-apim: vault:…#…` dans une app V005 | `aucun VaultWorker dans le contexte` ; aucune fiche | clé en clair par variable d'environnement, remplie par le Hub |
 | Clé tenant UUID au lieu d'une clé APIM | WARN au démarrage, puis 401 `auth_missing` traité en mode dégradé | clé `apim_<env>_<40hex>` |
-| Pack seulement dans `~/.m2` | compile sur le poste, échoue en CI / clone frais | vendoriser `mvn-repo/eu/lmvi/socle-pack-tenant/0.5.0/` |
+| Pack seulement dans `~/.m2` | compile sur le poste, échoue en CI / clone frais | vendoriser `mvn-repo/eu/lmvi/socle-pack-tenant/0.6.0/` |
+| Pack 0.6.0 dans une app en socle 5.8/5.9 (ou 0.5.0 en 5.10) | compile, puis casse au démarrage (Boot 4.1 contre 4.0) ; en 5.10 avec 0.5.0, deux artefacts `okhttp3` sur le classpath | appairer : socle 5.10 ↔ pack 0.6.0, socle 5.8/5.9 ↔ pack 0.5.0 |
+| `@Qualifier("ficheService")` (ou autre nom de bean générique) | 0.6.0 : `NoSuchBeanDefinitionException` | injecter par type, ou le nouveau nom préfixé (`tenantFicheService`, liste dans le README du pack) |
+| `lecture-double.enabled=true` avec un pack ≤ 0.5.0 | l'app refuse de démarrer : `MigrationEcarts.<init>()` introuvable | pack 0.6.0 (constructeur `@Autowired`) |
 | `scanBasePackages` sans `eu.lmvi.socle` | aucun bean `TenantProfile` à injecter | `{"eu.lmvi.socle", "eu.lmvi"}` |
-| Se fier au README pour les défauts | `fraicheur-max` attendu à 24 h, réel 1 h ; `revalidation` ignorée | la référence est `TenantProperties` (tableau §4) |
+| Se fier au README ≤ 0.5.0 pour les défauts | `fraicheur-max` attendu à 24 h, réel 1 h ; `revalidation` ignorée | corrigé dans le README et le manifeste 0.6.0 ; la référence reste `TenantProperties` (tableau §4) |
 | App multi-tenant avec la configuration par défaut | 3 tenants sur 4 servent « Hub muet » sans erreur | [[howto-tenant-06-servir-plusieurs-tenants\|tenant-06]] |
 | Invoquer l'action par `/api/actions/…` sur l'app | 404 | `POST /mcp` sur l'app, ou `mcp_proxy_invoke` depuis le Hub |
 

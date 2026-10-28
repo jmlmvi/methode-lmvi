@@ -2,7 +2,7 @@
 
 **Niveau :** Confirmé
 **Cible :** application V005 sur PostgreSQL
-**Versions vérifiées au code (2026-10-28) :** `eu.lmvi:socle-pack-mail` **1.4.0** (copie de travail, non commitée — base `24bc50a`) · `socle-v005` **5.9.5** · `socle-pack-ai` **2.7.9** (`provided`) · Spring Boot **4.0.6** · `jakarta.mail` 2.0.1 · jsoup 1.17.2 · OkHttp 4.12.0
+**Versions vérifiées au code et à l'exécution (2026-10-28) :** `eu.lmvi:socle-pack-mail` **1.5.0** (commit `a396ada`, tag `v1.5.0`) · `socle-v005` **5.10.0** · `socle-pack-ai` **2.8.0** (`provided`) · Spring Boot **4.1.2** · `jakarta.mail-api` 2.1.5 + `angus-mail` 2.0.5 (versions de Boot) · jsoup 1.17.2 · OkHttp `okhttp-jvm` 5.5.1 (du socle). Lignée **1.4.0** (tag `v1.4.0`) : socle 5.8.x-5.9.x, Boot 4.0.6, pack-ai 2.7.x — voir §4 et Pièges.
 **Prérequis :** Java 21 GraalVM CE, PostgreSQL ≥ 14, `socle-pack-ai` intégré ([[howto-ai-01-integrer-le-pack|HOWTO AI-01]])
 **Temps estimé :** 45 min
 
@@ -55,7 +55,7 @@ Le pack ne scanne aucune pièce jointe et n'en transmet aucune : le scan reste a
 ┌────────────────────────── Application hôte (V005) ─────────────────────────────┐
 │  @SpringBootApplication(scanBasePackages = "eu.lmvi.socle", "eu.lmvi")          │
 │                                                                                │
-│  socle-pack-ai (provided → à déclarer)     socle-pack-mail 1.4.0               │
+│  socle-pack-ai (provided → à déclarer)     socle-pack-mail 1.5.0               │
 │   GenerationWorker ◄──────────────────────  mail_generation_worker             │
 │                                             mail_import_worker   (passif)      │
 │                                             mail_send_worker     (passif)      │
@@ -65,7 +65,7 @@ Le pack ne scanne aucune pièce jointe et n'en transmet aucune : le scan reste a
 │                                             hub_iam_gateway_worker  ┐ si       │
 │                                             /activation/** (page)   ┘ ACTIVATION│
 │                                                                                │
-│  PackMigrationRunner (@PostConstruct) ── db/mail/V000..V005, V999 ──┐          │
+│  mailPackMigrationRunner (@PostConstruct) ── db/mail/V000..V005, V999 ─┐       │
 └──────────────────────────────────────────────────────────────────────┼─────────┘
                                                                        ▼
                      PostgreSQL : schéma ${SOCLE_MAIL_SCHEMA} (7 tables)
@@ -81,17 +81,32 @@ Le pack ne fournit **aucune auto-configuration Spring Boot** (pas de
 ## 3. Étape 1 — Dépendances Maven
 
 Le pack déclare `socle-v005`, `socle-pack-ai`, `spring-boot-starter-web`, `spring-boot-starter-jdbc`,
-Jackson et le pilote PostgreSQL en **`provided`** : l'application hôte les apporte. Il amène lui-même
-`jakarta.mail`, jsoup, OkHttp et disruptor.
+Jackson, OkHttp (`okhttp-jvm`, celui du socle) et le pilote PostgreSQL en **`provided`** : l'application
+hôte les apporte. Il amène lui-même `jakarta.mail-api` + `angus-mail` (versions gérées par Boot 4.1.2,
+celles de `spring-boot-starter-mail`) et jsoup. Le parent de l'app doit être le **Boot du socle**
+(4.1.2 pour socle 5.10.0) : un pack bâti sur un autre Boot que son socle compile, puis casse à
+l'exécution.
+
+| Pack mail | Socle | Spring Boot | pack-ai |
+|---|---|---|---|
+| **1.5.0** | 5.10.0 et + | 4.1.2 | 2.8.0 |
+| 1.4.0 | 5.8.x-5.9.x | 4.0.6 | 2.7.x |
 
 ```xml
+<parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>4.1.2</version> <!-- = parent de socle-v005-5.10.0.pom -->
+    <relativePath/>
+</parent>
+
 <properties>
     <java.version>21</java.version>
-    <socle.version>5.9.5</socle.version>
+    <socle.version>5.10.0</socle.version>
 </properties>
 
 <repositories>
-    <!-- 1.4.0 n'est publiée sur aucun dépôt distant : vendoriser le jar ET le pom -->
+    <!-- le pack n'est publié sur aucun dépôt distant : vendoriser le jar ET le pom -->
     <repository>
         <id>project-local</id>
         <name>Dépôt Maven vendorisé (in-repo)</name>
@@ -110,12 +125,12 @@ Jackson et le pilote PostgreSQL en **`provided`** : l'application hôte les appo
     <dependency>
         <groupId>eu.lmvi</groupId>
         <artifactId>socle-pack-ai</artifactId>
-        <version>2.7.9</version>
+        <version>2.8.0</version>
     </dependency>
     <dependency>
         <groupId>eu.lmvi</groupId>
         <artifactId>socle-pack-mail</artifactId>
-        <version>1.4.0</version>
+        <version>1.5.0</version>
     </dependency>
     <dependency>
         <groupId>org.springframework.boot</groupId>
@@ -137,7 +152,7 @@ Jackson et le pilote PostgreSQL en **`provided`** : l'application hôte les appo
 Vendoriser l'artefact construit localement :
 
 ```bash
-V=1.4.0
+V=1.5.0
 D=mvn-repo/eu/lmvi/socle-pack-mail/$V
 mkdir -p $D
 cp ~/.m2/repository/eu/lmvi/socle-pack-mail/$V/socle-pack-mail-$V.jar $D/
@@ -145,23 +160,52 @@ cp ~/.m2/repository/eu/lmvi/socle-pack-mail/$V/socle-pack-mail-$V.pom $D/
 git add $D
 ```
 
-C'est ce que fait déjà `APP-98-TheIdeaBox/theideabox/mvn-repo/eu/lmvi/socle-pack-mail/1.4.0/`.
+C'est ce que fait déjà `APP-98-TheIdeaBox/theideabox/mvn-repo/eu/lmvi/socle-pack-mail/1.4.0/` (en 1.4.0 :
+l'app est en Boot 4.0.6).
+
+Avec **socle-pack-comm 2.1.0** dans la même app : il embarque encore `com.sun.mail:jakarta.mail`
+2.0.1 (API + implémentation dans un seul jar), donc une seconde copie des classes `jakarta.mail.*`.
+L'exclure de la dépendance pack-comm :
+
+```xml
+<dependency>
+    <groupId>eu.lmvi</groupId>
+    <artifactId>socle-pack-comm</artifactId>
+    <version>2.1.0</version>
+    <exclusions>
+        <exclusion>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>jakarta.mail</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+```
 
 ---
 
 ## 4. Étape 2 — Balayage et noms de beans
 
-Le pack a deux classes **homonymes** de classes de `socle-pack-ai`, toutes deux `@Component` sans
-nom explicite :
+**Depuis la 1.5.0, rien à faire** : tous les beans du pack portent un nom préfixé `mail`, ceux de
+pack-ai 2.8.0 un nom préfixé `ai`. Les deux packs se balaient ensemble sans conflit — c'est ce que
+prouve le test de démarrage du pack (`DemarrageContexteSpringTest` : `SpringApplication` complète,
+socle 5.10.0 + pack-ai 2.8.0).
 
-| Nom de bean par défaut | pack-mail 1.4.0 | pack-ai 2.7.9 |
+| Classe | Bean 1.4.0 | Bean 1.5.0 |
 |---|---|---|
-| `packMigrationRunner` | `eu.lmvi.socle.pack.mail.adapter.jdbc.PackMigrationRunner` | `eu.lmvi.socle.pack.ai.service.PackMigrationRunner` |
-| `vaultCredentialResolver` | `eu.lmvi.socle.pack.mail.adapter.vault.VaultCredentialResolver` | `eu.lmvi.socle.pack.ai.service.VaultCredentialResolver` |
+| `adapter.jdbc.PackMigrationRunner` | `packMigrationRunner` (homonyme de pack-ai 2.7.x) | `mailPackMigrationRunner` |
+| `adapter.vault.VaultCredentialResolver` | `vaultCredentialResolver` (homonyme de pack-ai 2.7.x) | `mailVaultCredentialResolver` |
+| autres `@Component` et `@Bean` du pack | `contactExtractor`, `imapImporter`, `activationController`, `epurationWorker`, `depotMessages`… | `mailContactExtractor`, `mailImapImporter`, `mailActivationController`, `mailEpurationWorker`, `mailDepotMessages`… (liste : README du pack, `beanNames` du manifeste) |
 
-Le générateur de noms par défaut de Spring donne le même nom aux deux : balayer les deux packs lève
-`ConflictingBeanDefinitionException` au démarrage. Or le pack-mail **exige** le pack-ai. La parade
-est de nommer les beans des packs par leur nom complet, pour tout le contexte.
+L'injection se fait par type : une app qui remplace un port (`DepotMessages`, `FournisseurTenant`,
+`ActivationDepot`, `AnnuaireComptes`) publie son bean sous le nom qu'elle veut. Les noms de workers et
+d'actions MCP n'ont pas changé.
+
+<details>
+<summary>Lignée 1.4.0 (Boot 4.0.6, pack-ai 2.7.x) — générateur de noms qualifiés</summary>
+
+En 1.4.0, `packMigrationRunner` et `vaultCredentialResolver` existent dans les deux packs ; le
+générateur par défaut lève `ConflictingBeanDefinitionException`. Parade : nommer les beans balayés des
+packs par leur nom complet, pour tout le contexte.
 
 ```java
 package eu.lmvi;
@@ -178,7 +222,6 @@ public class PackQualifiedBeanNameGenerator extends AnnotationBeanNameGenerator 
     @Override
     public String generateBeanName(BeanDefinition definition, BeanDefinitionRegistry registry) {
         if (!(definition instanceof ScannedGenericBeanDefinition)) {
-            // Classes importées : Spring les nomme d'habitude par leur nom complet. On le garde.
             return FullyQualifiedAnnotationBeanNameGenerator.INSTANCE.generateBeanName(definition, registry);
         }
         String classe = definition.getBeanClassName();
@@ -209,10 +252,13 @@ public class NomsDesPacks implements ApplicationContextInitializer<ConfigurableA
 ```
 
 `src/main/resources/META-INF/spring.factories` :
+`org.springframework.context.ApplicationContextInitializer=eu.lmvi.NomsDesPacks`
 
-```properties
-org.springframework.context.ApplicationContextInitializer=eu.lmvi.NomsDesPacks
-```
+⚠️ Même ainsi, la 1.4.0 garde trois défauts qui empêchent le démarrage ou font disparaître un
+worker (corrigés en 1.5.0, voir Pièges) : `VaultCredentialResolver` injecté par `Object`,
+`ActivationController` sans constructeur désigné, `mail_epuration_worker` jamais créé.
+
+</details>
 
 `Application.java` reste celui de toute app V005 :
 
@@ -238,7 +284,7 @@ public class Application {
 ## 5. Étape 3 — Base de données et migrations
 
 Le pack joue ses propres migrations au démarrage, avant tout worker : `PackMigrationRunner`
-(`@PostConstruct`) lit `classpath*:db/mail/V*.sql`, remplace `${mail_schema}` par
+(bean `mailPackMigrationRunner`, `@PostConstruct`) lit `classpath*:db/mail/V*.sql`, remplace `${mail_schema}` par
 `SOCLE_MAIL_SCHEMA` (nettoyé en `[a-z0-9_]`), et inscrit chaque version dans
 `public.z_pack_migrations` (clé `pack_id, version`). Une migration en échec **arrête le démarrage**.
 
@@ -283,9 +329,9 @@ socle:
 
 ---
 
-## 6. Étape 4 — Clés de l'application (socle 5.9.x)
+## 6. Étape 4 — Clés de l'application (socle 5.9 et +)
 
-Les actions du pack sont des actions MCP de l'app. En socle 5.9.x, `MCP_API_KEY` vide **ferme**
+Les actions du pack sont des actions MCP de l'app. Depuis le socle 5.9 (5.10.0 compris), `MCP_API_KEY` vide **ferme**
 `/mcp` et fait **refuser le démarrage** ; il en va de même pour `ADMIN_API_KEY`.
 
 ```bash
@@ -309,6 +355,8 @@ Journal de démarrage attendu (extraits réels des classes du pack) :
 [pack:mail] dépôt d'épuration JDBC sur schema_monapp.tr_email_import (9 colonnes écrites)
 [vault-resolver] Vault disabled — credentials must be passed in source_config
 ```
+
+(et, si `SOCLE_MAIL_VAULT_ENABLED=true` : `Vault integration requested — worker resolved on first use` ; depuis la 1.5.0, le worker Vault est cherché au premier usage.)
 
 Lister les actions (porte d'administration de l'app, en-tête `X-Admin-Key`) :
 
@@ -348,10 +396,10 @@ WHERE n.nspname = 'schema_monapp' AND c.relkind = 'r' ORDER BY 1;
 |---|---|---|
 | 1 | Démarrer l'app sur une base neuve | 7 scripts appliqués, 7 tables, 4 workers « contacts » au tableau de bord |
 | 2 | Redémarrer | aucun script rejoué (`z_pack_migrations`) |
-| 3 | Retirer `NomsDesPacks` | `ConflictingBeanDefinitionException` sur `packMigrationRunner` ou `vaultCredentialResolver` |
+| 3 | Lister les beans (`/actuator/beans` ou journal DEBUG) | `mailPackMigrationRunner` et `aiPackMigrationRunner` côte à côte, aucun `packMigrationRunner` |
 | 4 | Retirer `socle-pack-ai` du pom | échec au chargement de `MailGenerationWorker` |
 | 5 | Démarrer sans `SOCLE_MAIL_BOITE_HOTE` ni `SOCLE_MAIL_ACTIVATION_ENABLED` | ni `boite_applicative_worker`, ni `hub_iam_gateway_worker`, ni route `/activation` |
-| 6 | `mvn test` sur le pack | 144 tests, 0 échec (relevé `target/surefire-reports`, PostgreSQL 17 sur `127.0.0.1:55461`) |
+| 6 | `mvn clean verify` sur le pack | 145 tests, 0 échec, 0 sauté (Docker pour le test de démarrage pgvector ; PostgreSQL 17 sur `127.0.0.1:55461` pour les autres) |
 
 ---
 
@@ -359,17 +407,22 @@ WHERE n.nspname = 'schema_monapp' AND c.relkind = 'r' ORDER BY 1;
 
 | Piège | Symptôme | Correction |
 |---|---|---|
-| Deux beans `packMigrationRunner` / `vaultCredentialResolver` (pack-mail + pack-ai) | `ConflictingBeanDefinitionException`, l'app ne démarre pas | Générateur de noms qualifiés posé par `ApplicationContextInitializer` (§4) |
+| Mélanger les lignées : pack-mail 1.5.0 avec pack-ai 2.7.x ou socle 5.9 / Boot 4.0.6 (ou l'inverse) | compile, puis `NoSuchMethodError` / `ClassNotFoundException` (OkHttp 4 ↔ 5) à l'exécution | 1.5.0 = socle 5.10.0 + Boot 4.1.2 + pack-ai 2.8.0 ; 1.4.0 = socle 5.9 + Boot 4.0.6 + pack-ai 2.7.x |
+| Pack-mail **1.4.0** avec pack-ai 2.7.x : deux beans `packMigrationRunner` / `vaultCredentialResolver` | `ConflictingBeanDefinitionException`, l'app ne démarre pas | Corrigé en 1.5.0 (beans `mail*`) ; en 1.4.0, générateur de noms qualifiés (§4) |
+| Pack-mail **1.4.0** dans une vraie app | `NoUniqueBeanDefinitionException … type 'java.lang.Object'` sur `vaultCredentialResolver`, démarrage refusé | Corrigé en 1.5.0 (le worker Vault n'est plus injecté par `Object`) |
+| Pack-mail **1.4.0**, `SOCLE_MAIL_ACTIVATION_ENABLED=true` | `No default constructor found` sur `ActivationController`, démarrage refusé | Corrigé en 1.5.0 (constructeur `@Autowired`) |
+| Pack-mail **1.4.0** : `mail_epuration_worker` absent du tableau de bord et de `/mcp` | aucune erreur, le worker n'existe pas | Corrigé en 1.5.0 (`@ConditionalOnBean(DataSource)` évalué trop tôt, retiré) |
+| pack-comm 2.1.0 dans la même app | deux copies de `jakarta.mail.*` (`com.sun.mail` 2.0.1 et `jakarta.mail-api` 2.1.5) | Exclure `com.sun.mail:jakarta.mail` de pack-comm (§3) |
 | `socle-pack-ai` absent du pom de l'hôte | `NoClassDefFoundError: eu/lmvi/socle/pack/ai/GenerationWorker` | Le déclarer : il est `provided` dans le pack |
 | Rôle `app_<nom>` sans droit sur `public` (PostgreSQL ≥ 15) | `permission denied for schema public` sur V000, démarrage refusé | `GRANT CREATE ON SCHEMA public`, extension `pgcrypto` posée par un rôle habilité |
 | Deux schémas de la même base reçoivent le pack | le second ne reçoit aucune migration | `z_pack_migrations` est tenue **par pack**, pas par schéma : une base par app |
 | Base où l'ancienne `V999` aurait été jouée | `checksum mismatch on V999__seed_prompt.sql — skipping` (WARN) | Sans conséquence : la 1.4.0 corrige le quotage `$$` → `$prompt$` |
-| `V999` qui ne pose pas le prompt | `mail_generation_worker` échoue faute de prompt `contextual_mail` | `V999` teste `information_schema.tables`, **filtré par les droits**, et écrit dans `public.z_config_ia` : vérifier où pack-ai range ses prompts (MAIL-04) |
+| `V999` qui ne pose pas le prompt | `mail_generation_worker` échoue faute de prompt `contextual_mail` | `V999` teste `information_schema.tables`, **filtré par les droits**, et écrit dans `public.z_config_ia` : vérifier où pack-ai range ses prompts (MAIL-04). Si pack-mail migre avant pack-ai (cas observé au démarrage 1.5.0), V999 ne pose rien |
+| Ajouter pack-mail à une app dont pack-ai a **déjà** créé `z_config_ia` dans un schéma ≠ `public` | `Migration V999__seed_prompt.sql failed`, démarrage refusé | Défaut ouvert (1.5.0) : créer `public.z_config_ia` vide de même structure, ou poser le prompt à la main et inscrire `V999` dans `public.z_pack_migrations` |
 | Appeler `/api/actions/<worker>/<action>` sur l'app | 404 | C'est la porte **du Hub** ; une app s'appelle par `POST /mcp` |
 | `POST /mcp` sans `Accept: application/json, text/event-stream` | 400 / -32601 | Ajouter l'en-tête (SDK MCP embarqué depuis 5.8.5) |
-| `MCP_API_KEY` ou `ADMIN_API_KEY` vide | refus de démarrer (5.9.x) | Poser les deux clés depuis Vault |
-| Croire le README sur « TheSocle V005 ≥ 5.0.0 » | — | Le manifeste dit `minSocleVersion: 5.9.5`, le pom compile contre 5.9.5 : c'est la version éprouvée |
-| Chercher la 1.4.0 sur `maven.thesocle.net` | 404 | Elle n'existe que dans `~/.m2` de la box de build : la vendoriser |
+| `MCP_API_KEY` ou `ADMIN_API_KEY` vide | refus de démarrer (socle 5.9 et +) | Poser les deux clés depuis Vault |
+| Chercher le pack sur `maven.thesocle.net` | 404 | 1.4.0 et 1.5.0 n'existent que dans `~/.m2` de la box de build (et en tags git) : les vendoriser |
 
 ---
 

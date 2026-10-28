@@ -1,7 +1,7 @@
 # HOWTO tenant-04 — Rendre la marque du tenant (couleurs, typographies, logo)
 
 **Niveau :** Intermédiaire
-**Cible :** `socle-pack-tenant` 0.5.0 — `TenantBranding`, `TenantBrandingDialect`, objet `#tenant`
+**Cible :** `socle-pack-tenant` 0.6.0 (API identique à 0.5.0 ; dialecte vérifié sous Thymeleaf 3.1.5 / Boot 4.1.2) — `TenantBranding`, `TenantBrandingDialect`, objet `#tenant`
 **Hub :** ≥ 3.63.0 (`GET /api/iam/tenant/{slug}/logo` → `302` vers une URL signée)
 **Vérifié au code :** 2026-10-28
 **Prérequis :** [[howto-tenant-01-integrer-le-pack|tenant-01]], [[howto-tenant-02-poser-le-tenant-courant|tenant-02]] ; bloc `marque` de la fiche saisi, logo déposé par `iam_worker.set_tenant_logo`
@@ -185,7 +185,7 @@ curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' \
 
 | Piège | Symptôme | Correction |
 |---|---|---|
-| **Le processeur s'applique à TOUT `<head>` Thymeleaf** | page de connexion, page d'erreur ou page publique sans tenant : rendu en erreur `TenantSansFiche` | poser le tenant pour ces routes (tenant-02), ou les servir hors Thymeleaf ; aucune propriété ne désactive le dialecte en 0.5.0 |
+| **Le processeur s'applique à TOUT `<head>` Thymeleaf** | page de connexion, page d'erreur ou page publique sans tenant : rendu en erreur `TenantSansFiche` | poser le tenant pour ces routes (tenant-02), ou les servir hors Thymeleaf ; aucune propriété ne désactive le dialecte (0.6.0 compris) |
 | `#tenant.logoUrl` appelé plusieurs fois par page | un aller-retour `GET /logo` vers le Hub **à chaque appel** (non mis en cache, l'URL signée expire) | l'évaluer une fois (`th:with`) |
 | Mettre l'URL signée dans un courriel | image cassée à l'ouverture, l'URL a expiré | servir `logoBytes()` depuis l'app (§4) |
 | Couleurs de repli codées dans le CSS | marque générique servie en silence | pas de repli : l'absence de fiche doit se voir |

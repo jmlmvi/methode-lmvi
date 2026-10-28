@@ -1,11 +1,20 @@
 # socle-pack-tenant — la fiche société du tenant, lue par l'application
 
-> **Version documentée : 0.5.0** — dépôt `/opt/2026-TheHub4TheSocle/socle-pack-tenant/`, branche
-> `main`, commit `bcddf0e` (« membresDe(slug), Membre.ville, contrat corrigé sur le réel »,
-> 2026-10-16). Vérifié au code le **2026-10-28**.
-> Coordonnées Maven : `eu.lmvi:socle-pack-tenant:0.5.0` — Boot 4.0.6, compilé contre
-> `socle-v005` 5.9.0 en `provided` (présence de `eu.lmvi.socle.tenant.TenantContext` vérifiée dans
-> les JAR 5.8.9, 5.9.0 et 5.9.5).
+> **Version documentée : 0.6.0** — dépôt `/opt/2026-TheHub4TheSocle/socle-pack-tenant/`, branche
+> `main`, tag `v0.6.0`, commit `c3b70e3` (« 0.6.0 — socle 5.10.0 et Spring Boot 4.1.2 »,
+> 2026-10-28). Vérifié au code le **2026-10-28**.
+> Coordonnées Maven : `eu.lmvi:socle-pack-tenant:0.6.0` — Boot **4.1.2**, compilé contre
+> `socle-v005` **5.10.0** en `provided`.
+
+| Pack | Socle V005 | Spring Boot | Client HTTP |
+|---|---|---|---|
+| **0.6.0** | 5.10.x | 4.1.2 | `okhttp-jvm` 5.5.1 du socle (`provided`) |
+| 0.5.0 (commit `bcddf0e`, sans tag) | 5.8.x – 5.9.x | 4.0.6 | `okhttp` 4.12.0 embarqué |
+
+L'API (beans injectés, propriétés, actions MCP, tables) est identique de 0.5.0 à 0.6.0. Ce qui
+change pour l'app : l'appariement socle ↔ pack, les **noms de beans** préfixés `tenant…`
+(`tenantFicheService`, `tenantFicheCache`, `tenantHubClient`… — sans effet pour une injection par
+type), et la lecture double qui démarre enfin avec `enabled=true`.
 
 ## Le pack en cinq lignes
 
@@ -53,9 +62,9 @@ lui, le lit **dans le MDC, clé `tenant_id`** — et c'est à l'application de l
 
 | Dépendance | Portée | Pourquoi |
 |---|---|---|
-| `eu.lmvi:socle-v005` | `provided` | `TenantContext`, `Worker`, `ActionProvider`, `KvBus` |
+| `eu.lmvi:socle-v005` 5.10.x | `provided` | `TenantContext`, `Worker`, `ActionProvider`, `KvBus` |
 | `spring-boot-starter-web`, `-log4j2`, `jackson-databind` | `provided` | fournis par l'app hôte |
-| `com.squareup.okhttp3:okhttp` 4.12.0 | `compile` | le seul client HTTP du chantier — l'app n'en déclare aucun |
+| `com.squareup.okhttp3:okhttp-jvm` 5.5.1 | `provided` (apporté par le socle 5.10.0) | le seul client HTTP du chantier — l'app n'en déclare aucun ; en 0.5.0 : `okhttp` 4.12.0 en `compile` |
 | `spring-boot-starter-thymeleaf` | `provided`, facultatif | dialecte de marque, conditionné à la présence de Thymeleaf |
 | `spring-boot-starter-jdbc` + une `DataSource` PostgreSQL | `provided`, facultatif | journal des écarts de la lecture double |
 | Hub ≥ 3.63.0 | service | routes `/api/iam/tenant/{slug}/…` (déployées le 2026-10-02 ; non re-mesurées le 2026-10-28) |
@@ -73,18 +82,24 @@ lui, le lit **dans le MDC, clé `tenant_id`** — et c'est à l'application de l
 
 Le code fait foi ; les howtos suivent le code.
 
-| # | Documentation | Code (0.5.0) |
+**Corrigés en 0.6.0** (documentation du pack réalignée sur le code) : `fraicheur-max` 1 h et
+`revalidation` 30 s dans le README et le manifeste ; `socle-pack.json` exact (0.6.0,
+`minSocleVersion` 5.10.0, deux workers, deux tables) ; le README et le `CLAUDE.md` disent que
+l'application pose `tenant_id` dans le MDC — **le socle 5.10.0 ne le fait toujours pas** ; l'état P4/P5 (Your360 passée en P5) est à jour ; la clé
+APIM « par Vault » est décrite telle qu'elle marche (bean `*Vault*Worker*` requis, absent du socle).
+Corrigé aussi en 0.6.0 : `lecture-double.enabled=true` empêchait le démarrage (constructeur
+`MigrationEcarts` non désigné).
+
+Restent ouverts :
+
+| # | Documentation | Code (0.6.0) |
 |---|---|---|
-| 1 | README et `socle-pack.json` : `fraicheur-max` = **24 h** | `TenantProperties` : **1 h** (et `revalidation` 30 s, absente du README) |
-| 2 | `socle-pack.json` : `version` 0.4.0, un seul worker, `tables: []` | pom 0.5.0 ; second worker `tenant_ecarts_worker` ; V001 crée `tr_tenant_ecarts` et `z_tenant_lectures_doubles` |
-| 3 | `CLAUDE.md` / README : « le socle résout le tenant (`TenantContextFilter` → `TenantContextHolder`) » | ces classes n'existent pas (vérifié jusqu'au socle 5.9.5) ; aucune classe du socle ne pose `tenant_id` dans le MDC |
-| 4 | README : « clé APIM résolue par Vault » | la forme `vault:<chemin>#<champ>` exige un bean `*Vault*Worker*` exposant `getSecret(String,String)` ; le socle 5.9.5 et les trois apps consommatrices n'en ont pas |
 | 5 | Javadoc `TenantMembres.membresDe` : « jamais une exception » | lève `TenantSansFiche` si le Hub ne sert pas la fiche du slug et que le cache est vide |
 | 6 | Javadoc `FicheCache` / `TenantFicheWorker` : invalidation KvBus essentielle, « pas de TTL » | depuis 0.2.1 la fraîcheur vient de la revalidation `ETag` ; l'abonnement KvBus reste posé mais n'est alimenté par aucune autre JVM (`docs/ECART-CONTRAT-KVBUS.md`) |
-| 7 | README « État 0.4.0 » : P4 « 2/4 câblées » | `docs/P4-LECTURE-DOUBLE.md` §8 : Your360 est passée en P5 le 2026-10-09 |
 | 8 | Contrat §4 | le Hub sert aussi `liens` sur un membre ; `Membre` ne le modélise pas |
 
 Fonctionnalités incomplètes : P5 n'a pas d'outillage propre dans le pack (c'est un retrait de colonnes
 côté app) ; l'invalidation par événement est inerte entre JVM ; `HubTenantClientIntegrationTest`
-(6 tests) et `JournalEcartsIntegrationTest` (14 tests) sont sautés sans Hub ni PostgreSQL de test —
-90 méthodes `@Test` au total.
+(6 tests) reste sauté sans Hub ni clé APIM. Depuis 0.6.0, `JournalEcartsIntegrationTest` (14) et
+`DemarrageContexteSpringTest` (vrai contexte Boot 4.1 + socle 5.10) tournent sur un PostgreSQL
+Testcontainers — 91 tests, 85 verts, 6 sautés.

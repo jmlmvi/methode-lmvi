@@ -2,7 +2,7 @@
 
 **Niveau :** Intermédiaire
 **Cible :** app qui échange des fichiers avec un Drive Google via un Service Account
-**Versions vérifiées au code (2026-10-28) :** `socle-pack-connectors:3.0.0` (Boot 4.0.6 ; code de ce périmètre identique à 2.0.0, dernière version Boot 3) — `GdriveWorker` (10 actions),
+**Versions vérifiées au code (2026-10-28) :** `socle-pack-connectors:3.1.0` (Boot 4.1.2, socle 5.10.0 ; code de ce périmètre identique depuis 2.0.0 hors noms de beans préfixés `connectors*` ; 3.0.0 = Boot 4.0.6, 2.0.0 = dernière Boot 3) — `GdriveWorker` (10 actions),
 `GoogleAuthService` (JWT RS256, scope `https://www.googleapis.com/auth/drive`) ; Drive API v3
 **Temps estimé :** 30 min
 

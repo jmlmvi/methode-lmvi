@@ -8,14 +8,34 @@
 4. Résilience commune (rate limiter, retry ×3, circuit breaker par fournisseur) et journal `tr_connector_log` dans le schéma PostgreSQL de l'app.
 5. Services Notion réutilisables sans worker (`NotionDatabaseService`, `PropertyConverter`) et récepteur webhook Stripe signé (`POST /api/webhooks/stripe`, qui valide et journalise seulement).
 
-**Version documentée :** `3.0.0` (pom, `socle-pack.json`) — **Spring Boot `4.0.6`**, construite et
-testée contre `socle-v005:5.9.0` (provided), compile aussi contre `5.8.8` ; socle minimal déclaré 5.8.4 ; Java 21.
-**Dernière version Boot 3 = `2.0.0`** (Boot 3.2.1, socle 5.7.4) : une app Boot 3 reste sur 2.0.0.
-**Référence git :** dépôt `socle-pack-Connectors`, branche `feat/boot4` @ `2be4a46` (partie de
-`feat/connectors-enabled` @ `298f758`) — **pas encore fusionnée dans `main`, pas de tag**.
-Ce que la 3.0.0 change pour une app : Boot 4 / socle ≥ 5.8.4 obligatoires ; `get_page.blocks` et
-`get_database_full.properties_schema` sortent enfin en JSON (voir CONNECTORS-04) ; `create_database`
-figure au manifeste.
+**Version documentée :** `3.1.0` (pom, `socle-pack.json`) — **Spring Boot `4.1.2`**, construite et
+testée contre `socle-v005:5.10.0` (provided) ; socle minimal déclaré 5.10.0 ; Java 21.
+**Référence git :** dépôt `socle-pack-Connectors`, `main` @ `69da4ab`, tag **`v3.1.0`** (code : `10ad868`).
+
+| Version du pack | Socle V005 | Spring Boot | OkHttp |
+|---|---|---|---|
+| **3.1.0** | **5.10.x** (≥ 5.10.0) | **4.1.2** | `okhttp-jvm` 5.5.1, fourni par le socle |
+| 3.0.0 | 5.8.x – 5.9.x (≥ 5.8.4) | 4.0.6 | `okhttp` 4.12.0, embarqué par le pack |
+| 2.0.0 | ≤ 5.7.x | 3.2.1 — **dernière Boot 3** | `okhttp` 4.12.0 |
+
+Ce que la 3.1.0 change pour une app : socle ≥ 5.10.0 / Boot 4.1.2 obligatoires ; OkHttp vient du socle
+(`okhttp-jvm`), le pack n'a plus aucune dépendance `compile` ; tous les beans du pack ont un nom explicite
+préfixé `connectors` (tableau ci-dessous). Workers, actions, propriétés, tables : inchangés.
+Ce que la 3.0.0 avait changé : Boot 4 ; `get_page.blocks` et `get_database_full.properties_schema` sortent
+en JSON (voir CONNECTORS-04) ; `create_database` figure au manifeste.
+
+**Noms des beans (3.1.0)** — à utiliser pour un `@Qualifier` ou un `@DependsOn` ; l'injection par type ne change pas :
+
+| Classe | Bean | Classe | Bean |
+|---|---|---|---|
+| `ConnectorsProperties` | `connectorsProperties` | `NotionClient` | `connectorsNotionClient` |
+| `ConnectorsActivationReport` | `connectorsActivationReport` | `NotionDatabaseService` | `connectorsNotionDatabaseService` |
+| `PackMigrationRunner` | `connectorsPackMigrationRunner` | `PropertyConverter` | `connectorsPropertyConverter` |
+| `VaultCredentialResolver` | `connectorsVaultCredentialResolver` | `GoogleAuthService` | `connectorsGoogleAuthService` |
+| `ResilienceFactory` | `connectorsResilienceFactory` | `StripeWebhookController` | `connectorsStripeWebhookController` |
+| `ConnectorLogger` | `connectorsConnectorLogger` | `NotionWorker` / `GdriveWorker` | `connectorsNotionWorker` / `connectorsGdriveWorker` |
+| | | `StripeWorker` / `HubspotWorker` | `connectorsStripeWorker` / `connectorsHubspotWorker` |
+
 **Vérifié au code le :** 2026-10-28.
 
 ---
@@ -53,13 +73,14 @@ figure au manifeste.
 import de `socle-pack-ai` ou `socle-pack-comm` (les classes de résilience sont recopiées localement).
 Dépendances techniques attendues de l'app hôte (scope `provided` dans le pack) : `socle-v005`,
 `spring-boot-starter-web`, `spring-boot-starter-jdbc`, `postgresql`, `jackson-databind` (Jackson 2),
-`log4j2`. Le pack apporte OkHttp 4.12.0. Le pack reste en Jackson 2 (`com.fasterxml`), comme le socle
+`log4j2`, et depuis 3.1.0 OkHttp (`okhttp-jvm` 5.5.1, amené par le socle 5.10) : le pack n'a plus
+aucune dépendance `compile` (jusqu'à 3.0.0 il apportait `okhttp` 4.12.0). Le pack reste en Jackson 2 (`com.fasterxml`), comme le socle
 et les packs tenant/mail/ai ; Boot 4 apporte Jackson 2 et 3 côte à côte.
 
 ## Applications consommatrices
 
 Au 2026-10-28, **aucune APP-* du dépôt ne déclare la dépendance** (`grep -rl socle-pack-connectors
---include=pom.xml` : zéro résultat hors du pack). Les versions `1.0.0-SNAPSHOT` → `3.0.0` sont
+--include=pom.xml` : zéro résultat hors du pack). Les versions `1.0.0-SNAPSHOT` → `3.1.0` sont
 installées dans `~/.m2` de la box de build ; aucune n'est vendorisée dans un `mvn-repo/`. Les
 exemples de code des HOWTOs utilisent donc une app fictive `monapp` (`schema_monapp`).
 

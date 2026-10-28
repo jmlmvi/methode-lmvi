@@ -1,7 +1,7 @@
 # HOWTO tenant-05 — Lire l'équipe du tenant
 
 **Niveau :** Débutant
-**Cible :** `socle-pack-tenant` 0.5.0 — `TenantMembres`, `model.Membre` (`ville` ajoutée en 0.5.0, `membresDe(slug)` ajoutée en 0.5.0)
+**Cible :** `socle-pack-tenant` 0.6.0 (API identique à 0.5.0) — `TenantMembres`, `model.Membre` (`ville` ajoutée en 0.5.0, `membresDe(slug)` ajoutée en 0.5.0)
 **Hub :** ≥ 3.63.0 (`GET /api/iam/tenant/{slug}/membres`, conforme au contrat depuis le 2026-10-02)
 **Vérifié au code :** 2026-10-28
 **Prérequis :** [[howto-tenant-01-integrer-le-pack|tenant-01]], [[howto-tenant-02-poser-le-tenant-courant|tenant-02]] ; membres saisis au Hub (`iam_worker.upsert_tenant_membre`)
@@ -176,7 +176,7 @@ Attendu après un appel à `/api/equipe` : `"membres_charges": true` sur la lign
 |---|---|---|
 | Rôles supposés uniformes | `parRole` vide sur certains tenants | liste de rôles acceptés par l'app |
 | `membresDe` sans `try` | une page de supervision en 500 pour un slug sans fiche | entourer `TenantSansFiche` |
-| Attendre `liens` (LinkedIn, site) | le Hub les sert, `Membre` ne les modélise pas en 0.5.0 | demander l'évolution du pack (PACK FIRST), pas un second client |
+| Attendre `liens` (LinkedIn, site) | le Hub les sert, `Membre` ne les modélise pas (0.6.0 compris) | demander l'évolution du pack (PACK FIRST), pas un second client |
 | Membre modifié au Hub, fiche inchangée | ancienne équipe tant que l'`ETag` de la fiche ne change pas (l'équipe vit dans l'entrée de la fiche) | `refresh_fiche slug=…` ; le contrat demande au Hub de changer l'`ETag` sur `upsert_tenant_membre` |
 | `photoUrl` stockée | URL signée expirée | la relire à chaque rendu |
 | Hub muet sur `/membres` | liste vide (WARN), pas d'erreur | voir le bandeau de fraîcheur (tenant-07) |

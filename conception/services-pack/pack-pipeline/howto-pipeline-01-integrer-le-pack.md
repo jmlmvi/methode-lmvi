@@ -1,8 +1,8 @@
 # HOWTO PIPELINE-01 — Intégrer socle-pack-pipeline dans une application
 
 **Niveau :** Confirmé
-**Cible :** application V005 **Spring Boot 4** (socle 5.8.4 → 5.9.x) avec un PostgreSQL applicatif — une app restée en Boot 3.2.1 (socle ≤ 5.8.0) prend `0.1.0-SNAPSHOT`, cf. §4
-**Versions vérifiées au code :** `socle-pack-pipeline` **0.2.0**, branche `feat/boot4` @ `4cb5aa6` · compilé contre `socle-v005` 5.9.0 / Spring Boot 4.0.6 (compile aussi contre 5.8.4 et 5.8.8) · date 2026-10-28
+**Cible :** application V005 **Spring Boot 4.1.2** (socle ≥ 5.10.0) avec un PostgreSQL applicatif — une app en Boot 4.0.6 (socle 5.8.4 → 5.9.x) prend `0.2.0`, une app restée en Boot 3.2.1 (socle ≤ 5.8.0) prend `0.1.0-SNAPSHOT`, cf. §4
+**Versions vérifiées au code :** `socle-pack-pipeline` **0.3.0**, `main` @ `fef144d` (tag `v0.3.0`) · compilé contre `socle-v005` 5.10.0 / Spring Boot 4.1.2 · date 2026-10-28
 **Temps estimé :** 30 min
 
 > Vue d'ensemble du pack : [[README|socle-pack-pipeline]]
@@ -85,10 +85,10 @@ Le pack n'est publié sur **aucun** dépôt distant. Il vit dans le `~/.m2` de l
 
 ```bash
 cd /opt/2026-TheHub4TheSocle/socle-pack-pipeline
-git checkout feat/boot4               # 0.2.0, Boot 4 — app Boot 3 : feat/p1-p4-dag-engine (0.1.0-SNAPSHOT)
+git checkout v0.3.0                   # Boot 4.1.2 / socle 5.10 — Boot 4.0.6 : v0.2.0 — Boot 3 : feat/p1-p4-dag-engine (0.1.0-SNAPSHOT)
 mvn -q clean install -DskipTests      # compile aussi les tests : ils doivent compiler
 
-V=0.2.0
+V=0.3.0
 APP=/opt/2026-TheHub4TheSocle/APP-XX-MonApp/monapp
 D=$APP/mvn-repo/eu/lmvi/socle-pack-pipeline/$V
 mkdir -p "$D"
@@ -124,10 +124,10 @@ ainsi n'existe que sur cette machine.
     <dependency>
         <groupId>eu.lmvi</groupId>
         <artifactId>socle-pack-pipeline</artifactId>
-        <version>0.2.0</version>   <!-- app Boot 3.2.1 : 0.1.0-SNAPSHOT -->
+        <version>0.3.0</version>   <!-- app Boot 4.0.6 : 0.2.0 ; app Boot 3.2.1 : 0.1.0-SNAPSHOT -->
     </dependency>
 
-    <!-- Jackson 2 : le pack l'emploie (provided), comme le socle. Le parent Boot 4.0.6 en gère la version
+    <!-- Jackson 2 : le pack l'emploie (provided), comme le socle. Le parent Boot 4.1.2 en gère la version
          (com.fasterxml.jackson.core:jackson-databind) ; le socle la tire déjà, la déclarer ne coûte rien. -->
     <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
@@ -154,7 +154,8 @@ ainsi n'existe que sur cette machine.
 
 | Version du pack | Parent Spring Boot de l'app | socle-v005 de l'app |
 |---|---|---|
-| **0.2.0** | **4.0.6** | 5.8.4 → 5.9.x |
+| **0.3.0** | **4.1.2** | ≥ 5.10.0 |
+| 0.2.0 (dernière Boot 4.0.6) | 4.0.6 | 5.8.4 → 5.9.x |
 | 0.1.0-SNAPSHOT (dernière Boot 3) | 3.2.1 | 5.7.4 → 5.8.0 |
 
 Le parent Spring Boot de l'app doit être **celui du socle** (`lib/socle-v005-<v>.pom`) et donc celui du
@@ -167,7 +168,20 @@ reste en Jackson 2 (`com.fasterxml`) et n'expose aucun contrôleur. Si l'app ren
 (`PipelineJson.mapper().convertValue(n, Object.class)`) ; un `com.fasterxml…JsonNode` en `@RequestBody`
 échoue (500) — lire le corps en `String` puis `PipelineJson.mapper().readTree(...)`.
 
-Les cinq apps consommatrices déclarent toutes `jnats` ; 0.2.0 ne change rien à ce point.
+Les cinq apps consommatrices déclarent toutes `jnats` ; 0.3.0 ne change rien à ce point (jnats 2.19.1, non
+géré par la nomenclature Boot 4.1.2).
+
+**Journalisation (0.3.0)** : le pack n'apporte plus Logback. Jusqu'en 0.2.0, `spring-boot-starter-jdbc` tirait
+`spring-boot-starter-logging` en portée compile ; une app qui comptait sur l'exclusion faite chez elle n'a rien
+à changer, une app qui l'avait oubliée voyait Logback et Log4j2 se disputer SLF4J.
+
+**OkHttp** : le pack n'en dépend pas. Le socle 5.10.0 apporte `com.squareup.okhttp3:okhttp-jvm` 5.5.1 (et non
+plus `okhttp`) : une app qui déclare encore `okhttp` 4.x aura deux copies de `okhttp3.*`.
+
+**Versions transitives du socle 5.10.0** : avec un parent Boot 4.1.2, la nomenclature Boot l'emporte sur les
+versions écrites dans le pom du socle. L'app reçoit gRPC **1.84.1** (le socle annonce 1.85.1), H2 2.4.240
+(annoncé 2.5.252), Jedis 7.4.1 (annoncé 8.0.2). Sans effet sur le pack ; fixer la propriété
+(`grpc-java.version`, `h2.version`, `jedis.version`) dans l'app si elle a besoin de la version du socle.
 
 ---
 
@@ -232,7 +246,7 @@ dans le même bloc.
 
 Les deux `PipelineProperties` coexistent : types distincts, l'injection **par type** n'est pas ambiguë, et
 chacune lit ses propres clés du bloc `socle.pipeline`. Le test `PackContexteSocleTest` du pack le prouve sur
-un contexte Spring avec le socle 5.9.0 (et 5.8.8) ; il échoue si le nom explicite est retiré.
+un contexte Spring avec le socle 5.10.0 / Boot 4.1.2 (0.3.0 ; 5.9.0 et 5.8.8 en 0.2.0) ; il échoue si le nom explicite est retiré. Le socle 5.10.0 n'introduit aucune nouvelle collision.
 
 Conséquences pour l'app :
 
@@ -368,7 +382,7 @@ La donnée est une **chaîne JSON** dans `result.content[0].text` : `{"handlers"
 |---|---|---|
 | 1 | Démarrer l'app sur une base vierge | 6 tables + `z_pack_migrations` dans `socle.pipeline.schema`, rien dans `public` |
 | 2 | Redémarrer | `skip … (already applied)` en DEBUG, aucune ré-exécution |
-| 3 | Socle ≥ 5.8.6, pack 0.2.0, **sans** générateur de noms dans l'app | démarrage normal, `pipeline_worker` visible sur `/dashboard` |
+| 3 | Socle ≥ 5.8.6, pack ≥ 0.2.0, **sans** générateur de noms dans l'app | démarrage normal, `pipeline_worker` visible sur `/dashboard` |
 | 4 | Dans le contexte : `getBeanNamesForType(eu.lmvi.socle.pack.pipeline.config.PipelineProperties)` | `[pipelinePackProperties]` ; `pipelineProperties` reste celui du socle |
 | 5 | `list_handlers` | contient vos handlers en plus des 6 built-ins |
 | 6 | Deux apps avec le pack sur la même base, schémas distincts | chacune a ses 6 tables et son registre |
@@ -381,12 +395,14 @@ La donnée est une **chaîne JSON** dans `result.content[0].text` : `{"handlers"
 |---|---|---|
 | Socle ≥ 5.8.6 + pack **0.1.0-SNAPSHOT** (app Boot 4 pas encore montée) | l'app ne démarre pas : deux beans `pipelineProperties` | passer au pack **0.2.0** (§6) ; à défaut, le générateur `NomsDesPacks` de TheDiffuseur 1.7.0 |
 | Pack 0.2.0 dans une app **Boot 3.2.1** | compile, puis `NoSuchMethodError`/`ClassNotFoundException` Spring à l'exécution | une app Boot 3 reste en `0.1.0-SNAPSHOT` |
+| Pack 0.3.0 dans une app Boot 4.0.6 (socle ≤ 5.9.x), ou 0.2.0 dans une app socle 5.10.0 | Boot du pack ≠ Boot de l'app : risque d'erreur Spring à l'exécution | aligner : socle 5.10 / Boot 4.1.2 → 0.3.0 ; socle 5.8.4–5.9.x / Boot 4.0.6 → 0.2.0 |
+| App en socle 5.10.0 qui déclare encore `com.squareup.okhttp3:okhttp` 4.x | deux copies de `okhttp3.*` sur le classpath | passer à `okhttp-jvm` 5.5.1 (celui du socle) ou ne rien déclarer |
 | `JsonNode` du pack rendu tel quel par un contrôleur de l'app (Boot 4) | JSON mal écrit ou 500 (Jackson 3 côté HTTP) | convertir en `Map`/`List` avant de rendre (§4) |
 | `socle.pipeline.schema` oublié | tables du pack dans `public`, mêlées aux autres apps | toujours fixer le schéma de l'app |
 | PostgreSQL 14 ou moins | `V002` échoue : `syntax error at or near "NULLS"`, l'app ne démarre pas | PostgreSQL ≥ 15 |
 | Rôle sans droit de création dans le schéma | `failed to apply V001…`, démarrage bloqué | provisionner le schéma au nom du rôle applicatif |
 | Checksum modifié d'un script déjà appliqué | `checksum mismatch … Skipping` : la migration n'est **pas** rejouée | ne jamais modifier un `V*.sql` publié ; écrire un `V00n` |
-| Dépôt vendorisé sans `<snapshots>` (app restée en 0.1.0-SNAPSHOT) | `Could not find artifact …0.1.0-SNAPSHOT` | activer les snapshots sur le dépôt `project-local` ; 0.2.0 est une release |
+| Dépôt vendorisé sans `<snapshots>` (app restée en 0.1.0-SNAPSHOT) | `Could not find artifact …0.1.0-SNAPSHOT` | activer les snapshots sur le dépôt `project-local` ; 0.2.0 et 0.3.0 sont des releases |
 | `mvn install -DskipTests` du pack après avoir modifié le constructeur de `PipelineWorker` | échec de compilation des tests | `-DskipTests` compile les tests ; mettre à jour les `new PipelineWorker(...)` des tests |
 | `queue-backend` laissé à `techdb` | `object is already closed` sous charge (RssArchiver, BilanSocle, NotionSocle) | `memory`, cf. [[howto-pipeline-04-executer-un-run\|PIPELINE-04]] §6 |
 | **`jnats` absent** (quel que soit le backend) | `NoClassDefFoundError: io/nats/client/Connection` au démarrage, à la création de `DagPipelineBuilder` | ajouter `io.nats:jnats:2.19.1` (scope `runtime` suffit) |

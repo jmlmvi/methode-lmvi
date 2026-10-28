@@ -2,7 +2,7 @@
 
 **Niveau :** Confirmé
 **Cible :** exploitant ou développeur d'une app qui sort par `socle-pack-egress`
-**Versions vérifiées au code (2026-10-28) :** `socle-pack-egress` **2.0.0** — comportement identique à la 1.0.0 (`EgressStats`, `EgressTunnelSession`, `ConnectHead`) · Hub `soclehub` **3.73.0** (`EgressProxyServer.openForClient`)
+**Versions vérifiées au code (2026-10-28) :** `socle-pack-egress` **3.0.0** (commit `aa521dc`) — comportement identique à la 2.0.0 et à la 1.0.0 (`EgressStats`, `EgressTunnelSession`, `ConnectHead`) · Hub `soclehub` **3.73.0** (`EgressProxyServer.openForClient`)
 **Temps estimé :** 15 min
 
 ---
@@ -176,16 +176,16 @@ le port MCP de KEW est `MCP_PORT` (8801 par défaut). Chercher le bloc `egress` 
 
 ---
 
-## 10. Écarts README ↔ code relevés (1.0.0, revus en 2.0.0)
+## 10. Écarts README ↔ code relevés (1.0.0, revus en 2.0.0 et 3.0.0)
 
-Le code fait foi. Les points 3 et 6 sont corrigés en 2.0.0 ; les autres demeurent (hors périmètre de la montée Boot 4).
+Le code fait foi. Les points 3 et 6 sont corrigés en 2.0.0, le point 5 en 3.0.0 ; les autres demeurent (hors périmètre des montées de plateforme).
 
 1. **Codes de refus** : le README cite 403/407/429/502/503/504 ; le code produit aussi `400` (pack : `CONNECT` mal formé ; Hub : hôte vide) et `405` (clair).
 2. **`429` et `Retry-After`** : le README renvoie au comportement du Hub ; par le pack, aucun `Retry-After` n'est transmis.
 3. ~~**Manifeste `socle-pack.json`** : `local-port` et `plaintext` n'y figurent pas~~ — **corrigé en 2.0.0** : `SOCLE_EGRESSCLIENT_LOCALPORT` et `SOCLE_EGRESSCLIENT_PLAINTEXT` y sont déclarés.
 4. **Champ `tor` de l'ack** : reçu mais ni mémorisé ni exposé par `stats()`.
-5. **User-agent** : écrit en dur dans `EgressTunnelProxy` (`socle-pack-egress/2.0.0` depuis la 2.0.0), indépendant de la version du pom — à réaligner à chaque version.
-6. ~~**Compatibilité** : le README annonce une compatibilité gRPC « avec les versions suivantes », jamais prouvée au-delà du socle 5.7.4~~ — **corrigé en 2.0.0** : le pack est compilé avec le gRPC du socle (1.81.0 / protobuf 3.25.9), alignement vérifié par `GrpcAlignementSocleTest` (5.9.0 et 5.8.8 passent, 5.7.4 échoue) ; la 1.0.0 reste la version des socles 5.7.x. Reste à faire : `EgressLiveIT` contre le Hub réel avec la 2.0.0.
+5. ~~**User-agent** : écrit en dur dans `EgressTunnelProxy`, indépendant de la version du pom~~ — **corrigé en 3.0.0** : constante `EgressTunnelProxy.USER_AGENT` (`socle-pack-egress/3.0.0`), comparée à la version du pom par `SoclePackManifestTest`.
+6. ~~**Compatibilité** : le README annonce une compatibilité gRPC « avec les versions suivantes », jamais prouvée au-delà du socle 5.7.4~~ — **corrigé en 2.0.0** : le pack est compilé avec le gRPC du socle (1.81.0 / protobuf 3.25.9), alignement vérifié par `GrpcAlignementSocleTest` (5.9.0 et 5.8.8 passent, 5.7.4 échoue) ; la 1.0.0 reste la version des socles 5.7.x. En 3.0.0 : gRPC 1.85.1 / protobuf 4.36.2 (socle 5.10.0), 5.9.0 échoue comme attendu. Reste à faire : `EgressLiveIT` contre le Hub réel avec la 3.0.0.
 7. **Authentification** : le Hub accepte sur ce tunnel un JWT Bearer ou une clé API ; le pack n'envoie que la clé. Les mots de passe de proxy (`egress_proxy_password_create`) ne s'appliquent qu'au proxy `soclehub:3128`.
 8. **Distribution** : le README montre la dépendance Maven sans dire d'où vient l'artefact ; il n'est pas publié sur `maven.thesocle.net` (fiche mémoire du pack, commentaire du `pom.xml` de RssArchiver) — `mvn install` depuis le dépôt.
 9. **Plusieurs sorties** : une seule politique (`selector`) par bean ; l'auto-configuration n'a pas de `@ConditionalOnMissingBean`.

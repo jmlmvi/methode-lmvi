@@ -1,7 +1,7 @@
 # HOWTO tenant-07 — Fraîcheur, cache et mode dégradé
 
 **Niveau :** Confirmé
-**Cible :** `socle-pack-tenant` ≥ 0.2.1 (séparation `revalidation` / `fraicheur-max`) — documenté sur 0.5.0
+**Cible :** `socle-pack-tenant` ≥ 0.2.1 (séparation `revalidation` / `fraicheur-max`) — documenté sur 0.6.0 (comportement identique à 0.5.0)
 **Hub :** ≥ 3.63.0 (`ETag` + `304` sur `If-None-Match`, mesurés le 2026-10-02)
 **Vérifié au code :** 2026-10-28 (`FicheService`, `FicheCache`, `TenantFicheWorker`, `ModeDegradeTest`)
 **Prérequis :** [[howto-tenant-01-integrer-le-pack|tenant-01]]
@@ -186,7 +186,7 @@ Côté app :
 | Piège | Symptôme | Correction |
 |---|---|---|
 | Croire que `fraicheur-max` décide du rappel | modification au Hub vue « trop tard » ou bandeau intempestif | `revalidation` décide du rappel, `fraicheur-max` de l'avertissement |
-| Se fier au défaut `24h` du README / du manifeste | attente erronée | code : 1 h |
+| Se fier au défaut `24h` du README / du manifeste ≤ 0.5.0 | attente erronée | code : 1 h — README et manifeste corrigés en 0.6.0 |
 | Compter sur l'événement `tenant.fiche.modifiee` | rien ne se passe à la modification | la revalidation `ETag` est le mécanisme ; `refresh_fiche` pour forcer |
 | Un `403` (grant manquant) lu comme une panne du Hub | mode dégradé permanent sur un tenant | tenant-06 |
 | Premier démarrage, Hub muet | aucune fiche, `TenantSansFiche` : le cache est en mémoire, rien n'est persisté | prévoir l'écran d'absence ; le préchargement ne recharge qu'un Hub joignable |

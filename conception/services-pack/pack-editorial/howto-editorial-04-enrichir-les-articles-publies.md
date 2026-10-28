@@ -1,8 +1,8 @@
 # HOWTO EDITORIAL-04 — Enrichir les articles publiés (corps complet, bibliographie, 5W1H, traduction, KEW, RAG)
 
 **Niveau :** Confirmé
-**Cible :** application V005 embarquant le pack — 2.0.0 sur Spring Boot 4.0.6 (1.0.0-SNAPSHOT sur Boot 3.2.1 : contenu identique)
-**Versions vérifiées au code (2026-10-28) :** `socle-pack-editorial:2.0.0`, `feat/boot4` @ `8879bf7` (fonctionnellement identique à `1.0.0-SNAPSHOT`, `main` @ `fffd6f9`) —
+**Cible :** application V005 embarquant le pack — 2.1.0 sur Spring Boot 4.1.2 / socle 5.10 (2.0.0 sur Boot 4.0.6, 1.0.0-SNAPSHOT sur Boot 3.2.1 : contenu identique)
+**Versions vérifiées au code (2026-10-28) :** `socle-pack-editorial:2.1.0`, `main` @ `1fb6c6a`, tag `v2.1.0` (fonctionnellement identique à 2.0.0 — tag `v2.0.0` — et à `1.0.0-SNAPSHOT`, commit `fffd6f9`) —
 `CurationWorker.buildEnrichment` / `tryIngestToRag`, `WebWorkerBodyFetcher`, `BibliographicExtractor`,
 `KewClient`, `KewTextCleaner` ; migrations `V007`, `V008`, `V009`, `V999z`
 **Prérequis :** [[howto-editorial-03-curer-et-router-les-articles|EDITORIAL-03]] en place ;
@@ -182,7 +182,7 @@ public class ArticleKewEnricher {
 
 ## 5. Étape 3 — Préparer le RAG
 
-L'ingestion passe par `RagWorker.ingest_document` de pack-ai (contrat inchangé de 2.3.3 à 2.7.13 :
+L'ingestion passe par `RagWorker.ingest_document` de pack-ai (contrat inchangé de 2.3.3 à 2.8.0 :
 `source_type`, `title`, `content`, `source_ref`, `language` → `document_id`), qui exige un fournisseur
 d'embeddings configuré ([[howto-ai-01-integrer-le-pack|AI-01]]). Sans `RagWorker`, le journal de
 démarrage l'annonce : `[worker:curation_worker] initialized — RAG ingestion available: false`.

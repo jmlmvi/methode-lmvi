@@ -1,7 +1,7 @@
 # HOWTO AI-04 — Construire un RAG : ingérer un corpus et répondre avec citations
 
 **Niveau :** Avancé
-**Pack :** `eu.lmvi:socle-pack-ai:2.7.14` — branche `main`, code au commit `a357a95` — vérifié au code le 2026-10-28
+**Pack :** `eu.lmvi:socle-pack-ai:2.8.0` — tag `v2.8.0`, code au commit `f8d7dac` (socle-v005 5.10.0 / Spring Boot 4.1.2) — vérifié au code le 2026-10-28 ; aucune action ni comportement ne change depuis 2.7.14 (`a357a95`)
 **Composants :** `RagWorker` (`rag_worker`), `DocumentIngestionService`, `StrategyDetector` + 4 découpeurs, `HybridSearchService`, `RagAnswerService`, `CitationExtractor`, `RagSearchLogger`, `ReindexService` ; tables `tr_rag_document`, `tr_rag_chunk`, `tr_rag_search_log`
 **Prérequis :** [[howto-ai-01-integrer-le-pack|AI-01]], [[howto-ai-02-generer-du-texte-avec-des-prompts-versionnes|AI-02]] (rédaction), [[howto-ai-03-calculer-des-embeddings|AI-03]] (vecteurs)
 **Temps estimé :** 1 h

@@ -1,7 +1,7 @@
 # HOWTO tenant-08 — Remplacer une table locale par la fiche : lecture double (P4) puis bascule (P5)
 
 **Niveau :** Confirmé
-**Cible :** `socle-pack-tenant` ≥ 0.3.0 (normalisations pays et montant) — documenté sur 0.5.0
+**Cible :** `socle-pack-tenant` ≥ 0.3.0 (normalisations pays et montant) — documenté sur 0.6.0 · **`enabled=true` exige 0.6.0** (voir Pièges)
 **Vérifié au code :** 2026-10-28 (`ecarts/*`, `V001__ecarts_lecture_double.sql`, `docs/P4-LECTURE-DOUBLE.md`)
 **Prérequis :** [[howto-tenant-01-integrer-le-pack|tenant-01]] ; l'app **lit réellement** les fiches (tenant-02, et tenant-06 si multi-tenant) ; une base PostgreSQL et le schéma de l'app
 **Temps estimé :** 1 h de branchement + **7 jours** d'observation
@@ -246,6 +246,7 @@ JSON libre.
 | `schema: public` sur le Hub | migration en échec, démarrage arrêté | schéma de l'app |
 | Corriger l'écart dans l'app | il revient, ou P5 l'efface | corriger au Hub |
 | `en-memoire: true` | journal perdu au redéploiement | base PostgreSQL |
+| `enabled=true` avec un pack ≤ 0.5.0 | l'app refuse de démarrer : `MigrationEcarts` a deux constructeurs et aucun `@Autowired`, Spring cherche `MigrationEcarts.<init>()` | pack **0.6.0** (corrigé ; aucune app n'avait encore activé la lecture double) |
 | Injecter `LectureDoubleService` avec `enabled=false` | l'app ne démarre pas (bean absent) | `ObjectProvider<LectureDoubleService>` |
 | Passer P5 sur un « journal vide » sans observations | bascule non prouvée | les **deux** conditions de `critere_p4_satisfait` |
 | Tenant réel sans tenant ni fiche au Hub (cas `be-rhc-001` chez UniqP) | `hub_muet` pour lui, P5 perdrait ses données | créer le tenant et sa fiche au Hub avant P5 |

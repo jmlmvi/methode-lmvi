@@ -1,7 +1,7 @@
 # HOWTO tenant-06 — Servir plusieurs tenants depuis une même application
 
 **Niveau :** Confirmé
-**Cible :** `socle-pack-tenant` ≥ 0.4.0 (propriété `envoyer-tenant-actif`) — documenté sur 0.5.0
+**Cible :** `socle-pack-tenant` ≥ 0.4.0 (propriété `envoyer-tenant-actif`) — documenté sur 0.6.0
 **Hub :** ≥ 3.63.0 (`ApiAuthFilter` lit `X-Active-Tenant`, `iam.tr_user_tenant_access`)
 **Vérifié au code :** 2026-10-28 (`HubTenantClient.requete()`, `EnteteTenantActifTest`)
 **Prérequis :** [[howto-tenant-01-integrer-le-pack|tenant-01]] ; droits d'administration IAM sur le Hub

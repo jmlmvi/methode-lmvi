@@ -2,7 +2,7 @@
 
 **Niveau :** Confirmé
 **Cible :** Worker ou service d'une app qui a intégré `socle-pack-egress` ([[howto-egress-01-integrer-le-pack|EGRESS-01]])
-**Versions vérifiées au code (2026-10-28) :** `socle-pack-egress` **2.0.0** (commit `36be667`, Boot 4 / socle ≥ 5.8.4 ; comportement identique à la 1.0.0, dernière version Boot 3) · KEW **1.8.0** · RssArchiver (socle 5.7.4)
+**Versions vérifiées au code (2026-10-28) :** `socle-pack-egress` **3.0.0** (commit `aa521dc`, Boot 4.1.2 / socle ≥ 5.10.0 ; comportement identique à la 2.0.0 et à la 1.0.0) · KEW **1.8.0** · RssArchiver (socle 5.7.4)
 **Temps estimé :** 15 min
 
 ---

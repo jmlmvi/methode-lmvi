@@ -1,9 +1,9 @@
 # HOWTO AI-01 — Intégrer socle-pack-ai dans une application V005
 
 **Niveau :** Confirmé
-**Pack :** `eu.lmvi:socle-pack-ai:2.7.14` — branche `main`, code au commit `a357a95` — vérifié au code le 2026-10-28
-**Socle :** pack compilé contre `socle-v005` 5.8.8 / Spring Boot 4.0.6 ; l'app doit être en Boot 4.0.6
-**Prérequis :** app V005 en Boot 4 ; schéma PostgreSQL de l'app créé par le Hub ; extension `vector` présente dans la base ; une clé APIM si l'app appelle AgentIA ou `embed-std`
+**Pack :** `eu.lmvi:socle-pack-ai:2.8.0` — tag `v2.8.0`, code au commit `f8d7dac` — vérifié au code et par démarrage le 2026-10-28
+**Socle :** pack compilé contre `socle-v005` **5.10.0** / Spring Boot **4.1.2** ; l'app doit être en Boot 4.1.2 et socle ≥ 5.10.0 (app Boot 4.0.6 / socle 5.8-5.9 : rester sur **2.7.14**)
+**Prérequis :** app V005 en Boot 4.1 ; schéma PostgreSQL de l'app créé par le Hub ; extension `vector` présente dans la base ; une clé APIM si l'app appelle AgentIA ou `embed-std`
 **Temps estimé :** 45 min
 
 > Mode d'emploi générique des packs : [[howto-28-integrer-un-socle-pack-dans-une-app|HOWTO 28]] (daté : 2.3.5).
@@ -17,7 +17,7 @@
 `socle-pack-ai` est une bibliothèque : ses classes sont des `@Component` balayés par Spring dans
 l'app hôte. Dès qu'elles sont balayées :
 
-- `PackMigrationRunner` (`@PostConstruct`) applique les 27 scripts `classpath*:db/ai/V*.sql` dans
+- `PackMigrationRunner` (bean `aiPackMigrationRunner`, `@PostConstruct`) applique les 27 scripts `classpath*:db/ai/V*.sql` dans
   le schéma `socle.ai.schema`, en substituant `${ai_schema}` et `${embedding_dimension}` ;
 - les 10 workers sont démarrés par le MOP et leurs actions publiées en MCP sous
   `<worker>__<action>` (`rag_worker__search`, `generation_worker__generate`…).
@@ -34,10 +34,10 @@ Deux modes d'intégration coexistent dans la flotte :
 ## 2. Architecture
 
 ```
-┌────────────────────────── App V005 (Boot 4.0.6) ──────────────────────────┐
+┌────────────────────────── App V005 (Boot 4.1.2) ──────────────────────────┐
 │  @ComponentScan("eu.lmvi")  ── balaie eu.lmvi.socle.pack.ai.*             │
 │                                                                           │
-│  @PostConstruct PackMigrationRunner ──► <schema>.z_pack_migrations         │
+│  @PostConstruct aiPackMigrationRunner ──► <schema>.z_pack_migrations       │
 │        V000…V1111, V999 (tables tr_*, z_*, db_*, seeds de prompts)        │
 │                                                                           │
 │  MOP ──► generation_worker  embedding_worker  rag_worker  …  (10 workers) │
@@ -55,11 +55,19 @@ Deux modes d'intégration coexistent dans la flotte :
 
 ## 3. Étape 1 — Dépendance Maven
 
+Choisir la version selon le socle de l'app :
+
+| Version du pack | Socle V005 | Spring Boot |
+|---|---|---|
+| **2.8.0** | 5.10.0 et + | 4.1.2 |
+| 2.7.14 | 5.8.x – 5.9.x | 4.0.6 |
+| 2.4.8 | 5.7.x | 3.2.1 ([[howto-ai-09-lignee-2-4-x-pour-les-apps-boot-3\|AI-09]]) |
+
 ```xml
 <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.0.6</version>
+    <version>4.1.2</version>   <!-- = parent de socle-v005 5.10.0 -->
     <relativePath/>
 </parent>
 
@@ -73,12 +81,11 @@ Deux modes d'intégration coexistent dans la flotte :
     <dependency>
         <groupId>eu.lmvi</groupId>
         <artifactId>socle-pack-ai</artifactId>
-        <version>2.7.14</version>
+        <version>2.8.0</version>
         <exclusions>
-            <exclusion>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-logging</artifactId>
-            </exclusion>
+            <!-- 2.8.0 n'amène plus Logback (exclu de son starter-jdbc) : plus d'exclusion de
+                 spring-boot-starter-logging à poser ici. OkHttp 5, gRPC 1.85.1 et Disruptor
+                 4.0.0 sont en provided : c'est le socle 5.10.0 qui les apporte. -->
             <!-- Pilote Playwright : ~200 Mo dans l'image. À retirer seulement si l'app
                  n'appelle jamais browser_worker ni fetch_playwright (cf. AI-07). -->
             <exclusion>
@@ -96,17 +103,19 @@ Deux modes d'intégration coexistent dans la flotte :
 </dependencies>
 ```
 
-**Où trouver l'artefact.** Au 2026-10-28, le `~/.m2` de la box de build s'arrête à **2.7.13** :
-la 2.7.14 se construit depuis `main` puis se **vendorise** dans l'app, comme IdéeBox le fait pour
-la 2.7.5 :
+**Où trouver l'artefact.** Au 2026-10-28, la **2.8.0** est installée dans le `~/.m2` de la box de
+build (`mvn install` du tag `v2.8.0`) ; elle n'est pas publiée sur `maven.thesocle.net`. Une app la
+**vendorise**, comme IdéeBox le fait pour la 2.7.5 :
 
 ```bash
 cd /opt/2026-TheHub4TheSocle/socle-pack-ai
-git checkout main && mvn -q clean install -DskipTests
-mkdir -p <app>/mvn-repo/eu/lmvi/socle-pack-ai/2.7.14
-cp ~/.m2/repository/eu/lmvi/socle-pack-ai/2.7.14/socle-pack-ai-2.7.14.{jar,pom} \
-   <app>/mvn-repo/eu/lmvi/socle-pack-ai/2.7.14/
+git checkout v2.8.0 && mvn -q clean install -DskipTests
+mkdir -p <app>/mvn-repo/eu/lmvi/socle-pack-ai/2.8.0
+cp ~/.m2/repository/eu/lmvi/socle-pack-ai/2.8.0/socle-pack-ai-2.8.0.{jar,pom} \
+   <app>/mvn-repo/eu/lmvi/socle-pack-ai/2.8.0/
 ```
+
+La 2.7.14 (Boot 4.0.6) n'est pas dans ce `~/.m2` : la construire depuis le commit `a357a95`.
 
 ```xml
 <repositories>
@@ -364,7 +373,7 @@ Depuis le Hub : `mcp_proxy_worker.mcp_proxy_invoke` avec le nom complet
 
 | Piège | Symptôme | Correction |
 |---|---|---|
-| `@SpringBootApplication` nu dans `eu.lmvi` | « A bean with that name has already been defined » ; en 2.7.3, `noopSkillLoader … points back to the same bean definition` | Exclure `eu.lmvi.socle.SocleApplication` (§4) ; pack ≥ 2.7.4 |
+| `@SpringBootApplication` nu dans `eu.lmvi` (toujours vrai en socle 5.10.0) | « A bean with that name has already been defined » ; en 2.7.3, `noopSkillLoader … points back to the same bean definition` | Exclure `eu.lmvi.socle.SocleApplication` (§4) ; pack ≥ 2.7.4 |
 | `socle.ai.schema` laissé à `public` | Tables du pack créées dans le schéma partagé du Hub, ou `permission denied` | `SOCLE_AI_SCHEMA=schema_<app>` |
 | Dimension changée après la première migration | `checksum mismatch on V001… Skipping` en WARN ; les colonnes restent `vector(<ancienne>)` et toute insertion échoue | Choisir la dimension avant le premier démarrage ; sinon nouveau schéma, ou `ALTER` manuel + suppression des lignes du registre |
 | Une migration échoue | `IllegalStateException: Migration Vxxx failed` dans un `@PostConstruct` : l'app ne démarre pas | Lire l'erreur SQL ; corriger droits ou extension |
@@ -375,7 +384,13 @@ Depuis le Hub : `mcp_proxy_worker.mcp_proxy_invoke` avec le nom complet
 | Workers du pack « stopped » au tableau de bord (socle ≤ 5.9.4) | Le worker tourne ; ses `getStats()` ne portent pas `running`/`state` | Lire `get_status` et les journaux |
 | `MCP_API_KEY` vide en socle 5.9.x | `/mcp` rend 401, l'app refuse de démarrer | Poser la clé |
 | `set_env_var` suivi de `restart_app` | La clé n'arrive pas dans le conteneur | `update_app` |
-| Croire le `README.md` du pack | Commandes `/api/actions/...` en 404, 4 workers décrits sur 10 | Ce HOWTO et le code font foi |
+| Pack 2.8.0 dans une app Boot 4.0.6 / socle 5.8-5.9 | `NoClassDefFoundError: okhttp3/...` ou erreurs Boot 4.1 au démarrage : la 2.8.0 attend OkHttp 5 (`okhttp-jvm`) et Boot 4.1.2, fournis par le socle 5.10 | Monter l'app en socle 5.10.0 / Boot 4.1.2, ou rester sur 2.7.14 |
+| Pack 2.7.x avec socle 5.10.0 | Deux copies de `okhttp3.*` dans l'app : `okhttp` 4.12.0 (pack, compile) et `okhttp-jvm` 5.5.1 (socle) — coordonnées différentes, Maven ne dédoublonne pas ; la première copie trouvée gagne | Pack 2.8.0 (OkHttp 5 en `provided`) |
+| L'app déclare `com.squareup.okhttp3:okhttp` 5.x | « package okhttp3 does not exist » : en 5.x `okhttp` est un module multiplateforme que Maven ne résout pas en JVM | Déclarer `okhttp-jvm`, ou rien (le socle l'apporte) |
+| gRPC à cheval sur deux versions (socle 5.10.0) | Boot 4.1.2 gère `grpc-bom` en 1.84.1, le socle déclare 1.85.1 : dans l'app, `grpc-stub`/`grpc-protobuf` du socle sortent en 1.85.1 et `grpc-api`/`grpc-core` en 1.84.1 | Importer `io.grpc:grpc-bom:1.85.1` dans le `dependencyManagement` de l'app (le pack le fait pour son propre build) |
+| `@Qualifier("packMigrationRunner")`, `getBean("tenantResolver")`… visant un bean du pack | `NoSuchBeanDefinitionException` après passage en 2.8.0 | 2.8.0 nomme ses beans `ai*` (`aiPackMigrationRunner`, `aiTenantResolver`, `aiVaultCredentialResolver`, `aiResilienceFactory`, `aiConfigReloadService`, `aiPromptResolverService`, `aiDocsParserClient`, `aiOrphanSessionResolver`, `aiProperties`, `aiNoopSkillLoader`, `aiSkillLoader`) ; injecter par type |
+| Deux packs dans la même app avant 2.8.0 (pack-ai + pack-com, -mail, -editorial…) | `ConflictingBeanDefinitionException` sur `packMigrationRunner`, `tenantResolver`, `vaultCredentialResolver`… | 2.8.0 (et les packs montés en socle 5.10 avec la même convention de préfixe) |
+| Croire le `README.md` du pack d'avant 2.8.0 | Commandes `/api/actions/...` en 404, 4 workers décrits sur 10 | README réécrit en 2.8.0 ; ce HOWTO et le code font foi |
 | App en Spring Boot 3.2.1 | Échec au démarrage (classes Boot 4) | Lignée 2.4.x : [[howto-ai-09-lignee-2-4-x-pour-les-apps-boot-3\|AI-09]] |
 | `socle.ai.browser.ws-url` vide | Chromium local au premier usage du navigateur : +1 Go, ou `playwright_error` dans une image GraalVM | `ws://playwright:3001/` |
 

@@ -2,7 +2,7 @@
 
 **Niveau :** Confirmé
 **Cible :** app qui doit réagir à `checkout.session.completed`, `invoice.paid`, `customer.subscription.deleted`…
-**Versions vérifiées au code (2026-10-28) :** `socle-pack-connectors:3.0.0` (Boot 4.0.6 ; contrôleur inchangé depuis 2.0.0) — `StripeWebhookController`
+**Versions vérifiées au code (2026-10-28) :** `socle-pack-connectors:3.1.0` (Boot 4.1.2, socle 5.10.0 ; contrôleur inchangé depuis 2.0.0, bean renommé `connectorsStripeWebhookController`) — `StripeWebhookController`
 (`POST /api/webhooks/stripe`), `StripeWorker.create_webhook_endpoint`, `StripeWorker.resolveWebhookSecret()`
 **Temps estimé :** 40 min
 
