@@ -469,7 +469,7 @@ sans `ConflictingBeanDefinitionException`, et `<id>_worker__get_status` par `POS
 ## 8. Pour aller plus loin
 
 - `/opt/2026-TheHub4TheSocle/socle-pack-ZZ-TEMPLATE/README.md` — le modèle, la checklist avant la 1re version
-- [[00-index|services-pack]] — les huit packs et leurs howtos ; [`CATALOGUE-PACKS.md`](../CATALOGUE-PACKS.md)
+- [[00-index|services-pack]] — les packs et leurs howtos ; [`CATALOGUE-PACKS.md`](../CATALOGUE-PACKS.md)
 - [`TEMPLATE-M6-plan-technique.md`](../TEMPLATE-M6-plan-technique.md) §3 bis — déclarer `EXTENSION` / `PACK NEUF`
 - `docs/02-DocHub/institutional/100-socle-packs-integration.md` — les packs dans l'écosystème
 - [[howto-28-integrer-un-socle-pack-dans-une-app|HOWTO 28]] — côté app, l'intégration générique d'un pack

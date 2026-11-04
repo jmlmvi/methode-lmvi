@@ -31,6 +31,8 @@ touche cette fonctionnalité, le howto donne le contournement ; à corriger **da
 | `socle-pack-mail` 1.6.0 (socle 5.10-5.11, ai 2.9.0 ; 1.5.0 aussi ; 1.4.0 pour 5.9.x) | [`howto-mail-01`](services-pack/pack-mail/howto-mail-01-integrer-le-pack.md) | prêt (tag `v1.6.0`) |
 | `socle-pack-pipeline` 0.4.0 (socle 5.10-5.11, 0.3.0 aussi ; 0.2.0 / 0.1.0-SNAPSHOT) | [`howto-pipeline-01`](services-pack/pack-pipeline/howto-pipeline-01-integrer-le-pack.md) | prêt (tag `v0.4.0`) |
 | `socle-pack-tenant` 0.7.0 (socle 5.10-5.11, 0.6.0 aussi ; 0.5.0 pour 5.9.x) | [`howto-tenant-01`](services-pack/pack-tenant/howto-tenant-01-integrer-le-pack.md) | prêt (tag `v0.7.0`) |
+| `socle-pack-referentiels` 0.1.0 (socle 5.10-5.11, construit contre 5.11.2) | [`howto-referentiels-01`](services-pack/pack-referentiels/howto-referentiels-01-integrer-le-pack.md) | prêt (tag `v0.1.0`, jar dans `mvn-repo/`) |
+| `socle-pack-documents` 0.1.0 (socle 5.10-5.11, construit contre 5.11.2) — partie fichiers | [`howto-documents-01`](services-pack/pack-documents/howto-documents-01-integrer-le-pack.md) | prêt (tag `v0.1.0`, jar dans `mvn-repo/`) ; 🔴 dépôt refusé sur un Hub sans clé KMS sur son stockage (posée sur `.net` le 2026-11-04, absente de `.io`) |
 | **un pack qui n'existe pas encore**, ou une extension d'un pack | [`00-creer-ou-amender-un-pack`](services-pack/00-creer-ou-amender-un-pack.md) — modèle `socle-pack-ZZ-TEMPLATE` 1.1.0 (`bootstrap.sh`, parent `socle-v005-parent`) | service-pack first |
 
 ### IA et texte
@@ -116,6 +118,21 @@ touche cette fonctionnalité, le howto donne le contournement ; à corriger **da
 | servir plusieurs tenants depuis une même app | [`howto-tenant-06`](services-pack/pack-tenant/howto-tenant-06-servir-plusieurs-tenants.md) | prêt |
 | fraîcheur, cache, fonctionnement Hub indisponible | [`howto-tenant-07`](services-pack/pack-tenant/howto-tenant-07-fraicheur-cache-et-mode-degrade.md) | prêt |
 | remplacer une table locale par la fiche du Hub | [`howto-tenant-08`](services-pack/pack-tenant/howto-tenant-08-migrer-une-table-locale-p4-p5.md) | prêt |
+
+### Référentiels métiers (ESCO, ROME)
+
+| Ma brique a besoin de… | Howto | État |
+|---|---|---|
+| charger une version d'ESCO, du ROME ou de la correspondance ROME ↔ ESCO, licence et mention gardées | [`howto-referentiels-01`](services-pack/pack-referentiels/howto-referentiels-01-integrer-le-pack.md) | prêt (`v0.1.0`) ; gabarit du paquet CSV ESCO à confirmer sur un paquet officiel |
+| proposer métiers et compétences à la frappe, rattacher avec la version, relire après rechargement, compter sans identité | [`howto-referentiels-02`](services-pack/pack-referentiels/howto-referentiels-02-rechercher-et-rattacher.md) | prêt (`v0.1.0`) |
+
+### Fichiers reçus par l'app (antivirus, chiffrement, quotas)
+
+| Ma brique a besoin de… | Howto | État |
+|---|---|---|
+| garder un fichier déposé (CV, pièce, dépôt d'un tiers) sur le S3 du Hub, chiffré au repos, après analyse antivirus, avec plafond par fichier et quota par propriétaire | [`howto-documents-01`](services-pack/pack-documents/howto-documents-01-integrer-le-pack.md) | prêt (`v0.1.0`) ; exige la clé KMS du stockage du Hub |
+| déposer, lire, lister, voir l'occupation, supprimer un fichier ou tous ceux d'un propriétaire, depuis le code de l'app | [`howto-documents-02`](services-pack/pack-documents/howto-documents-02-deposer-lire-supprimer.md) | prêt (`v0.1.0`) |
+| produire un document (modèle Word, PDF par OnlyOffice, PDF de secours) | — | à venir dans le même pack (K-2 « documents », avant la phase P-2 de TheBeneficiaire) |
 
 ### Sortie réseau
 

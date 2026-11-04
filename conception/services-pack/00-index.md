@@ -28,7 +28,7 @@
 
 ---
 
-## Les huit packs
+## Les dix packs
 
 | Pack | Ce qu'il apporte à l'app | Socle 5.10-5.11 · Boot 4.1.2 | Socle 5.8.4-5.9.x · Boot 4.0.6 | Boot 3.2.1 (socle ≤ 5.8.0) | Apps qui le consomment |
 |---|---|---|---|---|---|
@@ -40,6 +40,8 @@
 | [`pack-mail`](pack-mail/README.md) | boîte de chaque utilisateur (IMAP, Gmail, Outlook), envoi, boîte applicative, lien d'activation (ai) | **1.6.0** (1.5.0) | 1.4.0 | — | aucune déclarée (TheIdeaBox s'y prépare) |
 | [`pack-pipeline`](pack-pipeline/README.md) | moteur de pipelines DAG : runs, étapes humaines, DLQ, catalogue, NATS | **0.4.0** (0.3.0) | 0.2.0 | 0.1.0-SNAPSHOT | RssArchiver, BilanSocle, NotionSocle, REGIES, TheDiffuseur |
 | [`pack-tenant`](pack-tenant/README.md) | fiche société, marque, équipe et multi-tenant lus depuis l'IAM du Hub | **0.7.0** (0.6.0) | 0.5.0 | — | Your360, TheSociety, UniqPersonnality |
+| [`pack-referentiels`](pack-referentiels/README.md) | référentiels métiers ESCO et ROME 4.0 + correspondance : chargement versionné FR/EN, licences gardées, recherche à la frappe | **0.1.0** | — | — | TheBeneficiaire (à venir, P-0) |
+| [`pack-documents`](pack-documents/README.md) | fichiers reçus par une app : S3 du Hub chiffré au repos, antivirus ClamAV avant garde, plafond et quota ; documents produits (Word, PDF) à venir | **0.1.0** | — | — | TheBeneficiaire (à venir, P-0) |
 
 Colonne « Socle 5.10-5.11 » : en gras, la version construite le 2026-10-28 contre le socle **5.11.0** sur le parent
 `eu.lmvi:socle-v005-parent` (minimum **5.10.0**, aucune API 5.11 utilisée) ; entre parenthèses, la version
@@ -93,6 +95,13 @@ Dépendances entre packs : `editorial` → `ai` + `com` ; `mail` → `ai`. Les a
 | [`CONNECTORS-09`](pack-connectors/howto-connectors-09-hubspot-crm.md) | HubSpot : contacts, entreprises et deals |
 | [`CONNECTORS-10`](pack-connectors/howto-connectors-10-resilience-et-journal-des-appels.md) | Résilience et journal des appels (`tr_connector_log`) |
 
+### pack-documents — les fichiers reçus par l'app
+
+| Howto | Fonctionnalité |
+|---|---|
+| [`DOCUMENTS-01`](pack-documents/howto-documents-01-integrer-le-pack.md) | Intégrer socle-pack-documents : stockage chiffré, antivirus, plafond et quota, prérequis du Hub (clé KMS) |
+| [`DOCUMENTS-02`](pack-documents/howto-documents-02-deposer-lire-supprimer.md) | Déposer, lire, lister, voir l'occupation et supprimer un fichier depuis le code de l'app |
+
 ### pack-editorial — la chaîne éditoriale
 
 | Howto | Fonctionnalité |
@@ -138,6 +147,13 @@ Dépendances entre packs : `editorial` → `ai` + `com` ; `mail` → `ai`. Les a
 | [`PIPELINE-07`](pack-pipeline/howto-pipeline-07-observer-lineage-et-metriques.md) | Observer un run : lineage, métriques, artefacts |
 | [`PIPELINE-08`](pack-pipeline/howto-pipeline-08-catalogue-fork-et-sous-pipelines.md) | Catalogue, fork et sous-pipelines (étape Composite) |
 | [`PIPELINE-09`](pack-pipeline/howto-pipeline-09-backend-nats-jetstream.md) | Faire transiter les étapes par NATS JetStream |
+
+### pack-referentiels — les référentiels métiers dans l'app
+
+| Howto | Fonctionnalité |
+|---|---|
+| [`REFERENTIELS-01`](pack-referentiels/howto-referentiels-01-integrer-le-pack.md) | Intégrer socle-pack-referentiels et charger une version officielle (ESCO, ROME, correspondance) |
+| [`REFERENTIELS-02`](pack-referentiels/howto-referentiels-02-rechercher-et-rattacher.md) | Chercher à la frappe, rattacher, relire après rechargement, écran d'administration |
 
 ### pack-tenant — le tenant vu par l'app
 
