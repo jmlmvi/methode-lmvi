@@ -1,7 +1,7 @@
 # HOWTO documents-01 — Intégrer socle-pack-documents dans une application
 
 **Niveau :** Intermédiaire
-**Cible :** `eu.lmvi:socle-pack-documents:0.1.0` (tag `v0.1.0`, vendorisé dans `mvn-repo/`) · socle-v005 5.11.2 (minimum 5.10.0) · Spring Boot 4.1.2
+**Cible :** `eu.lmvi:socle-pack-documents:0.2.0` (branche `feat/analyse-sans-garder-0.2.0`, non publiée au 2026-11-04 ; vendorisée dans `mvn-repo/`) · socle-v005 5.11.2 (minimum 5.10.0) · Spring Boot 4.1.2
 **Vérifié au code :** 2026-11-04
 **Prérequis :** une app V005 Boot 4.1.2 / socle ≥ 5.10.0 qui démarre ; un schéma PostgreSQL d'app posé par le Hub ; un Hub dont le MinIO a une clé KMS (voir § 4)
 **Temps estimé :** 30 min
@@ -92,7 +92,7 @@ Voie recommandée : le parent du socle. Il apporte Spring Boot 4.1.2, `${socle.v
     <dependency>
         <groupId>eu.lmvi</groupId>
         <artifactId>socle-pack-documents</artifactId>
-        <version>0.1.0</version>
+        <version>0.2.0</version>
     </dependency>
 </dependencies>
 ```
@@ -109,10 +109,10 @@ cd /opt/2026-TheHub4TheSocle/socle-pack-documents
 mvn -q clean install
 
 APP=/opt/2026-TheHub4TheSocle/APP-XX-MonApp/monapp
-DEST=$APP/mvn-repo/eu/lmvi/socle-pack-documents/0.1.0
+DEST=$APP/mvn-repo/eu/lmvi/socle-pack-documents/0.2.0
 mkdir -p "$DEST"
-cp target/socle-pack-documents-0.1.0.jar "$DEST/"
-cp pom.xml "$DEST/socle-pack-documents-0.1.0.pom"
+cp target/socle-pack-documents-0.2.0.jar "$DEST/"
+cp pom.xml "$DEST/socle-pack-documents-0.2.0.pom"
 ```
 
 Le `@SpringBootApplication` balaie `eu.lmvi.socle` : les beans du pack vivent sous
@@ -150,7 +150,7 @@ de l'app.
 
 ## 5. Étape 3 — Configuration `socle.documents.*`
 
-Toutes les propriétés, avec les **défauts du code** (`DocumentsProperties`, 0.1.0) :
+Toutes les propriétés, avec les **défauts du code** (`DocumentsProperties`, 0.2.0) :
 
 ```yaml
 socle.documents:
@@ -178,6 +178,9 @@ socle.documents:
     hub-api-key: ${SOCLE_DOCUMENTS_ANTIVIRUS_HUB_API_KEY:}            # clé IAM, X-Api-Key
     delai-connexion-ms: 5000
     delai-reponse-ms: 60000
+    limite-flux-octets: ${SOCLE_DOCUMENTS_ANTIVIRUS_LIMITE_FLUX_OCTETS:104857600}  # 100 Mio = StreamMaxLength du clamd du Hub (0.2.0)
+  analyse:
+    taille-max-octets: ${SOCLE_DOCUMENTS_ANALYSE_TAILLE_MAX_OCTETS:20971520}        # plafond par défaut d'AnalyseService (0.2.0)
   reprises:
     max: 2                        # nouvelles tentatives après la première (délai, connexion, 5xx)
     delai-initial-ms: 500
@@ -186,7 +189,9 @@ socle.documents:
     reouverture-disjoncteur-ms: 30000
 ```
 
-Les plafonds se règlent par app ; ils ne se règlent pas par propriétaire en 0.1.0.
+Les plafonds se règlent par app ; ils ne se règlent pas par propriétaire. `limite-flux-octets` suit
+le `StreamMaxLength` du clamd du Hub : la relever seule ne fait rien analyser de plus (voir
+[[howto-documents-02-deposer-lire-supprimer|documents-02]] § 6 bis).
 
 **Requête HTTP de l'app** : le plafond du pack s'applique aux octets reçus. L'app plafonne aussi la
 requête, sinon un envoi de 2 Go est lu en mémoire avant d'être refusé :
@@ -242,7 +247,7 @@ clamd), et à rejouer par la gate de P-0 contre le Hub de recette :
 | URL présignée rendue au navigateur | lien mort (`soclehub-minio:9000`), et la signature ne se réécrit pas | `lire()` rend les octets ; l'app les sert elle-même |
 | Seau absent | `STOCKAGE_IMPOSSIBLE`, motif `NoSuchBucket` | créer le seau sur le Hub ; `creer-seau: true` seulement en développement |
 | Schéma de l'app absent ou mal nommé | l'app ne démarre pas : `schéma « … » absent` | poser le schéma par le Hub, corriger `socle.documents.schema` |
-| Pack seulement dans `~/.m2` | compile sur le poste, échoue en CI / clone frais | vendoriser `mvn-repo/eu/lmvi/socle-pack-documents/0.1.0/` |
+| Pack seulement dans `~/.m2` | compile sur le poste, échoue en CI / clone frais | vendoriser `mvn-repo/eu/lmvi/socle-pack-documents/0.2.0/` |
 | `scanBasePackages` sans `eu.lmvi.socle` | aucun bean du pack | `{"eu.lmvi.socle", "eu.lmvi"}` |
 | Une `<configuration>` sur `maven-enforcer-plugin` dans le pom de l'app | les bornes du socle ne s'appliquent plus, sans message | ne jamais configurer ce plugin ; une **autre** `<execution>` au besoin |
 

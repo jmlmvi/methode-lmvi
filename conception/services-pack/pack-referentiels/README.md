@@ -1,7 +1,9 @@
 # socle-pack-referentiels — référentiels métiers ESCO et ROME
 
-> **Version documentée : 0.1.0** — dépôt `jmlmvi/socle-pack-referentiels` (tag `v0.1.0`, 2026-11-04), jar
-> vendorisé dans `mvn-repo/eu/lmvi/socle-pack-referentiels/0.1.0/`. Vérifié au code le **2026-11-04**. Coordonnées Maven : `eu.lmvi:socle-pack-referentiels:0.1.0` —
+> **Version documentée : 0.1.1** — dépôt `jmlmvi/socle-pack-referentiels`, branche locale
+> `feat/motifs-refus-bilingues-0.1.1` (non poussée, non taguée au 2026-11-04 ; 0.1.0 = tag `v0.1.0`), jar
+> vendorisé dans `mvn-repo/eu/lmvi/socle-pack-referentiels/0.1.1/`. Vérifié au code le **2026-11-04**. Coordonnées Maven : `eu.lmvi:socle-pack-referentiels:0.1.1` —
+> 0.1.1 : refus de chargement codés (`MotifRefus`, 31 codes stables), libellés FR et EN (`ChargementRefuse.message(Locale)`) —
 > Spring Boot 4.1.2, parent `eu.lmvi:socle-v005-parent` 5.11.2, compilé contre `socle-v005` 5.11.2 en
 > `provided` (minimum 5.10.0). Prérequis K-1 d'APP-36-TheBeneficiaire.
 
@@ -63,7 +65,7 @@ Aucune dépendance en `compile` : CSV, ZIP et normalisation sont écrits en Java
 
 | App | Pack | Socle | Usage |
 |---|---|---|---|
-| APP-36-TheBeneficiaire (à venir, P-0) | 0.1.0 | 5.11.x | `ReferencementService` (B3, B5, B6, B10), `AdminReferentiels` (G1) |
+| APP-36-TheBeneficiaire (P-0) | 0.1.1 | 5.11.x | `ReferencementService` (B3, B5, B6, B10), `AdminReferentiels` (G1) |
 
 ## Écarts relevés entre la documentation du pack et son code
 

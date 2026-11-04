@@ -1,7 +1,7 @@
-# HOWTO documents-02 — Déposer, lire, lister et supprimer un fichier depuis le code de l'app
+# HOWTO documents-02 — Déposer, lire, lister, supprimer un fichier, ou l'analyser sans le garder
 
 **Niveau :** Intermédiaire
-**Cible :** `eu.lmvi:socle-pack-documents:0.1.0` (tag `v0.1.0`, vendorisé dans `mvn-repo/`) · socle-v005 5.11.2 (minimum 5.10.0) · Spring Boot 4.1.2
+**Cible :** `eu.lmvi:socle-pack-documents:0.2.0` (branche `feat/analyse-sans-garder-0.2.0`, non publiée au 2026-11-04 ; vendorisée dans `mvn-repo/`) · socle-v005 5.11.2 (minimum 5.10.0) · Spring Boot 4.1.2
 **Vérifié au code :** 2026-11-04
 **Prérequis :** le pack intégré et configuré ([[howto-documents-01-integrer-le-pack|documents-01]])
 **Temps estimé :** 30 min
@@ -157,6 +157,61 @@ reste et `FichiersIndisponibles` est levée : rien n'est déclaré supprimé qui
 
 ---
 
+## 6 bis. Étape 5 — Analyser sans garder (0.2.0)
+
+Pour un fichier que l'app **ne confie pas** au stockage du Hub : un paquet officiel (ESCO, ROME,
+correspondance) téléversé par l'administrateur, chargé puis effacé ; une pièce relayée sans être
+conservée. L'app n'appelle **jamais** `AntivirusGateway` (paquet `passerelle`, interne) : elle passe
+par `AnalyseService` (bean `documentsPackAnalyse`).
+
+```java
+@Component
+class Televersements {
+    private final AnalyseService analyse;
+
+    void verifier(Path fichierTemporaire, long plafondOctets) {
+        ResultatAnalyse r = analyse.analyser(fichierTemporaire, plafondOctets);   // lu en flux
+        if (!r.sain()) {
+            effacer(fichierTemporaire);
+            throw new Refus(r.codeHttp(), r.statut().code(), r.details().toString());
+        }
+    }
+}
+```
+
+| Méthode | Notes |
+|---|---|
+| `analyser(byte[])`, `analyser(byte[], plafond)` | octets en mémoire |
+| `analyser(Path)`, `analyser(Path, plafond)` | envoyé à clamd par morceaux de 64 Kio, jamais chargé en mémoire (transport `clamd`) ; un fichier qui grandit pendant l'analyse n'est pas déclaré sain |
+| `plafondEffectif(plafond)` | `min(plafond, socle.documents.antivirus.limite-flux-octets)` |
+
+Sans plafond donné, c'est `socle.documents.analyse.taille-max-octets` (20 Mo). Le pack n'écrit
+**rien** : ni ligne, ni objet S3, ni copie. Le fichier de l'appelant reste où il est ; l'effacer est
+à l'app.
+
+| `StatutAnalyse` | HTTP | Quand | Que dire à la personne |
+|---|---|---|---|
+| `SAIN` | 200 | analysé entier, rien trouvé | — |
+| `REFUSE_INVALIDE` | 400 | vide ou absent | choisir un fichier non vide |
+| `REFUSE_TROP_GROS` | 400 | > plafond de l'appel ou de la configuration, sans appel | réduire ou découper |
+| `REFUSE_TROP_GROS_POUR_ANTIVIRUS` | 400 | > limite de flux de clamd (100 Mio), sans appel, **même si l'appel demande plus** | découper, ou faire relever la limite du clamd du Hub |
+| `REFUSE_INFECTE` | 400 | menace (`menace()`) | analyser sur son poste, renvoyer une copie saine |
+| `ANALYSE_IMPOSSIBLE` | 503 | clamd injoignable, muet, sans verdict, ou qui refuse le flux | réessayer plus tard |
+| `INDISPONIBLE` | 503 | pack désactivé, antivirus non configuré | prévenir l'administrateur |
+
+Les textes du résultat (`message`, `conseil`) sont en français. Une app bilingue traduit à partir de
+`statut().code()` et de `details()` (`taille_max_octets`, `limite_antivirus_octets`, `menace`, `motif`).
+
+**Au-delà de la limite de clamd.** clamd n'analyse pas un flux INSTREAM plus long que son
+`StreamMaxLength` : **100 Mio** dans `clamav/clamav:stable` 1.5.x, l'image du Hub (`.net` en 1.5.2,
+`clamd.conf` sans surcharge ; mesuré le 2026-11-04, le `25M` du fichier d'exemple est périmé).
+Jusque-là, tout est analysé (un EICAR au bout d'une archive de 99 Mio est trouvé) ; au-delà, clamd
+répond `INSTREAM size limit exceeded. ERROR`, parfois en coupant l'envoi. Le pack refuse donc d'avance
+(`REFUSE_TROP_GROS_POUR_ANTIVIRUS`). Si `limite-flux-octets` est relevée sans que clamd le soit, la
+réponse de clamd est lue et rend `ANALYSE_IMPOSSIBLE`, sans reprise — jamais « sain ».
+
+---
+
 ## 7. Vérifier
 
 Dans les journaux de l'app, un dépôt écrit une ligne sans contenu ni nom de fichier :
@@ -167,6 +222,7 @@ Dans les journaux de l'app, un dépôt écrit une ligne sans contenu ni nom de f
 
 Une menace : `[documents][step:antivirus] menace « … » dans un dépôt de <dossier> : refusé`.
 Un antivirus en panne : `[gateway:documents_antivirus][step:analyse] analyse impossible : …`.
+Une analyse sans garde : `[documents][step:analyse] statut=sain taille=4556970`.
 
 ---
 
@@ -180,6 +236,9 @@ Un antivirus en panne : `[gateway:documents_antivirus][step:analyse] analyse imp
 | 4 | dossier à 199 Mo, dépôt de 2 Mo | 400 `refuse_quota` |
 | 5 | lecture du fichier d'un dossier par un autre dossier | 404 |
 | 6 | antivirus coupé | 503 `analyse_impossible`, rien de gardé |
+| 7 | `analyse.analyser(eicar.zip)` | `REFUSE_INFECTE`, rien en base ni sur le stockage |
+| 8 | `analyse.analyser(f, plafond)` avec `f` > plafond | `REFUSE_TROP_GROS`, aucun appel à clamd |
+| 9 | `analyse.analyser(f, 200 Mo)` avec `f` de 101 Mio | `REFUSE_TROP_GROS_POUR_ANTIVIRUS`, aucun appel à clamd |
 
 ---
 
@@ -192,6 +251,9 @@ Un antivirus en panne : `[gateway:documents_antivirus][step:analyse] analyse imp
 | `ANALYSE_IMPOSSIBLE` affiché comme « fichier infecté » | la personne croit son fichier dangereux | deux messages distincts : 400 menace, 503 réessayer plus tard |
 | Référence rangée avant `GARDE` | une ligne de l'app pointe vers un objet qui n'existe pas | ranger `id`/`bucket`/`cle` seulement si `r.garde()` |
 | Nom de fichier dans la clé S3 | donnée personnelle dans un identifiant technique | le pack ne l'y met pas ; ne pas construire de clé soi-même |
+| App qui importe `AntivirusGateway` pour « juste analyser » | passerelle interne, contrat non garanti d'une version à l'autre ; contourne le plafond et la limite de clamd | `AnalyseService.analyser(...)` (0.2.0) |
+| Plafond de l'app supposé appliqué tel quel | un paquet de 150 Mo autorisé par l'app est refusé | le plafond effectif est `min(plafond, 100 Mio)` : `plafondEffectif()` le dit, l'écran l'affiche |
+| `Files.readAllBytes` avant l'analyse | 200 Mo en mémoire par téléversement | `analyser(Path, plafond)` lit en flux |
 | `lire` attrapé comme « absent » | un stockage en panne devient « fichier introuvable » | `Optional.empty()` = absent pour ce propriétaire ; `FichiersIndisponibles` = 503 |
 
 ---

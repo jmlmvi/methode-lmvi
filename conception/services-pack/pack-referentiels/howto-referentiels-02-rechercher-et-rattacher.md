@@ -1,7 +1,7 @@
 # HOWTO referentiels-02 — Chercher à la frappe, rattacher, relire après rechargement
 
 **Niveau :** Intermédiaire
-**Cible :** `eu.lmvi:socle-pack-referentiels:0.1.0` · socle-v005 5.11.2 (minimum 5.10.0) · Spring Boot 4.1.2
+**Cible :** `eu.lmvi:socle-pack-referentiels:0.1.1` (recherche et rattachement inchangés depuis 0.1.0) · socle-v005 5.11.2 (minimum 5.10.0) · Spring Boot 4.1.2
 **Vérifié au code :** 2026-11-04
 **Prérequis :** [[howto-referentiels-01-integrer-le-pack|referentiels-01]] ; au moins une version ESCO et une version ROME chargées
 **Temps estimé :** 30 min

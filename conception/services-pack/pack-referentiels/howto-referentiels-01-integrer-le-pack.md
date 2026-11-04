@@ -1,7 +1,7 @@
 # HOWTO referentiels-01 — Intégrer socle-pack-referentiels et charger une version officielle
 
 **Niveau :** Intermédiaire
-**Cible :** `eu.lmvi:socle-pack-referentiels:0.1.0` (tag `v0.1.0`, vendorisé dans `mvn-repo/`) · socle-v005 5.11.2 (minimum 5.10.0) · Spring Boot 4.1.2
+**Cible :** `eu.lmvi:socle-pack-referentiels:0.1.1` (branche `feat/motifs-refus-bilingues-0.1.1`, non publiée au 2026-11-04 ; vendorisée dans `mvn-repo/`) · socle-v005 5.11.2 (minimum 5.10.0) · Spring Boot 4.1.2
 **Vérifié au code :** 2026-11-04
 **Prérequis :** une app V005 Boot 4.1.2 / socle ≥ 5.10.0 qui démarre ; un schéma PostgreSQL d'app posé par le Hub
 **Temps estimé :** 30 min (plus le téléchargement des fichiers officiels)
@@ -83,7 +83,7 @@ Cas réel : APP-36-TheBeneficiaire, prérequis K-1 (M4 Q1 : dernières versions,
     <dependency>
         <groupId>eu.lmvi</groupId>
         <artifactId>socle-pack-referentiels</artifactId>
-        <version>0.1.0</version>
+        <version>0.1.1</version>
     </dependency>
 </dependencies>
 ```
@@ -93,10 +93,10 @@ Le pack n'est servi par aucun dépôt distant : le construire, puis le vendorise
 ```bash
 cd /opt/2026-TheHub4TheSocle/socle-pack-referentiels
 mvn -q clean install
-DEST=<app>/mvn-repo/eu/lmvi/socle-pack-referentiels/0.1.0
+DEST=<app>/mvn-repo/eu/lmvi/socle-pack-referentiels/0.1.1
 mkdir -p "$DEST"
-cp target/socle-pack-referentiels-0.1.0.jar "$DEST/"
-cp pom.xml "$DEST/socle-pack-referentiels-0.1.0.pom"
+cp target/socle-pack-referentiels-0.1.1.jar "$DEST/"
+cp pom.xml "$DEST/socle-pack-referentiels-0.1.1.pom"
 ```
 
 Le `@SpringBootApplication` balaie `eu.lmvi.socle` : `scanBasePackages = {"eu.lmvi.socle", "eu.lmvi"}`.
@@ -105,7 +105,7 @@ Le `@SpringBootApplication` balaie `eu.lmvi.socle` : `scanBasePackages = {"eu.lm
 
 ## 4. Étape 2 — Configuration `socle.referentiels.*`
 
-Défauts du code (`ReferentielsProperties`, 0.1.0) :
+Défauts du code (`ReferentielsProperties`, 0.1.1, inchangés depuis 0.1.0) :
 
 ```yaml
 socle.referentiels:
@@ -179,6 +179,22 @@ Ce que fait chaque chargement, dans une seule transaction : licence vérifiée, 
 version neuve créée et mise en service, ancienne version passée à `remplacee` (lisible, jamais
 modifiée), comptes enregistrés. Une `ChargementRefuse` dit quoi corriger ; rien n'a été écrit.
 
+**Afficher le refus dans la langue de l'interface (0.1.1).** `ChargementRefuse` porte un code stable
+(`e.code()`, ex. `licence_non_reconnue`, `rome_version_txt_absent`), ses paramètres
+(`e.parametres()`) et ses deux libellés (`e.message(Locale.FRENCH)`, `e.message(Locale.ENGLISH)`).
+Le plus simple pour une app bilingue : rendre les deux et laisser l'écran choisir.
+
+```java
+} catch (ChargementRefuse e) {
+    // corps : {code: "chargement_refuse", motif: e.code(), message_fr, message_en}
+    throw new RefusAdmin(400, "chargement_refuse", e.code(), e.message(Locale.FRENCH), e.message(Locale.ENGLISH));
+}
+```
+
+L'écran affiche `message_<langue>` et peut tester `motif` (ex. surligner le champ licence sur
+`licence_non_reconnue`). `getMessage()` reste le texte français de 0.1.0. Les 31 codes sont dans
+`MotifRefus` ; un code ne change jamais.
+
 **Le chargement ne passe pas par MCP** (décision du commanditaire du 2026-11-04) : aucune action du
 worker n'écrit. La porte MCP s'ouvre par une clé de plateforme ; charger relève de l'administrateur,
 sous SSO et second facteur. L'écran d'administration de l'app est donc le seul chemin.
@@ -199,7 +215,7 @@ sous SSO et second facteur. L'écran d'administration de l'app est donc le seul 
 | # | Test | Attendu |
 |---|---|---|
 | 1 | démarrage de l'app | `[worker:referentiels_worker] schéma … à jour`, aucune `ConflictingBeanDefinitionException` |
-| 2 | chargement avec `licence` faux | `ChargementRefuse` nommant la bonne licence ; aucune ligne écrite |
+| 2 | chargement avec `licence` faux | `ChargementRefuse` `licence_non_reconnue` nommant la bonne licence, en FR et en EN ; aucune ligne écrite |
 | 3 | même `RefRomeCsv.zip` chargé deux fois | `deja_chargee: true`, une seule version |
 | 4 | nouvelle sortie | deux versions, la neuve `en_service`, l'ancienne `remplacee`, ses lignes inchangées |
 | 5 | `statistiques` | licence et mention de chaque version en service, aucune valeur nulle |
@@ -211,6 +227,8 @@ sous SSO et second facteur. L'écran d'administration de l'app est donc le seul 
 | Piège | Symptôme | Correction |
 |---|---|---|
 | Un seul paquet ESCO (une langue) | `occupations_en.csv absent` | ajouter le paquet de chaque langue de `socle.referentiels.langues` |
+| Refus affiché par `getMessage()` dans une interface anglaise | texte français à l'écran (RG-23) | `e.message(Locale)` ou `message_fr`/`message_en` (0.1.1) ; ne pas traduire côté app à partir du texte |
+| App qui teste le texte du refus | casse au premier libellé amélioré | tester `e.code()`, stable |
 | Gabarit du paquet CSV ESCO non confirmé | colonne « … » absente au premier chargement réel | le lecteur lit les colonnes **par nom** (`conceptUri`, `preferredLabel`, `altLabels`, `hiddenLabels`, `status`, `code`, `iscoGroup`, `description`, `skillType`, `reuseLevel` ; relations `occupationUri`, `relationType`, `skillType`, `skillUri`). Les tests du pack 0.1.0 tournent sur un extrait **reconstitué depuis l'API ESCO** (le paquet officiel exige le formulaire) : au premier paquet réel, rejouer `LecteursOfficielsTest` dessus |
 | `RefRomeCsv.zip` décompressé puis rezippé sans `version.txt` | `version.txt absent` | déposer l'archive telle que France Travail la publie |
 | Correspondance ouverte et réenregistrée dans un tableur | encodage ou séparateur changé, empreinte différente | redéposer le fichier téléchargé ; le lecteur accepte UTF-8 ou Windows-1252, `,` ou `;` |

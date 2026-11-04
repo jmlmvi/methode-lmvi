@@ -31,8 +31,8 @@ touche cette fonctionnalité, le howto donne le contournement ; à corriger **da
 | `socle-pack-mail` 1.6.0 (socle 5.10-5.11, ai 2.9.0 ; 1.5.0 aussi ; 1.4.0 pour 5.9.x) | [`howto-mail-01`](services-pack/pack-mail/howto-mail-01-integrer-le-pack.md) | prêt (tag `v1.6.0`) |
 | `socle-pack-pipeline` 0.4.0 (socle 5.10-5.11, 0.3.0 aussi ; 0.2.0 / 0.1.0-SNAPSHOT) | [`howto-pipeline-01`](services-pack/pack-pipeline/howto-pipeline-01-integrer-le-pack.md) | prêt (tag `v0.4.0`) |
 | `socle-pack-tenant` 0.7.0 (socle 5.10-5.11, 0.6.0 aussi ; 0.5.0 pour 5.9.x) | [`howto-tenant-01`](services-pack/pack-tenant/howto-tenant-01-integrer-le-pack.md) | prêt (tag `v0.7.0`) |
-| `socle-pack-referentiels` 0.1.0 (socle 5.10-5.11, construit contre 5.11.2) | [`howto-referentiels-01`](services-pack/pack-referentiels/howto-referentiels-01-integrer-le-pack.md) | prêt (tag `v0.1.0`, jar dans `mvn-repo/`) |
-| `socle-pack-documents` 0.1.0 (socle 5.10-5.11, construit contre 5.11.2) — partie fichiers | [`howto-documents-01`](services-pack/pack-documents/howto-documents-01-integrer-le-pack.md) | prêt (tag `v0.1.0`, jar dans `mvn-repo/`) ; 🔴 dépôt refusé sur un Hub sans clé KMS sur son stockage (posée sur `.net` le 2026-11-04, absente de `.io`) |
+| `socle-pack-referentiels` 0.1.1 (socle 5.10-5.11, construit contre 5.11.2 ; 0.1.0 aussi) | [`howto-referentiels-01`](services-pack/pack-referentiels/howto-referentiels-01-integrer-le-pack.md) | prêt (tag `v0.1.1`, jar dans `mvn-repo/`) |
+| `socle-pack-documents` 0.2.0 (socle 5.10-5.11, construit contre 5.11.2 ; 0.1.0 aussi) — partie fichiers | [`howto-documents-01`](services-pack/pack-documents/howto-documents-01-integrer-le-pack.md) | prêt (tag `v0.2.0`, jar dans `mvn-repo/`) ; 🔴 dépôt refusé sur un Hub sans clé KMS sur son stockage (posée sur `.net` le 2026-11-04, absente de `.io`) |
 | **un pack qui n'existe pas encore**, ou une extension d'un pack | [`00-creer-ou-amender-un-pack`](services-pack/00-creer-ou-amender-un-pack.md) — modèle `socle-pack-ZZ-TEMPLATE` 1.1.0 (`bootstrap.sh`, parent `socle-v005-parent`) | service-pack first |
 
 ### IA et texte

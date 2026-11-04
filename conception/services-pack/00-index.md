@@ -40,8 +40,8 @@
 | [`pack-mail`](pack-mail/README.md) | boîte de chaque utilisateur (IMAP, Gmail, Outlook), envoi, boîte applicative, lien d'activation (ai) | **1.6.0** (1.5.0) | 1.4.0 | — | aucune déclarée (TheIdeaBox s'y prépare) |
 | [`pack-pipeline`](pack-pipeline/README.md) | moteur de pipelines DAG : runs, étapes humaines, DLQ, catalogue, NATS | **0.4.0** (0.3.0) | 0.2.0 | 0.1.0-SNAPSHOT | RssArchiver, BilanSocle, NotionSocle, REGIES, TheDiffuseur |
 | [`pack-tenant`](pack-tenant/README.md) | fiche société, marque, équipe et multi-tenant lus depuis l'IAM du Hub | **0.7.0** (0.6.0) | 0.5.0 | — | Your360, TheSociety, UniqPersonnality |
-| [`pack-referentiels`](pack-referentiels/README.md) | référentiels métiers ESCO et ROME 4.0 + correspondance : chargement versionné FR/EN, licences gardées, recherche à la frappe | **0.1.0** | — | — | TheBeneficiaire (à venir, P-0) |
-| [`pack-documents`](pack-documents/README.md) | fichiers reçus par une app : S3 du Hub chiffré au repos, antivirus ClamAV avant garde, plafond et quota ; documents produits (Word, PDF) à venir | **0.1.0** | — | — | TheBeneficiaire (à venir, P-0) |
+| [`pack-referentiels`](pack-referentiels/README.md) | référentiels métiers ESCO et ROME 4.0 + correspondance : chargement versionné FR/EN, licences gardées, recherche à la frappe | **0.1.1** (0.1.0) | — | — | TheBeneficiaire (à venir, P-0) |
+| [`pack-documents`](pack-documents/README.md) | fichiers reçus par une app : S3 du Hub chiffré au repos, antivirus ClamAV avant garde, plafond et quota ; documents produits (Word, PDF) à venir | **0.2.0** (0.1.0) | — | — | TheBeneficiaire (à venir, P-0) |
 
 Colonne « Socle 5.10-5.11 » : en gras, la version construite le 2026-10-28 contre le socle **5.11.0** sur le parent
 `eu.lmvi:socle-v005-parent` (minimum **5.10.0**, aucune API 5.11 utilisée) ; entre parenthèses, la version
