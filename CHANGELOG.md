@@ -4,6 +4,12 @@
 > (procédure : README racine, « Resync d'une instance »). Ce fichier est auto-versionné par ses
 > entrées (pas de marqueur `KIT-VERSION`, cf. charte U-DOCS §3).
 
+## 1.16.2 — 2026-11-06
+
+**socle-pack-referentiels 0.2.0** (APP-36-TheBeneficiaire, P-1, B5) : `competencesDuMetier(metierUri,
+langue)` rend les compétences qu'ESCO rattache à un métier, essentielles puis optionnelles. README et
+howto-referentiels-02 (§ 4 bis) à jour.
+
 ## 1.16.1 — 2026-11-06
 
 **socle-pack-ai 2.9.1 (bipforge #248)** et **packs servis aux clients**.

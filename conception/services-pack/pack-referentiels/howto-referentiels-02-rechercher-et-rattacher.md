@@ -1,7 +1,7 @@
 # HOWTO referentiels-02 — Chercher à la frappe, rattacher, relire après rechargement
 
 **Niveau :** Intermédiaire
-**Cible :** `eu.lmvi:socle-pack-referentiels:0.1.1` (recherche et rattachement inchangés depuis 0.1.0) · socle-v005 5.11.2 (minimum 5.10.0) · Spring Boot 4.1.2
+**Cible :** `eu.lmvi:socle-pack-referentiels:0.2.0` (recherche et rattachement inchangés depuis 0.1.0 ; compétences d'un métier depuis 0.2.0) · socle-v005 5.11.2 (minimum 5.10.0) · Spring Boot 4.1.2
 **Vérifié au code :** 2026-11-04
 **Prérequis :** [[howto-referentiels-01-integrer-le-pack|referentiels-01]] ; au moins une version ESCO et une version ROME chargées
 **Temps estimé :** 30 min
@@ -92,6 +92,25 @@ RattachementRef ref = p.reference();          // (type, code, versionId)
 
 Une expérience sans rattachement reste dans le dossier, marquée « non référencée » (RG-05) : c'est
 l'app qui le fait, le pack n'en sait rien.
+
+---
+
+## 4 bis. Proposer les compétences d'un métier choisi (0.2.0, B5)
+
+```java
+// La personne a choisi le métier ESCO m (après clic, RG-04).
+List<CompetenceDuMetier> l = referentiels.competencesDuMetier(m.code(), langue);
+// Essentielles d'abord (c.essentielle() == true), puis optionnelles, chaque groupe par libellé,
+// dans la version d'ESCO en service. Rien n'est gardé : seules les compétences cochées deviennent
+// des rattachements, par c.reference() (type esco_competence, code, versionId).
+```
+
+- Le paramètre est un **URI de métier ESCO**. Pour une appellation ROME choisie, passer d'abord par
+  `correspondancesEsco(codeOgr)` pour obtenir les métiers ESCO correspondants.
+- Métier inconnu de la version en service, ou aucune version d'ESCO en service : liste vide.
+- Mesuré sur l'extrait officiel ESCO 1.2.1 : « comptable » rend 26 essentielles puis 31 optionnelles
+  (`CompetencesDuMetierTest`). Avant 0.2.0, aucune méthode ne lisait `db_esco_relation` : ne pas
+  lire cette table depuis l'app.
 
 ---
 
