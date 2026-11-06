@@ -44,7 +44,7 @@ App ──generateOne(partition, "analyse_idee", ctx, options)──► Generati
      oui → essaie chaque étape, réponse vide ou exception → étape suivante
      non → provider unique : options.provider > PromptDef.provider > socle.ai.llm.provider
                                                                 │
-   ResilienceFactory.execute(provider) : retry 3× (500 ms→10 s) dans un disjoncteur 5 échecs/30 s
+   ResilienceFactory.execute(provider) : retry 3× (500 ms→10 s, pas sur une 4xx) dans un disjoncteur 5 échecs/30 s
                                                                 ▼
    AgentIaLlmProvider ── POST {agentia-base-url}/chat/completions  (X-App-Id, Bearer apim_…)
                                                                 ▼
@@ -321,7 +321,7 @@ psql "$DATABASE_URL" -c "SELECT provider, model, tokens_input, tokens_output, co
 | 2 | `generate` | `text` non vide, `finish_reason` = `stop` |
 | 3 | Insérer 1.1.0 active sans désactiver 1.0.0, recharger | WARN `deux prompts actifs … x_id gardé` ; 1.0.0 sert toujours |
 | 4 | Plafond `CUTOFF` `GLOBAL_DAY` à 0,01 USD activé | `generate` rend `Hard cap reached: GLOBAL_DAY …` |
-| 5 | Clé AgentIA invalide | 3 tentatives journalisées `[retry:agentia] attempt n/3` puis échec |
+| 5 | Clé AgentIA invalide | **une seule** tentative (401 non rejouée depuis 2.9.1) : `[retry:agentia] non rejouable : ProviderHttpException … 401` |
 
 ---
 

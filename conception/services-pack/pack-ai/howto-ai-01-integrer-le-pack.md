@@ -335,7 +335,8 @@ public class PackAiConfig {
         return new ModelPricingService(ds, props, reload);
     }
 
-    /** Retry 3 tentatives (500 ms → 10 s) + disjoncteur 5 échecs / 30 s, ouvert 60 s. */
+    /** Retry 3 tentatives (500 ms → 10 s ; 4xx hors 408/429 jamais rejouées depuis 2.9.1)
+     *  + disjoncteur 5 échecs / 30 s, ouvert 60 s. */
     @Bean
     public ResilienceFactory packAiResilienceFactory() {
         return new ResilienceFactory();

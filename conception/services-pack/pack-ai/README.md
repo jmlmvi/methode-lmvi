@@ -1,21 +1,19 @@
 # socle-pack-ai — HOWTOs par fonctionnalité
 
-> **Version documentée :** `eu.lmvi:socle-pack-ai:2.9.0` — tag `v2.9.0` du dépôt
-> `/opt/2026-TheHub4TheSocle/socle-pack-ai`, branche `main`, commit `8c771e8` (2026-10-28,
-> « 2.9.0 — parent socle-v005-parent 5.11.0 ») ; **code identique à 2.8.0** (commit de code `f8d7dac`) :
-> seul le build change. Installée dans le `~/.m2` de la box de build, non publiée sur
-> `maven.thesocle.net`.
+> **Version documentée :** `eu.lmvi:socle-pack-ai:2.9.1` — tag `v2.9.1` du dépôt
+> `/opt/2026-TheHub4TheSocle/socle-pack-ai`, branche `main`, commit `61d0e98` (2026-11-06,
+> « 2.9.1 — 4xx non rejouées, CircuitOpenException porte la cause », bipforge #248).
+> Publiée sur GitHub Packages et **servie par `maven.thesocle.net`** (miroir automatique, dernière version seule).
 > **Socle :** construit contre `socle-v005` **5.11.0** (parent `eu.lmvi:socle-v005-parent` 5.11.0, fils de
 > Spring Boot **4.1.2**) ; socle **minimum 5.10.0** (`minSocleVersion`, aucune API 5.11 employée).
-> **Vérifié au code et par démarrage le 2026-10-28** (`PackContexteSocleTest` : contexte Boot 4.1,
-> 10 workers, 51 actions au registre du socle, 27 migrations ; 336 tests passés, 0 sauté ; règle
-> enforcer `socle-versions-testees` passée).
+> **Vérifié le 2026-11-06** : 342 tests passés, 0 sauté.
 
 ## Compatibilité
 
 | Version du pack | Socle V005 | Spring Boot | Statut |
 |---|---|---|---|
-| **2.9.0** | **5.10.0 et +** (construit contre 5.11.0) | **4.1.2** | courante — parent `eu.lmvi:socle-v005-parent` 5.11.0 (BOM et enforcer du socle hérités) ; code identique à 2.8.0 |
+| **2.9.1** | **5.10.0 et +** (construit contre 5.11.0) | **4.1.2** | courante — les 4xx des fournisseurs ne sont plus rejouées, `CircuitOpenException` porte la cause (#248) |
+| 2.9.0 | 5.10.0 et + | 4.1.2 | parent `eu.lmvi:socle-v005-parent` 5.11.0 (BOM et enforcer du socle hérités) ; code identique à 2.8.0 |
 | 2.8.0 | 5.10.0 et + | 4.1.2 | OkHttp 5, gRPC 1.85.1 / protobuf 4.36.2, beans `ai*` ; reste valide en socle 5.10.x et 5.11.x |
 | 2.7.14 | 5.8.x – 5.9.x | 4.0.6 | dernière Boot 4.0 (commit `a357a95`) ; aucune différence fonctionnelle avec 2.8.0 / 2.9.0 |
 | 2.4.8 | 5.7.x | 3.2.1 | dernière Boot 3 — [[howto-ai-09-lignee-2-4-x-pour-les-apps-boot-3\|AI-09]] |

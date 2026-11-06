@@ -4,6 +4,14 @@
 > (procédure : README racine, « Resync d'une instance »). Ce fichier est auto-versionné par ses
 > entrées (pas de marqueur `KIT-VERSION`, cf. charte U-DOCS §3).
 
+## 1.16.1 — 2026-11-06
+
+**socle-pack-ai 2.9.1 (bipforge #248)** et **packs servis aux clients**.
+- `pack-ai` : les 4xx des fournisseurs ne sont plus rejouées (408/429 et 5xx le restent) ;
+  `CircuitOpenException` porte la cause du dernier échec. README, AI-01 et AI-02 (recette n° 5) à jour.
+- Les dix packs sont publiés sur GitHub Packages à chaque nouveau tag, et `maven.thesocle.net` sert la
+  dernière version de chacun (miroir automatique, cf. `soclehub/tools/socle-maven-mirror.sh`).
+
 ## 1.16.0 — 2026-10-28
 
 **Les huit packs reconstruits contre le socle 5.11.0, sur son nouveau parent Maven.** Lignée renommée
