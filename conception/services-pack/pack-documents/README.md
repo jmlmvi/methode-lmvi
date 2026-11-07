@@ -1,15 +1,14 @@
 # socle-pack-documents — les fichiers d'une app : antivirus avant garde, chiffrement au repos, quotas
 
-> **Version documentée : 0.2.0** — dépôt `jmlmvi/socle-pack-documents`, branche locale
-> `feat/analyse-sans-garder-0.2.0` (non poussée, non taguée au 2026-11-04 ; 0.1.0 = tag `v0.1.0`), jar vendorisé
-> dans `mvn-repo/eu/lmvi/socle-pack-documents/0.2.0/`. Vérifié au code le **2026-11-04**.
-> Coordonnées Maven : `eu.lmvi:socle-pack-documents:0.2.0` — Spring Boot 4.1.2, parent `eu.lmvi:socle-v005-parent`
+> **Version documentée : 0.3.0** — dépôt `jmlmvi/socle-pack-documents`, branche `feat/production-0.3.0`
+> (non publiée au 2026-11-06 ; 0.2.0 = `main`, tag `v0.2.0`). Vérifié au code le **2026-11-06**.
+> Coordonnées Maven : `eu.lmvi:socle-pack-documents:0.3.0` — Spring Boot 4.1.2, parent `eu.lmvi:socle-v005-parent`
 > 5.11.2, compilé contre `socle-v005` 5.11.2 en `provided` (minimum 5.10.0).
+> 0.3.0 : documents produits — modèle Word, PDF par OnlyOffice, PDF de secours (howto-03).
 >
-> 🔴 **Le stockage du Hub `.net` n'a pas de clé KMS** (constaté en lecture le 2026-11-04 :
-> `MINIO_KMS_SECRET_KEY_FILE=kms_master_key`, valeur par défaut de l'image, fichier absent). Le pack
-> exige le chiffrement au repos (M4 Q12) : sur ce Hub, tout dépôt est refusé
-> (`CHIFFREMENT_NON_GARANTI`) tant que la clé n'est pas posée. C'est un prérequis de plateforme.
+> ✅ **Clé KMS du stockage de `.net` posée le 2026-11-04** (copie Vault `secret/soclehub/system/minio-kms`) :
+> le chiffrement au repos exigé par le pack (M4 Q12) y est effectif. 🔴 **`.io` n'en a pas encore** :
+> tout dépôt y serait refusé (`CHIFFREMENT_NON_GARANTI`) tant qu'elle n'est pas posée.
 
 ## Le pack en cinq lignes
 
@@ -22,7 +21,8 @@
    action métier en MCP, aucune adresse présignée.
 4. Chaque appel sortant passe par un **`GatewayWorker`** du socle : délai et 5xx réessayés, 4xx
    échec immédiat.
-5. Il ne fait pas (encore) les documents produits : modèles Word, PDF par OnlyOffice, PDF de secours
+5. Depuis 0.3.0, il **produit les documents** : `ModeleWord` (modèle .docx rempli), `ProductionService`
+   (PDF par l'OnlyOffice du Hub, sinon PDF de secours `PdfSecours`) — howto-03
    viendront dans une version suivante du même pack (K-2 « documents », avant P-2).
 
 ## Ce que fait le pack, ce que fait le Hub

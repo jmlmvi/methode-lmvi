@@ -4,6 +4,17 @@
 > (procédure : README racine, « Resync d'une instance »). Ce fichier est auto-versionné par ses
 > entrées (pas de marqueur `KIT-VERSION`, cf. charte U-DOCS §3).
 
+## 1.16.4 — 2026-11-07
+
+**socle-pack-ai 2.10.0** (APP-36-TheBeneficiaire, K-3) : anonymisation d'un CV avant le LLM. Nouveau howto-ai-10 ;
+index et README du pack IA.
+
+## 1.16.3 — 2026-11-06
+
+**socle-pack-documents 0.3.0** (APP-36-TheBeneficiaire, K-2 « documents ») : modèle Word, PDF par
+OnlyOffice, PDF de secours. Nouveau howto-documents-03 ; README du pack (KMS de `.net` posée, `.io` non).
+Piège consigné : une URL S3 présignée est inutilisable pour l'OnlyOffice du Hub (JWT en en-tête → MinIO 400).
+
 ## 1.16.2 — 2026-11-06
 
 **socle-pack-referentiels 0.2.0** (APP-36-TheBeneficiaire, P-1, B5) : `competencesDuMetier(metierUri,

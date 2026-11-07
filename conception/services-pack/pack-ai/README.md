@@ -1,5 +1,8 @@
 # socle-pack-ai — HOWTOs par fonctionnalité
 
+> **2.10.0 en préparation** (branche `feat/anonymisation-2.10.0`, non publiée au 2026-11-07) : anonymisation d'un
+> CV avant le LLM — [`AI-10`](howto-ai-10-anonymiser-un-cv-avant-le-llm.md).
+>
 > **Version documentée :** `eu.lmvi:socle-pack-ai:2.9.1` — tag `v2.9.1` du dépôt
 > `/opt/2026-TheHub4TheSocle/socle-pack-ai`, branche `main`, commit `61d0e98` (2026-11-06,
 > « 2.9.1 — 4xx non rejouées, CircuitOpenException porte la cause », bipforge #248).

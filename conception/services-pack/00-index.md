@@ -41,7 +41,7 @@
 | [`pack-pipeline`](pack-pipeline/README.md) | moteur de pipelines DAG : runs, étapes humaines, DLQ, catalogue, NATS | **0.4.0** (0.3.0) | 0.2.0 | 0.1.0-SNAPSHOT | RssArchiver, BilanSocle, NotionSocle, REGIES, TheDiffuseur |
 | [`pack-tenant`](pack-tenant/README.md) | fiche société, marque, équipe et multi-tenant lus depuis l'IAM du Hub | **0.7.0** (0.6.0) | 0.5.0 | — | Your360, TheSociety, UniqPersonnality |
 | [`pack-referentiels`](pack-referentiels/README.md) | référentiels métiers ESCO et ROME 4.0 + correspondance : chargement versionné FR/EN, licences gardées, recherche à la frappe | **0.1.1** (0.1.0) | — | — | TheBeneficiaire (à venir, P-0) |
-| [`pack-documents`](pack-documents/README.md) | fichiers reçus par une app : S3 du Hub chiffré au repos, antivirus ClamAV avant garde, plafond et quota ; documents produits (Word, PDF) à venir | **0.2.0** (0.1.0) | — | — | TheBeneficiaire (à venir, P-0) |
+| [`pack-documents`](pack-documents/README.md) | fichiers reçus par une app : S3 du Hub chiffré au repos, antivirus ClamAV avant garde, plafond et quota ; documents produits : modèle Word, PDF par OnlyOffice, PDF de secours | **0.3.0** (0.2.0) | — | — | TheBeneficiaire (à venir, P-0) |
 
 Colonne « Socle 5.10-5.11 » : en gras, la version construite le 2026-10-28 contre le socle **5.11.0** sur le parent
 `eu.lmvi:socle-v005-parent` (minimum **5.10.0**, aucune API 5.11 utilisée) ; entre parenthèses, la version
@@ -66,6 +66,7 @@ Dépendances entre packs : `editorial` → `ai` + `com` ; `mail` → `ai`. Les a
 | [`AI-07`](pack-ai/howto-ai-07-lire-le-web-fetch-recherche-navigateur.md) | Lire le web : récupérer une page, un document, chercher, piloter un navigateur |
 | [`AI-08`](pack-ai/howto-ai-08-construire-un-agent-llm-gateway-et-sessions.md) | Construire un agent : passerelle LLM, boucle d'outils, sessions |
 | [`AI-09`](pack-ai/howto-ai-09-lignee-2-4-x-pour-les-apps-boot-3.md) | La lignée 2.4.x pour les apps restées en Spring Boot 3.2.1 |
+| [`AI-10`](pack-ai/howto-ai-10-anonymiser-un-cv-avant-le-llm.md) | Anonymiser un CV avant de le faire lire par un LLM : règles sans LLM, prénoms INSEE, liens personnels, fail-closed (2.10.0) |
 
 ### pack-com — notifier
 
@@ -101,6 +102,7 @@ Dépendances entre packs : `editorial` → `ai` + `com` ; `mail` → `ai`. Les a
 |---|---|
 | [`DOCUMENTS-01`](pack-documents/howto-documents-01-integrer-le-pack.md) | Intégrer socle-pack-documents : stockage chiffré, antivirus, plafond et quota, prérequis du Hub (clé KMS) |
 | [`DOCUMENTS-02`](pack-documents/howto-documents-02-deposer-lire-supprimer.md) | Déposer, lire, lister, voir l'occupation et supprimer un fichier depuis le code de l'app |
+| [`DOCUMENTS-03`](pack-documents/howto-documents-03-produire-word-pdf.md) | Produire un document : modèle Word rempli, PDF par OnlyOffice, PDF de secours ; route de rappel (0.3.0) |
 
 ### pack-editorial — la chaîne éditoriale
 
