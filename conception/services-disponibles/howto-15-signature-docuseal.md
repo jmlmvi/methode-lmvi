@@ -315,7 +315,7 @@ Variables `.env` correspondantes :
 
 ```bash
 DOCUSEAL_URL=http://soclehub-docuseal:3000
-DOCUSEAL_SECRET_KEY=a3f8c2e1b9d7654321fedcba0987654321abcdef0123456789abcdef01234567
+DOCUSEAL_SECRET_KEY=<cle-secrete-docuseal>
 SIGN_DOMAIN=docuseal.thesocle.net
 SIGN_BLOCKCHAIN=false
 ```
