@@ -76,7 +76,7 @@ docker ps | grep soclehub-docuseal
 
 # 2. Healthcheck depuis le Hub
 curl -s https://admin.thesocle.net/admin/workers/signature_worker/actions/get_status \
-  -H "Authorization: Bearer gateway-mcp-2026" | jq
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" | jq
 ```
 
 Réponse :
@@ -108,7 +108,7 @@ Lister les templates depuis le Hub :
 
 ```bash
 curl -s -X POST https://admin.thesocle.net/admin/workers/signature_worker/actions/signature_templates \
-  -H "Authorization: Bearer gateway-mcp-2026" | jq '.templates'
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" | jq '.templates'
 ```
 
 ---
@@ -126,7 +126,7 @@ SUBMITTERS=$(jq -n '[
 ]')
 
 curl -s -X POST https://admin.thesocle.net/admin/workers/signature_worker/actions/signature_create \
-  -H "Authorization: Bearer gateway-mcp-2026" \
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" \
   -H "Content-Type: application/json" \
   -d "{
     \"template_id\": \"$TEMPLATE_ID\",
@@ -163,19 +163,19 @@ Le worker (`SignatureWorker.handleSignatureCreate`) :
 ```bash
 # Toutes les soumissions
 curl -s -X POST https://admin.thesocle.net/admin/workers/signature_worker/actions/signature_list \
-  -H "Authorization: Bearer gateway-mcp-2026" \
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" \
   -H "Content-Type: application/json" \
   -d '{}' | jq '.submissions | length, .submissions[0]'
 
 # Filtrer par statut
 curl -s -X POST https://admin.thesocle.net/admin/workers/signature_worker/actions/signature_list \
-  -H "Authorization: Bearer gateway-mcp-2026" \
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" \
   -H "Content-Type: application/json" \
   -d '{"status_filter":"pending"}' | jq
 
 # Détails d'une soumission précise
 curl -s -X POST https://admin.thesocle.net/admin/workers/signature_worker/actions/signature_get \
-  -H "Authorization: Bearer gateway-mcp-2026" \
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" \
   -H "Content-Type: application/json" \
   -d '{"id":"1827463"}' | jq
 ```
@@ -195,7 +195,7 @@ Une fois `status = completed`, télécharger le PDF signé :
 
 ```bash
 RESP=$(curl -s -X POST https://admin.thesocle.net/admin/workers/signature_worker/actions/signature_download \
-  -H "Authorization: Bearer gateway-mcp-2026" \
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" \
   -H "Content-Type: application/json" \
   -d '{"id":"1827463"}')
 
@@ -219,7 +219,7 @@ L'URL retournée pointe vers `${DOCUSEAL_URL}/api/submissions/{id}/documents`. S
 ```bash
 # Vérification d'intégrité
 curl -s -X POST https://admin.thesocle.net/admin/workers/signature_worker/actions/signature_verify \
-  -H "Authorization: Bearer gateway-mcp-2026" \
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" \
   -H "Content-Type: application/json" \
   -d '{"id":"1827463"}' | jq
 ```
@@ -244,7 +244,7 @@ echo "SHA-256 = $SHA256"
 
 # Demander un timestamp TSA via le tsa_worker (le paramètre est hash_hex, SHA-256 attendu)
 curl -s -X POST https://admin.thesocle.net/admin/workers/tsa_worker/actions/tsa_timestamp \
-  -H "Authorization: Bearer gateway-mcp-2026" \
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" \
   -H "Content-Type: application/json" \
   -d "{\"hash_hex\":\"$SHA256\"}" | jq
 ```
@@ -270,7 +270,7 @@ Si `blockchain_anchor: true` est activé dans `SocleHubProperties.signature`, le
 
 ```bash
 curl -s -X POST https://admin.thesocle.net/admin/workers/signature_worker/actions/signature_stats \
-  -H "Authorization: Bearer gateway-mcp-2026" | jq
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" | jq
 ```
 
 Réponse :
@@ -329,16 +329,16 @@ SIGN_BLOCKCHAIN=false
 ```bash
 # 1. SignatureWorker reachable
 curl -s https://admin.thesocle.net/admin/workers/signature_worker/stats \
-  -H "Authorization: Bearer gateway-mcp-2026" | jq '.state, .reachable'
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" | jq '.state, .reachable'
 # Attendu : "running", true
 
 # 2. TsaWorker
 curl -s -X POST https://admin.thesocle.net/admin/workers/tsa_worker/actions/tsa_providers \
-  -H "Authorization: Bearer gateway-mcp-2026" | jq
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" | jq
 
 # 3. Bucket d'archive (via storage_worker — réf [[45-storage-worker]])
 curl -s -X POST https://admin.thesocle.net/admin/workers/storage_worker/actions/storage_browse \
-  -H "Authorization: Bearer gateway-mcp-2026" \
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" \
   -H "Content-Type: application/json" \
   -d '{"bucket":"signatures-archive","prefix":""}' | jq '.count'
 ```

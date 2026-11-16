@@ -83,7 +83,7 @@ docker exec soclehub curl -s http://soclehub-onlyoffice/healthcheck
 
 # 3. Healthcheck via le worker
 curl -s https://admin.thesocle.net/admin/workers/onlyoffice_worker/actions/test_health \
-  -H "Authorization: Bearer gateway-mcp-2026" | jq
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" | jq
 ```
 
 Réponse attendue :
@@ -299,7 +299,7 @@ KEY="test/$(date +%s)-validation.docx"
 # 1. Uploader un .docx de test dans MinIO via storage_worker
 DOCX_BASE64=$(base64 -w0 /tmp/test.docx)
 curl -s -X POST https://$DOMAIN/admin/workers/storage_worker/actions/storage_upload \
-  -H "Authorization: Bearer gateway-mcp-2026" \
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" \
   -H "Content-Type: application/json" \
   -d "{\"bucket\":\"$BUCKET\",\"key\":\"$KEY\",\"content_base64\":\"$DOCX_BASE64\",\"content_type\":\"application/vnd.openxmlformats-officedocument.wordprocessingml.document\"}"
 

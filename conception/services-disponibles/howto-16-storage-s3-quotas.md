@@ -73,7 +73,7 @@ L'authentification passe par `MCP_API_KEY` ou JWT IAM avec scope `storage:admin`
 
 ```bash
 curl -s -X POST https://admin.thesocle.net/admin/workers/storage_worker/actions/get_status \
-  -H "Authorization: Bearer gateway-mcp-2026" | jq
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" | jq
 ```
 
 Réponse :
@@ -111,7 +111,7 @@ Réponse :
 
 ```bash
 curl -s -X POST https://admin.thesocle.net/admin/workers/storage_worker/actions/storage_stats \
-  -H "Authorization: Bearer gateway-mcp-2026" | jq
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" | jq
 ```
 
 Réponse :
@@ -141,13 +141,13 @@ Réponse :
 ```bash
 # Racine du bucket user-files
 curl -s -X POST https://admin.thesocle.net/admin/workers/storage_worker/actions/storage_browse \
-  -H "Authorization: Bearer gateway-mcp-2026" \
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" \
   -H "Content-Type: application/json" \
   -d '{"bucket":"user-files"}' | jq
 
 # Sous-dossier d'un user
 curl -s -X POST https://admin.thesocle.net/admin/workers/storage_worker/actions/storage_browse \
-  -H "Authorization: Bearer gateway-mcp-2026" \
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" \
   -H "Content-Type: application/json" \
   -d '{"bucket":"user-files","prefix":"jmh/documents/"}' | jq
 ```
@@ -181,7 +181,7 @@ Le `displayName` est extrait du dernier segment du `key` — utile pour rendre u
 CONTENT=$(base64 -w0 /tmp/rapport.pdf)
 
 curl -s -X POST https://admin.thesocle.net/admin/workers/storage_worker/actions/storage_upload \
-  -H "Authorization: Bearer gateway-mcp-2026" \
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" \
   -H "Content-Type: application/json" \
   -d "{
     \"bucket\": \"user-files\",
@@ -212,7 +212,7 @@ Réponse :
 
 ```bash
 curl -s -X POST https://admin.thesocle.net/admin/workers/storage_worker/actions/storage_download_url \
-  -H "Authorization: Bearer gateway-mcp-2026" \
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" \
   -H "Content-Type: application/json" \
   -d '{"bucket":"user-files","key":"jmh/documents/rapport-2026-Q1.pdf"}' | jq
 ```
@@ -239,7 +239,7 @@ Réponse :
 
 ```bash
 curl -s -X POST https://admin.thesocle.net/admin/workers/storage_worker/actions/storage_delete \
-  -H "Authorization: Bearer gateway-mcp-2026" \
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" \
   -H "Content-Type: application/json" \
   -d '{"bucket":"user-files","key":"jmh/documents/old.pdf"}' | jq
 ```
@@ -267,7 +267,7 @@ ON CONFLICT (user_id) DO UPDATE SET max_bytes = EXCLUDED.max_bytes, updated_at =
 ```bash
 # Limiter user "jmh" à 10 GB
 curl -s -X POST https://admin.thesocle.net/admin/workers/storage_worker/actions/storage_set_quota \
-  -H "Authorization: Bearer gateway-mcp-2026" \
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" \
   -H "Content-Type: application/json" \
   -d '{"user_id":"jmh","max_bytes":"10737418240"}' | jq
 ```
@@ -292,7 +292,7 @@ Réponse :
 ```bash
 # Lister tous les partages actifs
 curl -s -X POST https://admin.thesocle.net/admin/workers/storage_worker/actions/storage_list_shares \
-  -H "Authorization: Bearer gateway-mcp-2026" | jq
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" | jq
 ```
 
 Réponse :
@@ -330,7 +330,7 @@ Plusieurs lignes par folder si plusieurs membres (LEFT JOIN sur `shared_members`
 ```bash
 # Révoquer alice du dossier f1a2b3c4-...
 curl -s -X POST https://admin.thesocle.net/admin/workers/storage_worker/actions/storage_revoke_share \
-  -H "Authorization: Bearer gateway-mcp-2026" \
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" \
   -H "Content-Type: application/json" \
   -d '{"folder_id":"f1a2b3c4-...","user_id":"alice"}' | jq
 ```
@@ -352,7 +352,7 @@ Convention : tout objet `user-files/{userId}/.trash/...` est considéré comme c
 ```bash
 # Purger la corbeille du user "jmh"
 curl -s -X POST https://admin.thesocle.net/admin/workers/storage_worker/actions/storage_purge_trash \
-  -H "Authorization: Bearer gateway-mcp-2026" \
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" \
   -H "Content-Type: application/json" \
   -d '{"user_id":"jmh"}' | jq
 ```
@@ -384,7 +384,7 @@ Réponse :
 ```bash
 #!/bin/bash
 set -e
-TOKEN="gateway-mcp-2026"
+TOKEN="<cle-mcp-de-la-plateforme>"
 BASE="https://admin.thesocle.net/admin/workers/storage_worker/actions"
 
 echo "=== 1. Stats avant ==="

@@ -84,7 +84,7 @@ Vérifier l'agrégation après démarrage :
 
 ```bash
 curl -s -X POST https://admin.thesocle.net/mcp \
-  -H "Authorization: Bearer gateway-mcp-2026" \
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" \
   -H "Content-Type: application/json" \
   -d '{
         "jsonrpc": "2.0",
@@ -130,10 +130,10 @@ Le `MCP_API_KEY` est défini dans `docker/.env` et passé au container Hub via `
 ```bash
 MCP_ENABLED=true
 MCP_MODE=http
-MCP_API_KEY=gateway-mcp-2026
+MCP_API_KEY=<cle-mcp-de-la-plateforme>
 ```
 
-Un `Authorization: Bearer gateway-mcp-2026` suffit pour passer le filtre. `OidcMcpAuthFilter.doFilterInternal()` détecte l'égalité avec `staticApiKey` et laisse passer la requête sans réécriture.
+Un `Authorization: Bearer <cle-mcp-de-la-plateforme>` suffit pour passer le filtre. `OidcMcpAuthFilter.doFilterInternal()` détecte l'égalité avec `staticApiKey` et laisse passer la requête sans réécriture.
 
 ### Mode B — JWT OIDC (Claude.ai sur le web, ChatGPT plugin entreprise)
 
@@ -145,7 +145,7 @@ Validation manuelle d'un JWT :
 # 1. Obtenir un access token via login
 TOKEN=$(curl -s -X POST https://admin.thesocle.net/api/v1/iam/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"jmh@lmvi.eu","password":"THlmvi0330!"}' \
+  -d '{"email":"jmh@lmvi.eu","password":"<mot-de-passe>"}' \
   | jq -r '.access_token')
 
 # 2. Utiliser le JWT comme Bearer sur /mcp
@@ -172,7 +172,7 @@ Dans `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) o
         "mcp-remote",
         "https://admin.thesocle.net/mcp",
         "--header",
-        "Authorization: Bearer gateway-mcp-2026"
+        "Authorization: Bearer <cle-mcp-de-la-plateforme>"
       ]
     }
   }
@@ -196,7 +196,7 @@ Claude Code utilise des MCP servers déclarés dans `~/.claude/settings.json` ou
       "type": "http",
       "url": "https://admin.thesocle.net/mcp",
       "headers": {
-        "Authorization": "Bearer gateway-mcp-2026"
+        "Authorization": "Bearer <cle-mcp-de-la-plateforme>"
       }
     }
   }
@@ -226,7 +226,7 @@ Settings → Cline → MCP Servers → Add :
     "url": "https://admin.thesocle.net/mcp",
     "transport": "http",
     "headers": {
-      "Authorization": "Bearer gateway-mcp-2026"
+      "Authorization": "Bearer <cle-mcp-de-la-plateforme>"
     }
   }
 }
@@ -241,7 +241,7 @@ Settings → Cline → MCP Servers → Add :
   "mcpServers": {
     "soclehub": {
       "url": "https://admin.thesocle.net/mcp",
-      "headers": { "Authorization": "Bearer gateway-mcp-2026" }
+      "headers": { "Authorization": "Bearer <cle-mcp-de-la-plateforme>" }
     }
   }
 }
@@ -260,11 +260,11 @@ Quand vous installez une nouvelle app via le portail Hub ou via `docker_worker__
 ```bash
 # Solution 1 : appel direct via l'API REST admin du Hub
 curl -X POST https://admin.thesocle.net/admin/workers/mcp_proxy_worker/actions/mcp_proxy_refresh \
-  -H "Authorization: Bearer gateway-mcp-2026"
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>"
 
 # Solution 2 : appel via le protocole MCP (recommandé depuis un agent IA)
 curl -s -X POST https://admin.thesocle.net/mcp \
-  -H "Authorization: Bearer gateway-mcp-2026" \
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" \
   -H "Content-Type: application/json" \
   -d '{
         "jsonrpc": "2.0",
@@ -288,7 +288,7 @@ Réponse attendue :
 
 ```bash
 curl -s https://admin.thesocle.net/admin/workers/mcp_proxy_worker/stats \
-  -H "Authorization: Bearer gateway-mcp-2026" | jq
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" | jq
 ```
 
 Réponse attendue :
@@ -310,7 +310,7 @@ Réponse attendue :
 
 ```bash
 curl -s -X POST https://admin.thesocle.net/mcp \
-  -H "Authorization: Bearer gateway-mcp-2026" \
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","method":"tools/list","id":1}' \
   | jq '.result.tools[] | .name' | head -20
@@ -320,7 +320,7 @@ curl -s -X POST https://admin.thesocle.net/mcp \
 
 ```bash
 curl -s -X POST https://admin.thesocle.net/mcp \
-  -H "Authorization: Bearer gateway-mcp-2026" \
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" \
   -H "Content-Type: application/json" \
   -d '{
         "jsonrpc": "2.0",
@@ -388,7 +388,7 @@ curl -s https://admin.thesocle.net/hub/mcpagger/refresh
 
 ```bash
 curl -s -X POST https://admin.thesocle.net/mcp \
-  -H "Authorization: Bearer gateway-mcp-2026" \
+  -H "Authorization: Bearer <cle-mcp-de-la-plateforme>" \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","method":"tools/call",
        "params":{"name":"mcpagger_aggregator_worker__list_all_specs","arguments":{}},"id":1}' \

@@ -42,9 +42,14 @@ RÈGLES DE PILOTAGE :
    Profil client : PV de recette proposé à chaque gate, piliers conformité/run appliqués.
    À chaque arrêt : un RÉSUMÉ COURT + la décision attendue, pas un déballage de fichiers.
 
-3. RELECTURES M1/M4/M6 : par un relecteur DIFFÉRENT EN NATURE — par défaut tu pilotes
-   opencode (autre modèle, installé sur la box) :
-     opencode run "Tu es relecteur adversarial. Lis <fichiers>. <consigne de relecture USAGE §2>"
+3. RELECTURES M1/M4/M6 : par un relecteur DIFFÉRENT EN NATURE — par défaut le service de
+   relecture OpenCode (MiniMax-M3) du Hub, par MCP :
+     mcp_proxy_invoke minihub-ovh-vps-4abf5b5e/opencode-01__relire
+       {"agent":"relecteur-spec" (M1/M4) | "relecteur-adversarial" (M6),
+        "consigne":"<consigne de relecture USAGE §2>", "fichiers":{"<chemin>":"<texte>"}}
+     puis minihub-ovh-vps-4abf5b5e/opencode-01__job_wait {"job_id":"<job_id>"}, à rappeler
+     tant que state=running, jusqu'à state=done.
+   Repli : opencode run "Tu es relecteur adversarial. Lis <fichiers>. <consigne>" s'il est installé.
    Tu archives sa sortie brute dans tracking/relectures/ (preuve), tu corriges ce qui doit
    l'être, et tu me montres défauts trouvés/corrigés avec le livrable. Si opencode est
    indisponible : dis-le-moi, on choisit un autre relecteur — jamais de relecture par toi-même
