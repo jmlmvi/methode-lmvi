@@ -38,7 +38,7 @@
 | [`pack-editorial`](pack-editorial/README.md) | RSS → curation LLM → validation humaine → newsletter (ai + comm) | **2.2.0** (2.1.0) | 2.0.0 | 1.0.0-SNAPSHOT | RssArchiver |
 | [`pack-egress`](pack-egress/README.md) | faire sortir les appels HTTPS de l'app par un miniMiniHub du Hub | **3.1.0** (3.0.0) — protobuf 4 | 2.0.0 | 1.0.0 | KEW, RssArchiver |
 | [`pack-mail`](pack-mail/README.md) | boîte de chaque utilisateur (IMAP, Gmail, Outlook), envoi, boîte applicative, lien d'activation (ai) | **1.6.0** (1.5.0) | 1.4.0 | — | aucune déclarée (TheIdeaBox s'y prépare) |
-| [`pack-pipeline`](pack-pipeline/README.md) | moteur de pipelines DAG : runs, étapes humaines, DLQ, catalogue, NATS | **0.4.0** (0.3.0) | 0.2.0 | 0.1.0-SNAPSHOT | RssArchiver, BilanSocle, NotionSocle, REGIES, TheDiffuseur |
+| [`pack-pipeline`](pack-pipeline/README.md) | moteur de pipelines DAG : runs, étapes humaines, DLQ, catalogue, NATS ; déclencheurs (événement, webhook, cron) à file dédiée, `http`, `mcp_action`, credentials masqués | **0.5.0** (0.4.0) — branche `feat/0.5.0`, non commitée au 2026-11-12 | 0.2.0 | 0.1.0-SNAPSHOT | RssArchiver, BilanSocle, NotionSocle, REGIES, TheDiffuseur |
 | [`pack-tenant`](pack-tenant/README.md) | fiche société, marque, équipe et multi-tenant lus depuis l'IAM du Hub | **0.7.0** (0.6.0) | 0.5.0 | — | Your360, TheSociety, UniqPersonnality |
 | [`pack-referentiels`](pack-referentiels/README.md) | référentiels métiers ESCO et ROME 4.0 + correspondance : chargement versionné FR/EN, licences gardées, recherche à la frappe | **0.1.1** (0.1.0) | — | — | TheBeneficiaire (à venir, P-0) |
 | [`pack-documents`](pack-documents/README.md) | fichiers reçus par une app : S3 du Hub chiffré au repos, antivirus ClamAV avant garde, plafond et quota ; documents produits : modèle Word, PDF par OnlyOffice, PDF de secours | **0.3.0** (0.2.0) | — | — | TheBeneficiaire (à venir, P-0) |
@@ -149,6 +149,8 @@ Dépendances entre packs : `editorial` → `ai` + `com` ; `mail` → `ai`. Les a
 | [`PIPELINE-07`](pack-pipeline/howto-pipeline-07-observer-lineage-et-metriques.md) | Observer un run : lineage, métriques, artefacts |
 | [`PIPELINE-08`](pack-pipeline/howto-pipeline-08-catalogue-fork-et-sous-pipelines.md) | Catalogue, fork et sous-pipelines (étape Composite) |
 | [`PIPELINE-09`](pack-pipeline/howto-pipeline-09-backend-nats-jetstream.md) | Faire transiter les étapes par NATS JetStream |
+| [`PIPELINE-10`](pack-pipeline/howto-pipeline-10-credentials-http-et-actions.md) | Credentials, appels HTTP et actions MCP depuis une étape ; expressions `{{ $json }}` / `{{ $etape("id") }}` (0.5.0) |
+| [`PIPELINE-11`](pack-pipeline/howto-pipeline-11-declencheurs-et-file-dediee.md) | Déclencher un pipeline : événement, webhook, planning, file dédiée par pipeline (0.5.0) |
 
 ### pack-referentiels — les référentiels métiers dans l'app
 

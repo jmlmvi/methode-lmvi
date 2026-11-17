@@ -2,7 +2,7 @@
 
 **Niveau :** Confirmé
 **Cible :** application qui embarque `socle-pack-pipeline` ([[howto-pipeline-01-integrer-le-pack|PIPELINE-01]] fait)
-**Versions vérifiées au code :** `socle-pack-pipeline` 0.4.0 @ `2e477c2` (tag `v0.4.0`, `main` ; code identique à 0.3.0 @ `fef144d` ; code fonctionnel identique à 0.2.0 et à 0.1.0-SNAPSHOT @ `5fa8f05`) · `socle-v005` 5.11.0 (minimum 5.10.0) / Spring Boot 4.1.2 · date 2026-10-28
+**Versions vérifiées au code :** `socle-pack-pipeline` **0.5.0**, branche `feat/0.5.0`, non commitée au 2026-11-12 (règle V7, expressions, `list_handlers.descriptors`) · 0.4.0 @ `2e477c2` (tag `v0.4.0`) pour le reste, inchangé · `socle-v005` 5.11.0 (minimum 5.10.0) / Spring Boot 4.1.2 · date 2026-11-12
 **Temps estimé :** 30 min
 
 > Classes de référence : `model/TypePipeline`, `StageDef`, `EdgeDef`, `GuardDef`, `StageConfigDef`,
@@ -36,7 +36,7 @@ publié au démarrage par `eu.lmvi.pipeline.PipelineDefinitionRunner`.
    JSON du DAG                         PipelineWorker
  ┌──────────────┐   validate   ┌──────────────────────────┐
  │ code, label  │ ───────────► │ PipelineJson.parse        │
- │ executionMode│              │ DagValidator  V1…V6       │──► { valid, errors[], warnings[] }
+ │ executionMode│              │ DagValidator  V1…V7       │──► { valid, errors[], warnings[] }
  │ stages[]     │   define     │   └ GuardEvaluator        │
  │ edges[]      │ ───────────► │ PipelineRepository        │──► db_pipeline_type (draft)
  │ guards[]     │   publish    │   insertType/publishType  │──► status = published
@@ -121,8 +121,13 @@ T et E ne diffèrent que par l'intention : le moteur les traite de la même faç
 (`FAIL_ON_UNKNOWN_PROPERTIES=false`).
 
 **Étape (`StageDef`)** : `id` (unique), `type` (`S|T|E|G|K|H|C`, casse libre), `handler` (nom d'un
-`StageHandler` enregistré), `label`, `params` (objet libre transmis au handler), `contractIn`,
+`StageHandler` enregistré), `label`, `params` (objet transmis au handler), `contractIn`,
 `contractOut` (noms de contrat), `config`.
+
+Depuis 0.5.0, toute chaîne de `params`, à toute profondeur, peut porter des **expressions** résolues juste
+avant l'étape : `{{ $json.a.b }}`, `{{ $etape("id").x }}` (alias `$step`), `{{ $meta.x }}`, `{{ $run.key }}`
+(`pipeline`, `tenant`, `owner`, `eventId`). Détail et exemples :
+[[howto-pipeline-10-credentials-http-et-actions|PIPELINE-10]] §7.
 
 **Réglages d'exécution (`StageConfigDef` → `StageConfig` du framework V2)** :
 
@@ -183,6 +188,22 @@ dans les données :
 | `V4` | `contractOut` amont = `contractIn` aval | erreur si différents, avertissement si l'amont n'en déclare pas |
 | `V5` | gardes décidables et existantes ; un Gate a ≥ 1 arête gardée et ≤ 1 branche par défaut | erreur ; avertissement si Gate sans défaut, ou garde sur un non-Gate |
 | `V6` | `timeoutMs > 0`, `maxRetries ≥ 0`, `concurrency ≥ 1` | erreur ; avertissement si `config` absent (hors S) |
+| `V7` (0.5.0) | `handler` renseigné = handler **enregistré** ; paramètres `required` de son descripteur présents (non vides) ; toute expression `{{ … }}` a une racine connue (`$json`, `$etape("id")`/`$step`, `$meta`, `$run.`) ; `$etape("id")` désigne une étape **en amont** ; avec un `credential`, son code est écrit en dur et, pour `http`, le schéma et l'hôte de `url` aussi | erreur |
+
+V7 s'appuie sur le registre des handlers : les handlers de l'app doivent être des beans du contexte au
+moment du `validate` / `define` (c'est le cas dès le démarrage). Une étape sans `handler` (handler par défaut
+du type) n'est pas contrôlée par V7.
+
+Messages V7 (extraits du code) :
+
+```text
+stage 'h' : handler inconnu 'nexiste-pas'
+stage 'h' (http) : paramètre requis 'url' absent
+stage 't1' : {{ $etape("t2").y }} désigne 't2', qui n'est pas en amont
+stage 't1' : expression à racine inconnue {{ System.exit(0) }} (racines admises: $json, $etape("id"), $meta, $run)
+stage 'appel' : le credential doit être écrit dans le DAG, pas calculé par une expression
+stage 'appel' : avec un credential, le schéma et l'hôte de 'url' doivent être écrits dans le DAG
+```
 
 ---
 
@@ -312,7 +333,7 @@ Pipeline Studio React (`frontend/lib/pipeline-studio/`, `@xyflow/react`).
 |---|---|---|
 | `graph_view` | `graph` (inline) **ou** `type_id` **ou** `code` | `{nodes[], edges[]}` au format React Flow, disposition en couches topologiques (240 px × 120 px), arêtes issues d'un Gate animées |
 | `get_graph` | `type_id` ou `code` | le JSON source éditable + `type_id`, `code`, `label`, `status`, `version_label` |
-| `list_handlers` | — | `{handlers:[…]}` triés : la palette disponible |
+| `list_handlers` | — | `{handlers:[…], descriptors:[…]}` triés : la palette ; depuis 0.5.0, un descripteur par handler (`label`, `category`, `icon`, `description`, `stageTypes`, `paramsSchema`, `credentialTypes`) pour dessiner nœud et formulaire |
 | `list_types` | — | tous les templates, avec `category` lue au catalogue |
 
 Chaque nœud projeté porte `type: "pipelineStage"` et `data: {label, stageType, handler}`.
@@ -350,6 +371,9 @@ Attendu : `8`.
 | 6 | Redémarrer l'app sans changer le JSON | aucune nouvelle ligne `db_pipeline_type` |
 | 7 | Changer un `timeoutMs` dans le JSON, redémarrer | nouvelle version `app-xxxxxxxx`, publiée |
 | 8 | `instantiate` sur un draft | échec `template '…' non publié (status=draft)` |
+| 9 | (0.5.0) `validate` avec `"handler": "nexiste-pas"` | erreur `V7 … handler inconnu` |
+| 10 | (0.5.0) `validate` d'une étape `http` sans `url` | erreur `V7 … paramètre requis 'url' absent` |
+| 11 | (0.5.0) `{{ $etape("t2").y }}` dans `t1`, `t2` en aval de `t1` | erreur `V7 … n'est pas en amont` |
 
 ---
 
@@ -362,7 +386,10 @@ Attendu : `8`.
 | `code` désigne la dernière ligne, pas la dernière publiée | après un `define` d'essai, `instantiate code=…` échoue `non publié` | instancier et publier par `type_id`, ou publier chaque version définie |
 | `define` répété avec le même `version_label` | lignes en double : l'index unique est neutralisé par `x_partition` NULL (V002 n'a corrigé que les runs) | tester l'existence avant `define` (§5) |
 | Plusieurs étapes S | seule la **première** S déclarée reçoit les messages ; les autres n'en reçoivent jamais | une seule Source par DAG, ou des sous-pipelines |
-| Champ `triggers` / `phases` / `execution_mode` dans le JSON | ignoré sans erreur | la clé est `executionMode` ; `triggers` et `phases` ne sont pas modélisés |
+| Champ `triggers` / `phases` / `execution_mode` dans le JSON | ignoré sans erreur | la clé est `executionMode` ; `phases` n'est pas modélisé ; les déclencheurs (0.5.0) vivent **hors du DAG**, créés par `trigger_create` ([[howto-pipeline-11-declencheurs-et-file-dediee\|PIPELINE-11]]) |
+| (0.5.0) `{{ $run.foo }}` | V7 l'accepte (tout `$run.*`), l'exécution le refuse : `$run admet key, pipeline, tenant, owner, eventId` | s'en tenir aux cinq clés |
+| (0.5.0) Studio `lmvi-ui` ou Pipeline Studio d'une app | il ne lit pas encore `descriptors` : formulaires et palette ne reflètent pas les paramètres requis | se fier à `validate` (V7) ; alignement du studio prévu en 0.6.0 |
+| (0.5.0) DAG de 0.4.0 qui citait un handler absent | se validait, échouait à `instantiate` ; refusé désormais à `define` (V7) | enregistrer le handler, ou corriger le nom |
 | `contractIn` pris pour un JSON Schema | aucune vérification de structure à l'exécution | lister les champs requis dans `params.requiredIn` |
 | Garde posée sur une arête d'un T/E/K | avertissement V5, garde ignorée : l'arête est toujours empruntée | gardes uniquement en sortie de G |
 | `value` numérique écrite en nombre JSON (`"value": 70`) | accepté par Jackson (converti en `"70"`) | écrire `"70"` pour rester explicite |

@@ -12,6 +12,7 @@
 ```
 methode-AgileIA/
 ├── ESSENTIEL.md              ← LIRE EN PREMIER : la philosophie en 1 page (preuve externe, 3 axes)
+├── COMPRENDRE.md             ← le guide expliqué : organisation, relectures adversariales, tests, E2E, gates, changements
 ├── USAGE.md                  ← puis le mode d'emploi (pas-à-pas + prompts + PILOTE)
 ├── CONTRAT-ARCHITECTURE.md   ← les règles plateforme héritées par toute app (jamais redécidées)
 ├── CHANGELOG.md              ← versions du kit (cadence : 1 version = 1 RETEX de chantier réel)

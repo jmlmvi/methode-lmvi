@@ -4,6 +4,32 @@
 > (procédure : README racine, « Resync d'une instance »). Ce fichier est auto-versionné par ses
 > entrées (pas de marqueur `KIT-VERSION`, cf. charte U-DOCS §3).
 
+## 1.17.0 — 2026-11-17
+
+**`COMPRENDRE.md`, le guide expliqué de la méthode.** Entre `ESSENTIEL.md` (la philosophie) et
+`METHODE-Besoin2Plan.md` (la référence) : l'organisation du chantier (rôles, six arrêts, arborescence),
+la confrontation adversariale (relecteurs hors-famille par maillon, gravités P0/P1/P2, contre-vérification,
+contre-relecture, contrôle avant go), la naissance et la génération des tests (CA, RG, `@neg`, Gherkin,
+étiquettes), les trois niveaux (unitaire, acceptation JUnit 5 + Testcontainers sur le banc, E2E Playwright
+local puis recette), ce qu'est un test E2E et pourquoi une US d'écran en exige un, le passage d'une gate
+pas à pas, et la façon dont la méthode encaisse les changements (révisions, kit figé, RETEX, resync).
+Illustré par APP-36 TheBeneficiaire (gate P-3). Renvois ajoutés dans `README.md` et `ESSENTIEL.md`.
+
+## 1.16.6 — 2026-11-12
+
+**socle-pack-pipeline 0.5.0** (toujours non commité) : howto-pipeline-11 §9 complété — `list_runs` filtrable
+(`status`, `pipeline_code`, avec `error_message`) et nouvelle action `run_attempts` pour bâtir un écran d'erreurs ;
+`run_status` / `lineage` ne montrent que la dernière tentative d'une clé (piège consigné).
+
+## 1.16.5 — 2026-11-12
+
+**socle-pack-pipeline 0.5.0** (branche `feat/0.5.0`, non commitée ; `socle-pack-pipeline#1`, au service de `soclehub#60`) :
+pipelines déclenchés à la manière de n8n. Nouveaux howto-pipeline-10 (credentials, `http`, `mcp_action`, expressions) et
+howto-pipeline-11 (déclencheurs, file dédiée par pipeline, DLQ, anti-boucle, webhook, planning) ; PIPELINE-01, 02 (V7),
+03 (descripteur, `ctx.credentials()`, `ctx.call()`), 09 (files `PIPE_trig_…`), README et index à jour. Pièges consignés :
+run déclenché en pas-à-pas (retries par étape sans effet), dédoublonnage par `eventId` quel que soit l'état, SPI
+remplacées qui perdent la garde SSRF ou le refus de `pipeline_worker`, nœud `code` reporté en 0.6.0.
+
 ## 1.16.4 — 2026-11-07
 
 **socle-pack-ai 2.10.0** (APP-36-TheBeneficiaire, K-3) : anonymisation d'un CV avant le LLM. Nouveau howto-ai-10 ;

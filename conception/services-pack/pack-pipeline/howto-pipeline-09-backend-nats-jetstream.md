@@ -2,7 +2,7 @@
 
 **Niveau :** Expert
 **Cible :** application qui embarque `socle-pack-pipeline` et joint un serveur NATS JetStream
-**Versions vérifiées au code :** `socle-pack-pipeline` 0.4.0 @ `2e477c2` (tag `v0.4.0`, `main` ; code identique à 0.3.0 @ `fef144d` ; code fonctionnel identique à 0.2.0 et à 0.1.0-SNAPSHOT @ `5fa8f05`) · `socle-v005` 5.11.0 (minimum 5.10.0) / Spring Boot 4.1.2 · `io.nats:jnats` 2.19.1 · date 2026-10-28
+**Versions vérifiées au code :** `socle-pack-pipeline` **0.5.0**, branche `feat/0.5.0`, non commitée au 2026-11-12 (files dédiées des déclencheurs, §8 bis) · 0.4.0 @ `2e477c2` (tag `v0.4.0`) pour le reste, inchangé · `socle-v005` 5.11.0 (minimum 5.10.0) / Spring Boot 4.1.2 · `io.nats:jnats` 2.19.1 · date 2026-11-12
 **Temps estimé :** 30 min
 
 > Classe de référence : `engine/NatsStageQueue` (implémente `eu.lmvi.socle.pipeline.queue.StageQueue` du framework)
@@ -21,9 +21,10 @@ Ce backend est un **transport interne** au pipeline d'une app. Il crée ses prop
 conventions de nommage du socle NATS du Hub (`<DOMAIN>_<CHANNEL>`) et hors de sa gouvernance. Pour faire
 circuler des messages **entre applications**, la voie reste le socle NATS du Hub (HOWTO 37/38).
 
-État au 2026-10-28 : implémentation complète et testée contre un JetStream réel
-(`NatsPipelineIntegrationTest`, 3 tests, image `nats:2.10-alpine`) ; **aucune app de la flotte ne
-l'utilise** en production.
+État au 2026-11-12 : implémentation complète et testée contre un JetStream réel
+(`NatsPipelineIntegrationTest`, et en 0.5.0 `Pipeline050IntegrationTest` pour les files dédiées, image
+`nats:2.10-alpine`) ; **aucune app de la flotte ne l'utilise** en production. La 0.5.0 en fait le backend
+cible des **files dédiées des déclencheurs** (décision D1, §8 bis) ; le Hub (`soclehub#60`) s'y prépare.
 
 ---
 
@@ -197,12 +198,55 @@ Côté app, `run_status.stages.<id>.pending` lit `numPending` du consumer durabl
 | Bail de 2 min fixe | un handler plus long voit son message relivré pendant qu'il travaille (puis jeté par la dédup) | `timeoutMs` < 2 min ; le bail n'est pas réglable par étape (`leaseOverride` ignoré) |
 | Run en mode `step` sur `nats` | un échec d'étape fait `nack(requeue=false)` → `term()` : le message est **abandonné**, absent de la DLQ | `batch` sur `nats` (l'échec passe par `sendToDlq` de V2) |
 | Confondre avec le socle NATS du Hub | streams hors convention, aucune DLQ `.dlq`, pas de `Nats-Msg-Id` | HOWTO 37/38 pour les échanges entre apps |
+| (0.5.0) Codes de pipeline qui ne diffèrent que par `-` et `_` | **corrigé en 0.5.0** : condensat ajouté au nom de file dès que le code contient un caractère hors `[A-Za-z0-9_]` | — |
+| (0.5.0) Supprimer à la main un stream `PIPE_trig_*` | événements en attente perdus ; la file se recrée vide au prochain tir | ne nettoyer que les streams `PIPE_q_*` des runs clos (§4) |
 | Contexte V2 attendu en persistance | `InMemoryPipelineContext` : l'état d'exécution V2 est perdu au redémarrage, seules les files survivent | le métier se relit en base (`tr_pipeline_*`) |
+
+---
+
+## 8 bis. Les files dédiées des déclencheurs (0.5.0)
+
+Avec `queue-backend=nats`, chaque pipeline déclenché a **sa** file JetStream, créée par la même
+`NatsStageQueue` que les étapes ([[howto-pipeline-11-declencheurs-et-file-dediee|PIPELINE-11]]) :
+
+```
+ file  trig.<tenant|_>.<code>          tenant et code : hors [A-Za-z0-9_] → « _ » + condensat de 8 caractères
+   ├ stream PIPE_<q'>        sujet  trig.<tenant|_>.<code>
+   ├ stream PIPE_<q'>_DLQ    sujet  DLQ_<q'>
+   └ consumer durable C_<q'> bail = trigger.run-timeout-seconds + 30 s (30 s au moins)
+   UNE connexion NATS partagée par toutes les files dédiées (TriggerDispatcher), fermée à l'arrêt
+```
+
+Exemple vérifié au test : pipeline `salon-echo`, tenant `null` → sujet `trig._.salon-echo`, stream
+`PIPE_trig___salon_echo`.
+
+Ce qui diffère des files d'étapes :
+
+- **Une file par pipeline, pas par run** : ses streams vivent aussi longtemps que le pipeline déclenché. Le
+  run d'un événement, lui, tourne en pas-à-pas avec des files **en mémoire** : il ne crée aucun stream
+  `PIPE_q_*`.
+- **La DLQ marche** : la file est consommée par un `VThreadStageExecutor` (mode batch), un échec après
+  `trigger.max-retries` passe par `sendToDlq`. `trigger_retry` rejoue (`replayAllFromDlq`).
+- **Reprise** : au démarrage, `pipeline_worker` rouvre les files des pipelines qui ont un déclencheur actif ;
+  les messages non acquittés reviennent après le bail.
+
+```bash
+# Depuis le Hub : les files dédiées
+curl -s -H "X-Api-Key: $HUB_KEY" -H "Content-Type: application/json" \
+  -X POST https://admin.thesocle.net/api/actions/nats_worker/list_streams -d '{}' \
+ | jq -r '.. | strings | select(startswith("PIPE_trig_"))'
+```
 
 ---
 
 ## 9. Pour aller plus loin
 
 - [[howto-pipeline-04-executer-un-run|PIPELINE-04]] §6 — comparer les trois backends
+- [[howto-pipeline-11-declencheurs-et-file-dediee|PIPELINE-11]] — déclencheurs et files dédiées (0.5.0)
 - [[howto-23-nats-streams|HOWTO 23]] — administrer les streams du serveur NATS du Hub
 - `socle-pack-pipeline/src/test/java/eu/lmvi/socle/pack/pipeline/NatsPipelineIntegrationTest.java`
+
+> **0.5.0 — rétention.** Le stream principal d'une file est créé en rétention `WorkQueue` : un message acquitté ou
+> abandonné en est retiré. La DLQ reste en rétention par limites, bornée à 30 jours. JetStream refuse de changer la
+> rétention d'un stream existant : un stream créé par 0.4.0 garde la sienne (avertissement au démarrage) ; le
+> supprimer une fois vide pour qu'il soit recréé.

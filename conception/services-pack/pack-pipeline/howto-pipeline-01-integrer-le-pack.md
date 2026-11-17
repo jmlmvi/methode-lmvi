@@ -2,7 +2,7 @@
 
 **Niveau :** Confirmé
 **Cible :** application V005 **Spring Boot 4.1.2** (socle ≥ 5.10.0) avec un PostgreSQL applicatif — une app en Boot 4.0.6 (socle 5.8.4 → 5.9.x) prend `0.2.0`, une app restée en Boot 3.2.1 (socle ≤ 5.8.0) prend `0.1.0-SNAPSHOT`, cf. §4
-**Versions vérifiées au code :** `socle-pack-pipeline` **0.4.0**, `main` @ `2e477c2` (tag `v0.4.0` ; code identique à 0.3.0 @ `fef144d`) · compilé contre `socle-v005` 5.11.0 (minimum 5.10.0), parent `eu.lmvi:socle-v005-parent` 5.11.0 / Spring Boot 4.1.2 · 15 tests verts, 0 sauté · date 2026-10-28
+**Versions vérifiées au code :** `socle-pack-pipeline` **0.5.0**, branche `feat/0.5.0`, non commitée au 2026-11-12 (0.4.0 : `main` @ `2e477c2`, tag `v0.4.0`) · compilé contre `socle-v005` 5.11.0 (minimum 5.10.0), parent `eu.lmvi:socle-v005-parent` 5.11.0 / Spring Boot 4.1.2 · 33 tests verts · date 2026-11-12
 **Temps estimé :** 30 min
 
 > Vue d'ensemble du pack : [[README|socle-pack-pipeline]]
@@ -26,7 +26,7 @@ Avant d'intégrer quoi que ce soit, il faut savoir lequel des trois mécanismes 
 | Persistance métier | — | état technique en TechDB H2 | runs, étapes, lineage, métriques **en PostgreSQL** |
 | Validation humaine | — | — | étape **H** + `human_resolve` |
 | Modifiable sans recompiler | oui (YAML) | non | **oui** : `define` → `publish` à chaud |
-| Pilotage | Java | Java | 24 actions MCP/REST + Java |
+| Pilotage | Java | Java | 35 actions MCP/REST + Java (24 jusqu'en 0.4.0) |
 
 **Règle de choix :**
 
@@ -34,6 +34,9 @@ Avant d'intégrer quoi que ce soit, il faut savoir lequel des trois mécanismes 
   `PipelineV2OrchestratorWorker` ou `PipelineEngineWorker` dans `templates/workers/`). Rien à ajouter.
 - Un graphe avec des **branches** selon le contenu, une étape **humaine**, un **historique** des runs à
   consulter, ou un pipeline qu'on veut **modifier sans redéployer** → **le pack**.
+- Un pipeline qui doit **partir tout seul** (événement de l'app, webhook, cron), appeler une adresse HTTP
+  ou une action MCP avec un secret → **le pack 0.5.0** ([[howto-pipeline-11-declencheurs-et-file-dediee|PIPELINE-11]],
+  [[howto-pipeline-10-credentials-http-et-actions|PIPELINE-10]]).
 - Le pack ne remplace pas V2, il s'appuie dessus. Ses étapes héritent de la concurrence, du timeout et de
   la DLQ de V2. Les réglages s'écrivent dans le JSON, au bloc `config` de chaque étape.
 
@@ -52,12 +55,17 @@ Cas de référence : **APP-12-RssArchiver**, dont toute la curation éditoriale 
 │                                   │     pipelineWorker.executeAction │
 │                                   ▼              │                   │
 │  ┌─────────────── socle-pack-pipeline ───────────┼─────────────────┐ │
-│  │ PipelineWorker (PASSIVE, 24 actions) ◄────────┘    /mcp, REST   │ │
-│  │   ├ DagValidator (V1–V6)                                        │ │
+│  │ PipelineWorker (PASSIVE, 35 actions) ◄────────┘    /mcp, REST   │ │
+│  │   ├ DagValidator (V1–V7)                                        │ │
 │  │   ├ PipelineRuntimeManager ── runs actifs (mémoire)             │ │
 │  │   │     └ DagPipelineBuilder ── 1 queue + 1 executor par étape  │ │
 │  │   ├ StageHandlerRegistry ── built-ins + vos handlers            │ │
 │  │   ├ PipelineRepository (JdbcTemplate)                           │ │
+│  │   ├ (0.5.0) CredentialService + SPI CredentialResolver          │ │
+│  │   ├ (0.5.0) PipelineTriggerService → TriggerDispatcher          │ │
+│  │   │     └ 1 file dédiée trig.<tenant>.<code> par pipeline       │ │
+│  │   ├ (0.5.0) PipelineScheduleWorker (POLLING, échéances cron)    │ │
+│  │   ├ (0.5.0) PipelineWebhookController (si webhook-enabled)      │ │
 │  │   └ PackMigrationRunner ("pipelinePackMigrationRunner")         │ │
 │  └───────────┬──────────────────────────────┬──────────────────────┘ │
 │              │ exécution (framework V2)     │ métier + lineage       │
@@ -85,10 +93,10 @@ Le pack n'est publié sur **aucun** dépôt distant. Il vit dans le `~/.m2` de l
 
 ```bash
 cd /opt/2026-TheHub4TheSocle/socle-pack-pipeline
-git checkout v0.4.0                   # Boot 4.1.2 / socle 5.10-5.11 — Boot 4.0.6 : v0.2.0 — Boot 3 : feat/p1-p4-dag-engine (0.1.0-SNAPSHOT)
+git checkout feat/0.5.0               # 0.5.0 : pas encore de tag au 2026-11-12 — 0.4.0 : v0.4.0 — Boot 4.0.6 : v0.2.0 — Boot 3 : feat/p1-p4-dag-engine
 mvn -q clean install -DskipTests      # compile aussi les tests : ils doivent compiler
 
-V=0.4.0
+V=0.5.0
 APP=/opt/2026-TheHub4TheSocle/APP-XX-MonApp/monapp
 D=$APP/mvn-repo/eu/lmvi/socle-pack-pipeline/$V
 mkdir -p "$D"
@@ -144,7 +152,7 @@ autre version que `${socle.version}`.
     <dependency>
         <groupId>eu.lmvi</groupId>
         <artifactId>socle-pack-pipeline</artifactId>
-        <version>0.4.0</version>   <!-- 0.3.0 : même code, mais disruptor 3.4.4 ; app Boot 4.0.6 : 0.2.0 ; app Boot 3.2.1 : 0.1.0-SNAPSHOT -->
+        <version>0.5.0</version>   <!-- déclencheurs, http/mcp_action, credentials ; 0.4.0 sans eux ; app Boot 4.0.6 : 0.2.0 ; app Boot 3.2.1 : 0.1.0-SNAPSHOT -->
     </dependency>
 
     <!-- Jackson 2 : le pack l'emploie (provided), comme le socle. Le parent Boot 4.1.2 en gère la version
@@ -174,7 +182,8 @@ autre version que `${socle.version}`.
 
 | Version du pack | Parent Spring Boot de l'app | socle-v005 de l'app |
 |---|---|---|
-| **0.4.0** | **4.1.2** (parent `socle-v005-parent` 5.11.0) | ≥ 5.10.0 (construit contre 5.11.0) |
+| **0.5.0** | **4.1.2** (parent `socle-v005-parent` 5.11.0) | ≥ 5.10.0 (construit contre 5.11.0) |
+| 0.4.0 | 4.1.2 (parent `socle-v005-parent` 5.11.0) | ≥ 5.10.0 (construit contre 5.11.0) |
 | 0.3.0 | 4.1.2 | ≥ 5.10.0 |
 | 0.2.0 (dernière Boot 4.0.6) | 4.0.6 | 5.8.4 → 5.9.x |
 | 0.1.0-SNAPSHOT (dernière Boot 3) | 3.2.1 | 5.7.4 → 5.8.0 |
@@ -184,7 +193,8 @@ l'assure : un pack bâti sur un autre Boot compile, puis casse à l'exécution. 
 `0.1.0-SNAPSHOT` garde `<snapshots><enabled>true</enabled></snapshots>` sur son dépôt `project-local`.
 
 **Jackson** : Boot 4 sérialise les requêtes et réponses HTTP en Jackson 3 (`tools.jackson.*`). Le pack, lui,
-reste en Jackson 2 (`com.fasterxml`) et n'expose aucun contrôleur. Si l'app rend dans **son** contrôleur un
+reste en Jackson 2 (`com.fasterxml`). Son seul contrôleur (0.5.0, désactivé par défaut) est
+`POST /pipeline/webhook/{jeton}`, qui lit son corps en texte et l'analyse en Jackson 2. Si l'app rend dans **son** contrôleur un
 `JsonNode` venu du pack (`graph`, `payload`, `lineage`…), le convertir d'abord en `Map`/`List`
 (`PipelineJson.mapper().convertValue(n, Object.class)`) ; un `com.fasterxml…JsonNode` en `@RequestBody`
 échoue (500) — lire le corps en `String` puis `PipelineJson.mapper().readTree(...)`.
@@ -228,13 +238,29 @@ spring:
 
 socle:
   pipeline:
-    # OBLIGATOIRE : le défaut est `public`. Sans cette ligne, les 6 tables et le registre de
+    # OBLIGATOIRE : le défaut est `public`. Sans cette ligne, les 9 tables (0.5.0) et le registre de
     # migrations du pack atterrissent dans le schéma partagé de la base.
     schema: ${PIPELINE_SCHEMA:schema_monapp}
     # techdb (défaut) | memory | nats — cf. HOWTO PIPELINE-04 §6 pour le choix
     queue-backend: ${PIPELINE_QUEUE_BACKEND:memory}
     # seulement si queue-backend=nats
     nats-url: ${PIPELINE_NATS_URL:nats://soclehub-nats:4222}
+    # 0.5.0 — clé AES-256 (base64, 32 octets) des credentials ; vide = credential_set refusé
+    credentials:
+      key: ${SOCLE_PIPELINE_CREDENTIALS_KEY:}
+    http:                          # handler http : garde SSRF du client par défaut
+      allow-private: false
+      allowed-hosts: []            # vide = tout hôte public ; ".exemple.fr" admet les sous-domaines
+      timeout-ms: 15000
+      max-response-bytes: 2000000
+    trigger:                       # déclencheurs et files dédiées
+      enabled: true
+      max-depth: 5
+      concurrency: 2
+      max-retries: 0
+      run-timeout-seconds: 300
+      schedule-interval-ms: 30000
+      webhook-enabled: false       # true expose POST /pipeline/webhook/{jeton}
 ```
 
 Classe liée : `eu.lmvi.socle.pack.pipeline.config.PipelineProperties`. Les variables
@@ -249,7 +275,10 @@ dans le même bloc.
 |---|---|---|
 | `socle.pipeline.schema` | `public` | schéma PostgreSQL des tables du pack et de son registre `z_pack_migrations` |
 | `socle.pipeline.queue-backend` | `techdb` | où vivent les files d'attente entre étapes |
-| `socle.pipeline.nats-url` | `nats://localhost:4222` | serveur JetStream, si `nats` |
+| `socle.pipeline.nats-url` | `nats://localhost:4222` | serveur JetStream, si `nats` ; en 0.5.0 aussi les files dédiées des déclencheurs |
+| `socle.pipeline.credentials.key` | *(vide)* | clé du résolveur de credentials par défaut ([[howto-pipeline-10-credentials-http-et-actions\|PIPELINE-10]]) |
+| `socle.pipeline.http.*` | cf. ci-dessus | handler `http` ([[howto-pipeline-10-credentials-http-et-actions\|PIPELINE-10]] §5.1) |
+| `socle.pipeline.trigger.*` | cf. ci-dessus | déclencheurs ([[howto-pipeline-11-declencheurs-et-file-dediee\|PIPELINE-11]] §3) |
 
 ---
 
@@ -275,6 +304,11 @@ dans le même bloc.
 | `validation.DagValidator` | `pipelinePackDagValidator` |
 | `service.ConfigReloadService` | `pipelinePackConfigReloadService` |
 | `service.PackMigrationRunner` | `pipelinePackMigrationRunner` (inchangé) |
+| (0.5.0) `engine.handlers.HttpHandler` / `McpActionHandler` | `pipelinePackHttpHandler` / `pipelinePackMcpActionHandler` |
+| (0.5.0) `credential.CredentialService` / `CredentialRepository` / `DbCredentialResolver` | `pipelinePackCredentialService` / `pipelinePackCredentialRepository` / `pipelinePackDbCredentialResolver` |
+| (0.5.0) `spi.JdkPipelineHttpClient` / `LocalActionInvoker` | `pipelinePackJdkHttpClient` / `pipelinePackLocalActionInvoker` |
+| (0.5.0) `trigger.PipelineTriggerService` / `TriggerDispatcher` / `TriggerRepository` | `pipelinePackTriggerService` / `pipelinePackTriggerDispatcher` / `pipelinePackTriggerRepository` |
+| (0.5.0) `trigger.PipelineScheduleWorker` | `pipelinePackScheduleWorker` (nom MOP `pipeline_schedule_worker`) |
 
 Les deux `PipelineProperties` coexistent : types distincts, l'injection **par type** n'est pas ambiguë, et
 chacune lit ses propres clés du bloc `socle.pipeline`. Le test `PackContexteSocleTest` du pack le prouve sur
@@ -308,6 +342,7 @@ Au démarrage, `PackMigrationRunner` (bean `pipelinePackMigrationRunner`, `@Post
 | `V000__init.sql` | schéma, fonctions `fn_touch_datechanged()` et `fn_x_partition_default()` locales au schéma |
 | `V001__core.sql` | `db_pipeline_type`, `tr_pipeline_run`, `tr_pipeline_stage_run`, `tr_pipeline_artifact`, `tr_pipeline_metric`, `db_pipeline_catalogue` + triggers |
 | `V002__run_key_unique.sql` | *(branche)* clôt les runs en double puis pose `uq_tr_pipeline_run_runkey_vivant … NULLS NOT DISTINCT` |
+| `V003__credentials_triggers.sql` | (0.5.0) `db_pipeline_credential`, `tr_pipeline_trigger`, `tr_pipeline_trigger_event` + triggers ; `tr_pipeline_run.run_key` porté à 400 caractères (`<code>:<eventId>`) |
 
 Sur le Hub, le schéma s'obtient par `db_worker.create_app_schema` à l'installation. Le rôle applicatif
 doit **posséder** le schéma (ou y avoir `CREATE`) : les scripts créent séquences, tables, fonctions et
@@ -321,7 +356,10 @@ ne démarre pas.
 ## 8. Étape 6 — Premier appel depuis le code
 
 `PipelineWorker` est un bean ordinaire : on l'injecte et on appelle `executeAction`. C'est la voie
-retenue par RssArchiver et BilanSocle. Le `ActionContext` peut être `null` : le worker ne le lit pas.
+retenue par RssArchiver et BilanSocle. Le `ActionContext` peut être `null`. Depuis 0.5.0, le worker en lit le
+tenant (`tenantId()`) et l'auteur (`callerId()`) : `instantiate` les inscrit dans le run (credentials du
+tenant, `{{ $run.tenant }}`, contexte des appels sortants), et les actions `credential_*` / `trigger_*`
+travaillent dans ce tenant. `null` = tenant `null`.
 
 ```java
 package eu.lmvi.monapp.pipeline;
@@ -369,14 +407,18 @@ public class PipelineSmokeCheck implements ApplicationRunner {
 **Au démarrage, dans les journaux :**
 
 ```
-[worker:pack-migration] Found 3 DDL scripts for pack socle-pack-pipeline (schéma schema_monapp)
+[worker:pack-migration] Found 4 DDL scripts for pack socle-pack-pipeline (schéma schema_monapp)
 [worker:pack-migration] all migrations applied successfully
-[pipeline] StageHandlerRegistry initialisé — 6 handlers: [identity, set-field, merge-fields, log, collect, composite]
+[pipeline] StageHandlerRegistry initialisé — 8 handlers: [identity, set-field, merge-fields, log, collect, composite, http, mcp_action]
+[pipeline] credentials : résolveur actif 'db-aes-gcm' (écriture possible)
 [worker:pipeline_worker] initialized
+[worker:pipeline_schedule_worker] initialized
+[pipeline-trigger] 0 file(s) dédiée(s) ouverte(s) — backend memory
 ```
 
-Six handlers sans aucun handler d'app : les cinq built-ins plus `composite`, déclaré en bean. L'ordre de
-la liste varie d'un démarrage à l'autre (table de hachage).
+Huit handlers sans aucun handler d'app (0.5.0) : les cinq built-ins plus `composite`, `http` et `mcp_action`,
+déclarés en beans (six jusqu'en 0.4.0). L'ordre de la liste varie d'un démarrage à l'autre (table de hachage).
+Sans clé de credentials, la deuxième ligne dit `écriture impossible — credentials en base indisponibles : …`.
 
 **En base :**
 
@@ -390,7 +432,7 @@ SELECT c.relname FROM pg_catalog.pg_class c
  WHERE n.nspname = 'schema_monapp' AND c.relname LIKE '%pipeline%' AND c.relkind = 'r';
 ```
 
-Attendu : `V000`, `V001`, `V002` ; 6 tables. La requête passe par `pg_catalog` : `information_schema`
+Attendu : `V000` à `V003` ; 9 tables (6 jusqu'en 0.4.0). La requête passe par `pg_catalog` : `information_schema`
 ne montre que les objets sur lesquels le rôle a des droits et peut rendre un faux « absent ».
 
 **Par MCP, sur l'app :**
@@ -404,7 +446,7 @@ curl -s https://monapp.thesocle.net/mcp \
        "params":{"name":"pipeline_worker__list_handlers","arguments":{}}}'
 ```
 
-La donnée est une **chaîne JSON** dans `result.content[0].text` : `{"handlers":["collect","composite",…]}`.
+La donnée est une **chaîne JSON** dans `result.content[0].text` : `{"handlers":["collect","composite",…],"descriptors":[…]}`.
 
 ---
 
@@ -412,12 +454,13 @@ La donnée est une **chaîne JSON** dans `result.content[0].text` : `{"handlers"
 
 | # | Test | Attendu |
 |---|---|---|
-| 1 | Démarrer l'app sur une base vierge | 6 tables + `z_pack_migrations` dans `socle.pipeline.schema`, rien dans `public` |
+| 1 | Démarrer l'app sur une base vierge | 9 tables + `z_pack_migrations` dans `socle.pipeline.schema`, rien dans `public` |
 | 2 | Redémarrer | `skip … (already applied)` en DEBUG, aucune ré-exécution |
-| 3 | Socle ≥ 5.8.6, pack ≥ 0.2.0, **sans** générateur de noms dans l'app | démarrage normal, `pipeline_worker` visible sur `/dashboard` |
+| 3 | Socle ≥ 5.8.6, pack ≥ 0.2.0, **sans** générateur de noms dans l'app | démarrage normal, `pipeline_worker` (et en 0.5.0 `pipeline_schedule_worker`) visibles sur `/dashboard` |
 | 4 | Dans le contexte : `getBeanNamesForType(eu.lmvi.socle.pack.pipeline.config.PipelineProperties)` | `[pipelinePackProperties]` ; `pipelineProperties` reste celui du socle |
-| 5 | `list_handlers` | contient vos handlers en plus des 6 built-ins |
-| 6 | Deux apps avec le pack sur la même base, schémas distincts | chacune a ses 6 tables et son registre |
+| 5 | `list_handlers` | contient vos handlers en plus des 8 du pack (0.5.0) |
+| 6 | Deux apps avec le pack sur la même base, schémas distincts | chacune a ses 9 tables et son registre |
+| 7 | (0.5.0) `credential_types` | `resolver: db-aes-gcm`, `writable: true` si la clé est posée |
 
 ---
 
@@ -427,7 +470,7 @@ La donnée est une **chaîne JSON** dans `result.content[0].text` : `{"handlers"
 |---|---|---|
 | Socle ≥ 5.8.6 + pack **0.1.0-SNAPSHOT** (app Boot 4 pas encore montée) | l'app ne démarre pas : deux beans `pipelineProperties` | passer au pack **0.2.0** (§6) ; à défaut, le générateur `NomsDesPacks` de TheDiffuseur 1.7.0 |
 | Pack 0.2.0 dans une app **Boot 3.2.1** | compile, puis `NoSuchMethodError`/`ClassNotFoundException` Spring à l'exécution | une app Boot 3 reste en `0.1.0-SNAPSHOT` |
-| Pack 0.4.0 / 0.3.0 dans une app Boot 4.0.6 (socle ≤ 5.9.x), ou 0.2.0 dans une app socle 5.10.x-5.11.x | Boot du pack ≠ Boot de l'app : risque d'erreur Spring à l'exécution | aligner : socle 5.10-5.11 / Boot 4.1.2 → 0.4.0 ; socle 5.8.4–5.9.x / Boot 4.0.6 → 0.2.0 |
+| Pack 0.4.0 / 0.3.0 dans une app Boot 4.0.6 (socle ≤ 5.9.x), ou 0.2.0 dans une app socle 5.10.x-5.11.x | Boot du pack ≠ Boot de l'app : risque d'erreur Spring à l'exécution | aligner : socle 5.10-5.11 / Boot 4.1.2 → 0.5.0 (ou 0.4.0) ; socle 5.8.4–5.9.x / Boot 4.0.6 → 0.2.0 |
 | App sur pack **≤ 0.3.0** | `disruptor` 3.4.4 dans l'app au lieu de la 4.0.0 du socle (`mvn dependency:tree`) ; Log4j2 du socle attend la 4.x | prendre **0.4.0**, ou déclarer `com.lmax:disruptor:4.0.0` dans l'app |
 | App en socle 5.10.x-5.11.x qui déclare encore `com.squareup.okhttp3:okhttp` 4.x | deux copies de `okhttp3.*` sur le classpath | passer à `okhttp-jvm` 5.5.1 (celui du socle) ou ne rien déclarer |
 | `JsonNode` du pack rendu tel quel par un contrôleur de l'app (Boot 4) | JSON mal écrit ou 500 (Jackson 3 côté HTTP) | convertir en `Map`/`List` avant de rendre (§4) |
@@ -438,6 +481,9 @@ La donnée est une **chaîne JSON** dans `result.content[0].text` : `{"handlers"
 | Dépôt vendorisé sans `<snapshots>` (app restée en 0.1.0-SNAPSHOT) | `Could not find artifact …0.1.0-SNAPSHOT` | activer les snapshots sur le dépôt `project-local` ; 0.2.0, 0.3.0 et 0.4.0 sont des releases |
 | `mvn install -DskipTests` du pack après avoir modifié le constructeur de `PipelineWorker` | échec de compilation des tests | `-DskipTests` compile les tests ; mettre à jour les `new PipelineWorker(...)` des tests |
 | `queue-backend` laissé à `techdb` | `object is already closed` sous charge (RssArchiver, BilanSocle, NotionSocle) | `memory`, cf. [[howto-pipeline-04-executer-un-run\|PIPELINE-04]] §6 |
+| (0.5.0) `SOCLE_PIPELINE_CREDENTIALS_KEY` absente | l'app démarre ; `credential_set` échoue `aucune clé de chiffrement` | poser la clé (32 octets base64), ou un bean `CredentialResolver` de l'app |
+| (0.5.0) `trigger.webhook-enabled=true` derrière une authentification de l'app ou du Hub | les appels entrants reçoivent 401/302 | laisser passer `/pipeline/webhook/**` sans authentification, et rien d'autre ([[howto-pipeline-11-declencheurs-et-file-dediee\|PIPELINE-11]] §7) |
+| (0.5.0) Déclencheurs avec `queue-backend` à `memory` | événements en file perdus au redémarrage | `nats` en production (décision D1) |
 | **`jnats` absent** (quel que soit le backend) | `NoClassDefFoundError: io/nats/client/Connection` au démarrage, à la création de `DagPipelineBuilder` | ajouter `io.nats:jnats:2.19.1` (scope `runtime` suffit) |
 | Déclarer une `<configuration>` sur `maven-enforcer-plugin` dans le pom de l'app (liste `bannedDependencies/excludes`, `combine.self="override"`, `<skip>true</skip>`) | aucun message : la liste redéclarée **remplace** celle du parent, ou la règle est coupée — les bornes de `socle-versions-testees` disparaissent | Ne jamais configurer le plugin dans l'app. Une règle de plus = une autre `<execution>` avec son propre `<id>` |
 | Redéclarer `h2.version`, `jedis.version`, `kafka.version`, `mysql.version` ou `mariadb.version` sous la version du socle dans une app au parent `socle-v005-parent` | build en échec à `validate` (règle `socle-versions-testees`) | Voulu : retirer la surcharge, la version vient du parent |
@@ -449,5 +495,7 @@ La donnée est une **chaîne JSON** dans `result.content[0].text` : `{"handlers"
 
 - [[howto-pipeline-02-declarer-valider-publier-un-dag|PIPELINE-02]] — écrire et publier son premier DAG
 - [[howto-pipeline-03-ecrire-un-stage-handler|PIPELINE-03]] — brancher sa logique métier
+- [[howto-pipeline-10-credentials-http-et-actions|PIPELINE-10]] — credentials, `http`, `mcp_action` (0.5.0)
+- [[howto-pipeline-11-declencheurs-et-file-dediee|PIPELINE-11]] — déclencheurs et file dédiée (0.5.0)
 - [[howto-28-integrer-un-socle-pack-dans-une-app|HOWTO 28]] — intégration générique d'un pack
 - `docs-socleV005/01-docsV2/institutional/71-pipeline-v2.md` — le moteur V2 sur lequel le pack s'appuie

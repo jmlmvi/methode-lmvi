@@ -46,6 +46,7 @@ prouve par un test, on fait, on prouve, on n'instrumente pas.
 
 ---
 
-*La suite, dans l'ordre : [`USAGE.md`](USAGE.md) (comment démarrer) →
+*La suite, dans l'ordre : [`COMPRENDRE.md`](COMPRENDRE.md) (la méthode expliquée, exemples
+réels à l'appui) → [`USAGE.md`](USAGE.md) (comment démarrer) →
 [`conception/PROFILS.md`](conception/PROFILS.md) (quel niveau d'outillage) →
 [`conception/METHODE-Besoin2Plan.md`](conception/METHODE-Besoin2Plan.md) (la référence).*
